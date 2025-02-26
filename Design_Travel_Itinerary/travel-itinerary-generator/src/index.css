@@ -1,13 +1,160 @@
-body {
-  margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+/* Page Container */
+.page-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  padding: 2rem;
+  background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
+  overflow-x: hidden;
 }
 
-code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
-    monospace;
+/* Glassmorphism Effect */
+.glass-card {
+  background: rgba(255, 255, 255, 0.75);
+  backdrop-filter: blur(15px);
+  border-radius: 20px;
+  padding: 3rem;
+  max-width: 700px;
+  width: 100%;
+  box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.glass-card:hover {
+  transform: translateY(-10px);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+}
+
+/* Form Styles */
+.form-grid {
+  display: grid;
+  gap: 1.5rem;
+}
+
+.form-label {
+  font-weight: 600;
+  color: #134e4a;
+  margin-bottom: 0.5rem;
+  display: block;
+}
+
+.form-input {
+  border: 2px solid #14b8a6;
+  padding: 12px;
+  border-radius: 8px;
+  width: 100%;
+  box-shadow: 0 5px 10px rgba(20, 184, 166, 0.1);
+  transition: border-color 0.3s, box-shadow 0.3s;
+}
+
+.form-input:focus {
+  border-color: #0f766e;
+  outline: none;
+  box-shadow: 0 5px 15px rgba(15, 118, 110, 0.2);
+}
+
+/* Button Styles */
+.form-button {
+  background-color: #0f766e;
+  color: white;
+  padding: 15px;
+  border: none;
+  border-radius: 12px;
+  font-weight: bold;
+  font-size: 1.2rem;
+  cursor: pointer;
+  transition: background-color 0.3s, transform 0.2s, box-shadow 0.2s;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  box-shadow: 0 8px 15px rgba(0, 118, 110, 0.2);
+}
+
+.form-button:hover {
+  background-color: #0e5e59;
+  transform: translateY(-5px);
+  box-shadow: 0 12px 25px rgba(0, 118, 110, 0.3);
+}
+
+/* Page Title */
+.page-title {
+  font-size: 3.5rem;
+  font-weight: bold;
+  color: #134e4a;
+  margin-bottom: 2rem;
+  text-align: center;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+
+/* Background Animation */
+body {
+  background-color: #f0f4f8;
+  margin: 0;
+  padding: 0;
+  font-family: 'Arial', sans-serif;
+  overflow-x: hidden;
+}
+
+/* Input and Button Styles */
+input[type="text"],
+select {
+  border: 2px solid #14b8a6;
+  padding: 12px;
+  border-radius: 8px;
+  width: 100%;
+  margin-top: 8px;
+  box-shadow: 0 5px 10px rgba(20, 184, 166, 0.1);
+  transition: border-color 0.3s, box-shadow 0.3s;
+}
+
+input:focus,
+select:focus {
+  border-color: #0f766e;
+  outline: none;
+  box-shadow: 0 5px 15px rgba(15, 118, 110, 0.2);
+}
+
+button {
+  background-color: #0f766e;
+  color: white;
+  padding: 12px;
+  border: none;
+  border-radius: 10px;
+  font-weight: bold;
+  font-size: 1.1rem;
+  cursor: pointer;
+  transition: background-color 0.3s, transform 0.2s;
+}
+
+button:hover {
+  background-color: #115e59;
+  transform: translateY(-5px);
+}
+
+/* Headings */
+h2 {
+  font-size: 4rem;
+  font-weight: bold;
+  color: #134e4a;
+  margin-bottom: 1.5rem;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Form Layout */
+form {
+  display: grid;
+  gap: 1.5rem;
+}
+
+/* Utility Classes */
+.text-center {
+  text-align: center;
+}
+
+.mt-8 {
+  margin-top: 2rem;
 }
