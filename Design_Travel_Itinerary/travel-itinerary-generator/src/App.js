@@ -1,15 +1,18 @@
 // src/App.js
 import React from 'react';
-import TravelItineraryGenerator from './TravelItineraryGenerator.js';
-
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import TravelItineraryGenerator from './TravelItineraryGenerator';
+import VisualizationItinerary from './VisualizationItinerary';
 
 const App = () => {
     return (
-        <div>
-            <TravelItineraryGenerator />
-        </div>
+        <Router>
+            <Routes>
+                <Route path="/" element={<TravelItineraryGenerator />} />
+                <Route path="/visualization" element={<VisualizationItinerary />} />
+            </Routes>
+        </Router>
     );
 };
 
 export default App;
-

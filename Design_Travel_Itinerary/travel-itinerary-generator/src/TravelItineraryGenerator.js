@@ -1,4 +1,7 @@
+// src/TravelItineraryGenerator.js
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { FaPlaneDeparture, FaWalking, FaCar, FaBiking, FaBusAlt, FaTrain, FaShuttleVan,} from 'react-icons/fa';
 
 
@@ -9,11 +12,13 @@ const TravelItineraryGenerator = () => {
         destinations: [],
         activities: [],
         cuisines: [],
-        foodPreferences: [],
+        foodPreferences: '',
         transportationMode: [],
         maxDistance: '',
         numberOfDays: '',
     });
+
+    const navigate = useNavigate(); 
 
     const handleChange = (e) => {
         const { name, value, type, checked } = e.target;
@@ -32,34 +37,33 @@ const TravelItineraryGenerator = () => {
     const handleSubmit = (e) => {
         e.preventDefault();
         console.log('Form Data:', formData);
+        navigate('/visualization', { state: { formData } });
     };
 
     return (
         <div className="page-container" style={{backgroundImage: 'url(https://i0.wp.com/www.tourbooking.lk/wp-content/uploads/2023/03/merlin_148552275_74c0d250-949c-46e0-b8a1-e6d499e992cf-superJumbo-edited.jpg?fit=2048%2C1151&ssl=1)'}}>
+            <nav>
+                <div className="nav-links">
+                    <Link to="/features">Features</Link>
+                    <Link to="/privacy">Privacy</Link>
+                    <Link to="/help-center">Help Center</Link>
+                    <Link to="/blog">Blog</Link>
+                    <Link to="/for-business">For Business</Link>
+                    <Link to="/login">Log in</Link>
+                    <Link to="/create-account">Get Started</Link>
+                </div>
+            </nav>
+
             <div className="glass-card">
                 <h2 className="page-title">Heal to Nature : Craft your Dream</h2>
                 <form onSubmit={handleSubmit} className="form-grid">
 
-                <div className="col-span-2">
+                    <div className="col-span-2">
                         <label className="form-label">Itinerary Name:</label>
                         <input
                             type="text"
                             name="name"
-                            placeholder="Enter your itinerary  name"
-                            value={formData.name}
-                            onChange={handleChange}
-                            className="w-full p-3 border-2 border-green-500 rounded-md focus:border-green-700 focus:outline-none shadow-sm"
-                            required
-                        />
-                    </div>
-                    <br></br>
-
-                    <div className="col-span-2">
-                        <label className="form-label">Name:</label>
-                        <input
-                            type="text"
-                            name="name"
-                            placeholder="Enter your name"
+                            placeholder="Enter your itinerary name"
                             value={formData.name}
                             onChange={handleChange}
                             className="w-full p-3 border-2 border-green-500 rounded-md focus:border-green-700 focus:outline-none shadow-sm"
@@ -134,8 +138,8 @@ const TravelItineraryGenerator = () => {
 
                     <div className="col-span-2">
                         <label className="form-label">Activities:</label>
-                        <div className="form-grid">
-                            {['Historical Sites', 'Nature Trails', 'Cultural Experiences', 'Adventurous', 'Shopping', 'Wildlife', 'Religious', 'Spa and Wellness'].map((activity) => (
+                        <div className="checkbox-grid">
+                            {['Historical Sites', 'Nature Trails', 'Cultural', 'Adventurous', 'Shopping', 'Wildlife', 'Religious', 'Spa and Wellness'].map((activity) => (
                                 <label key={activity} className="flex items-center">
                                     <input
                                         type="checkbox"
@@ -153,8 +157,8 @@ const TravelItineraryGenerator = () => {
 
                     <div className="col-span-2">
                         <label className="form-label">Cuisines:</label>
-                        <div className="form-grod">
-                            {['Italian', 'Chinese', 'Indian', 'Mexican', 'Sri Lankan', 'Western', 'Thai'].map((cuisine) => (
+                        <div className="checkbox-grid">
+                            {['Italian', 'Chinese', 'Indian', 'Mexican', 'Sri-Lankan', 'Western', 'Thai'].map((cuisine) => (
                                 <label key={cuisine} className="flex items-center">
                                     <input
                                         type="checkbox"
@@ -172,17 +176,17 @@ const TravelItineraryGenerator = () => {
 
                     <div className="col-span-2">
                         <label className="form-label">People Count:</label>
-                        <div className="flex gap-4">
-                            {['1', '2', '3-5', '6+'].map((preference) => (
-                                <label key={preference} className="flex items-center">
+                        <div className="radio-grid">
+                            {['1', '2', '3-5', '6+'].map((count) => (
+                                <label key={count} className="flex items-center">
                                     <input
                                         type="radio"
                                         name="peopleCount"
-                                        value={preference}
+                                        value={count}
                                         onChange={handleChange}
                                         className="mr-2"
                                     />
-                                    {preference}
+                                    {count}
                                 </label>
                             ))}
                         </div>
@@ -191,7 +195,7 @@ const TravelItineraryGenerator = () => {
 
                     <div className="col-span-2">
                         <label className="form-label">Food Preference:</label>
-                        <div className="flex gap-4">
+                        <div className="radio-grid">
                             {['Veg', 'Non-Veg'].map((preference) => (
                                 <label key={preference} className="flex items-center p-2 bg-green-50 border-2 border-green-300 rounded-lg shadow-sm hover:bg-green-100 transition">
                                     <input
@@ -210,7 +214,7 @@ const TravelItineraryGenerator = () => {
 
                     <div className="col-span-2">
                         <label className="form-label">Transportation Mode:</label>
-                        <div className="form-grid">
+                        <div className="checkbox-grid">
                             {[
                                 {mode: 'Car', icon: <FaCar />},
                                 {mode: 'Bus', icon: <FaBusAlt />},
@@ -240,6 +244,17 @@ const TravelItineraryGenerator = () => {
                     </button>
                 </form>
             </div>
+
+            <footer className="footer">
+                <div className="footer-content">
+                    <p>© 2025 Pearl Path. All rights reserved.</p>
+                    <p>Contact Us: info@pearlpath.com</p>
+                    <div className="social-links">
+                        <a href="https://twitter.com/pearlpath" target="_blank" rel="noopener noreferrer">X</a>
+                        <a href="https://instagram.com/pearlpath" target="_blank" rel="noopener noreferrer">Instagram</a>
+                    </div>
+                </div>
+            </footer>
         </div>
     );
 };
