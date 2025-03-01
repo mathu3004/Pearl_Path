@@ -1,5 +1,6 @@
 /* Page Container */
 .page-container {
+  margin-top: 100px;
   flex: 1;
   display: flex;
   flex-direction: column;
@@ -7,7 +8,6 @@
   align-items: center;
   min-height: 100vh;
   padding: 0;
-  background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
   overflow-x: hidden;
 }
 
@@ -163,10 +163,14 @@ body, html {
   background-color: #f0f4f8;
   margin: 0;
   padding: 0;
-  font-family: 'Arial', sans-serif;
+  font-family: 'Times New Roman', Times, serif;
   overflow-x: hidden;
   display: flex;
   flex-direction: column;
+  background-image: url('https://i0.wp.com/www.tourbooking.lk/wp-content/uploads/2023/03/merlin_148552275_74c0d250-949c-46e0-b8a1-e6d499e992cf-superJumbo-edited.jpg?fit=2048%2C1151&ssl=1'); /* Change path to your image */
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed;
 }
 
 /* Input and Button Styles */
@@ -229,76 +233,136 @@ form {
   margin-top: 2rem;
 }
 
-.footer {
-  width: 100%; /* Full width */
-  padding: 10px 20px; /* Appropriate padding */
-  background-color: #333; /* Footer background color */
-  color: white;
-  text-align: center;
-  box-shadow: 0 -2px 5px rgba(0,0,0,0.1); /* Optional: adds depth */
-  position: relative; /* Change to fixed if you want it always visible */
-  bottom: 0;
+
+
+.header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 70px;
+  background: rgba(39, 47, 45, 0.7);
+  display: flex;
+  align-items: center;
+  padding: 5px 30px;
+  z-index: 1000;
+  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+  justify-content: space-between;
 }
 
-@media (max-width: 768px) {
-  .footer {
-      padding: 20px 10px; /* Increase padding for smaller screens */
-  }
+.header img {
+  height: 80px;
+  max-width: 150px;
+  margin-right: 20px;
 }
 
-@media (max-width: 480px) {
-  .footer {
-      padding: 15px 5px; /* Further increase padding for smaller devices */
-  }
-}
-
-
-.footer-content p, .footer-content a {
-  margin: 5px 0; /* Vertical spacing for text and links */
-  color: white; /* Ensures text and links are white */
-  text-decoration: none; /* Removes underline from links */
-}
-
-.social-links a {
-  margin: 0 10px; /* Horizontal spacing between social media links */
-}
-
-.social-links a:hover {
-  text-decoration: underline; /* Adds underline on hover for links */
-}
-
-nav {
-    width: 100%; /* Full width */
-    padding: 10px 20px 10px 20px; /* Appropriate padding */
-    background-color: #333; /* Footer background color */
-    color: white;
-    text-align: center;
-    box-shadow: 0 -2px 5px rgba(0,0,0,0.1); /* Optional: adds depth */
-    position: relative; /* Change to fixed if you want it always visible */
-
+.nav-links {
+  display: flex;
+  list-style: none;
+  align-items: center;
+  gap: 30px;
+  align-items: center;
+  height: 100%;
+  margin-right: 30px;
 }
 
 .nav-links a {
-  width: 100%;
-  height: 50px;
-  color: white;
+  color: rgb(255, 255, 255);
   text-decoration: none;
-  margin: 0 10px;
-  padding: 5px 10px; /* Adjusted padding */
-
+  font-size: 20px;
+  padding: 5px 5px;
+  margin-top: 20px;
+  margin-bottom: 5px;
+  border-radius: 5px;
+  transition: all 0.3s ease;
+  margin-right: 5px;
 }
 
 .nav-links a:hover {
+  background-color: rgba(255, 255, 255, 0.2);
+  transform: translateY(-2px);
+  color: black;
+}
+
+.footer {
+  width: 100%;
+  background-color: rgb(42, 42, 42);
+  color: white;
+  text-align: center;
+  padding: 15px 30px;
+  margin-top: auto;
+  position: relative;
+  bottom: 0;
+  left: 0;
+}
+
+.footer-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  position: relative;
+  z-index: 2;
+  color: white;
+}
+
+.footer-left {
+  font-size: 16px;
+  color: white;
+  margin-left: 30px;
+}
+
+.footer-right {
+  display: flex;
+  align-items: center;
+  font-size: 16px;
+  gap: 30px;
+  margin-right: 30px;
+}
+
+.footer a {
+  color: white;
+  text-decoration: none;
+  font-size: 16px;
+  display: flex;
+  align-items: center;
+  padding-right: 20px;
+  gap: 8px;
+  z-index: 2;
+}
+
+.footer a:hover {
   text-decoration: underline;
 }
 
-.nav-links a.button {
-  background-color: lightseagreen;
-  border-radius: 20px;
-  font-weight: bold;
-  transition: background-color 0.3s; /* Smooth transition for hover effect */
+.social-links {
+  display: flex;
+  gap: 20px;
 }
 
-.nav-links a.button:hover {
-  background-color: forestgreen; /* Darker on hover */
+.social-links i {
+  font-size: 20px;
+}
+
+@media (max-width: 768px) {
+  .header {
+    padding: 10px 20px;
+  }
+  .nav-links {
+    gap: 10px;
+  }
+  .footer {
+    flex-direction: column;
+    height: auto;
+    padding: 10px 0;
+    text-align: center;
+  }
+  .footer-container {
+    flex-direction: column;
+    gap: 5px;
+  }
+}
+
+h2 {
+    color: #065f46; /* Dark green */
 }

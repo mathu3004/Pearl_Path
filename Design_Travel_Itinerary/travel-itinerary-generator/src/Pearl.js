@@ -1,6 +1,6 @@
 import React from "react";
 import { GoogleMap, LoadScript, Marker } from "@react-google-maps/api";
-import { FaHotel, FaUtensils, FaMapMarkerAlt, FaStar } from "react-icons/fa";
+import { FaHotel, FaUtensils, FaMapMarkerAlt, FaStar, FaTrain } from "react-icons/fa";
 import { FaInstagram, FaFacebook } from "react-icons/fa";
 import { Link } from "react-router-dom";
 import "./App.css";
@@ -9,24 +9,20 @@ const Header = () => {
   return (
     <header className="header">
       <img src="/assests/IconPearl.png" alt="Logo" />
-
-
-        <ul className="nav-links">
+      <ul className="nav-links">
         <Link to="/home">Home</Link>
-<Link to="/generateItinerary">Generate Itinerary</Link>
-<Link to="/chatbot">Chatbot</Link>
-<Link to="/about-us">About Us</Link>
-<Link to="/features">Features</Link>
-                   
-
-        </ul>
+        <Link to="/generateItinerary">Itinerary</Link>
+        <Link to="/chatbot">Help!</Link>
+        <Link to="/about-us">AboutUs</Link>
+        <Link to="/features">Features</Link>
+      </ul>
 
     </header>
   );
 };
 
 const itinerary = {
-  name: "My Travel Itinerary",
+  name: "Minal's Itinerary",
   days: [
     {
       day: 1,
@@ -57,7 +53,8 @@ const center = {
 
 const TravelItinerary = () => {
   return (
-    <div className="page-container">
+    <div>
+    <div className="page-containers">
       <Header />
       <div className="main-layout">
         <div className="itinerary-card">
@@ -112,10 +109,12 @@ const TravelItinerary = () => {
         <button className="button">Save Itinerary</button>
         <button className="button">Export</button>
       </div>
-      <p className="thank-you-message">Thank You! Enjoy Your Trip! ✈️</p>
-      <Footer />
-    </div>
+      <p className="thank-you-message">Thank You! Enjoy Your Trip! <FaTrain /> </p>
+
+    </div> <Footer />
+        </div>  
   );
+ 
 };
 
 const Footer = () => {

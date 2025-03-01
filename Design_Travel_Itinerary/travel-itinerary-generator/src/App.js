@@ -1,9 +1,12 @@
 // src/App.js
+         //
+import Pearl from './Pearl'
+
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import TravelItineraryGenerator from './TravelItineraryGenerator';
 import VisualizationItinerary from './VisualizationItinerary';
-import Pearl from './Pearl'
+
 
 const App = () => {
     return (

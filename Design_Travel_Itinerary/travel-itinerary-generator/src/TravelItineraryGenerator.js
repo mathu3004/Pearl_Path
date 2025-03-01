@@ -2,7 +2,24 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Link } from 'react-router-dom';
+import { FaInstagram, FaFacebook } from "react-icons/fa";
 import { FaPlaneDeparture, FaWalking, FaCar, FaBiking, FaBusAlt, FaTrain, FaShuttleVan,} from 'react-icons/fa';
+
+const Header = () => {
+  return (
+    <header className="header">
+      <img src="/assests/IconPearl.png" alt="Logo" />
+      <ul className="nav-links">
+        <Link to="/home">Home</Link>
+        <Link to="/Pearl.js">Itinerary</Link>
+        <Link to="/chatbot">Help!</Link>
+        <Link to="/about-us">AboutUs</Link>
+        <Link to="/features">Features</Link>
+      </ul>
+
+    </header>
+  );
+};
 
 
 const TravelItineraryGenerator = () => {
@@ -41,19 +58,8 @@ const TravelItineraryGenerator = () => {
     };
 
     return (
-        <div className="page-container" style={{backgroundImage: 'url(https://i0.wp.com/www.tourbooking.lk/wp-content/uploads/2023/03/merlin_148552275_74c0d250-949c-46e0-b8a1-e6d499e992cf-superJumbo-edited.jpg?fit=2048%2C1151&ssl=1)'}}>
-            <nav>
-                <div className="nav-links">
-                    <Link to="/features">Features</Link>
-                    <Link to="/privacy">Privacy</Link>
-                    <Link to="/help-center">Help Center</Link>
-                    <Link to="/blog">Blog</Link>
-                    <Link to="/for-business">For Business</Link>
-                    <Link to="/login">Log in</Link>
-                    <Link to="/create-account">Get Started</Link>
-                </div>
-            </nav>
-
+        <div className="page-container">
+            <Header />
             <div className="glass-card">
                 <h2 className="page-title">Heal to Nature : Craft your Dream</h2>
                 <form onSubmit={handleSubmit} className="form-grid">
@@ -245,18 +251,31 @@ const TravelItineraryGenerator = () => {
                 </form>
             </div>
 
-            <footer className="footer">
-                <div className="footer-content">
-                    <p>© 2025 Pearl Path. All rights reserved.</p>
-                    <p>Contact Us: info@pearlpath.com</p>
-                    <div className="social-links">
-                        <a href="https://twitter.com/pearlpath" target="_blank" rel="noopener noreferrer">X</a>
-                        <a href="https://instagram.com/pearlpath" target="_blank" rel="noopener noreferrer">Instagram</a>
-                    </div>
-                </div>
-            </footer>
+            <Footer />
         </div>
     );
+};
+
+const Footer = () => {
+  return (
+    <footer className="footer">
+      <div className="footer-container">
+        <div className="footer-left">&copy; 2025 Pearl Path. All rights reserved.</div>
+        <div className="footer-right">
+          <div className="social-links">
+          <a href="https://www.instagram.com/yourpage" target="_blank" rel="noopener noreferrer">
+  <FaInstagram /> Instagram
+</a>
+<a href="https://www.facebook.com/yourpage" target="_blank" rel="noopener noreferrer">
+  <FaFacebook /> Facebook
+</a>
+
+          </div>
+          <a href="/contact">Contact</a>
+        </div>
+      </div>
+    </footer>
+  );
 };
 
 export default TravelItineraryGenerator;
