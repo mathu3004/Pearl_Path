@@ -21,7 +21,6 @@ const Header = () => {
   );
 };
 
-
 const TravelItineraryGenerator = () => {
     const [formData, setFormData] = useState({
         name: '',
@@ -33,28 +32,35 @@ const TravelItineraryGenerator = () => {
         transportationMode: [],
         maxDistance: '',
         numberOfDays: '',
+        peopleCount: '',
     });
 
     const navigate = useNavigate(); 
 
     const handleChange = (e) => {
         const { name, value, type, checked } = e.target;
-        if (type === 'checkbox') {
-            setFormData((prevData) => ({
-                ...prevData,
-                [name]: checked
-                    ? [...prevData[name], value]
-                    : prevData[name].filter((item) => item !== value),
-            }));
-        } else {
-            setFormData({ ...formData, [name]: value });
-        }
-    };
     
-
+        setFormData((prevData) => {
+            if (type === 'checkbox') {
+                return {
+                    ...prevData,
+                    [name]: checked
+                        ? [...prevData[name], value]
+                        : prevData[name].filter((item) => item !== value),
+                };
+            } else if (["numberOfDays", "maxDistance"].includes(name)) {
+                return { ...prevData, [name]: value ? Number(value) : 0 }; // Convert to number, default to 0 if empty
+            } else if (name === "peopleCount") {
+                return { ...prevData, [name]: String(value) }; // Ensure it is stored as a string
+            } else {
+                return { ...prevData, [name]: value };
+            }
+        });
+    };  
+    
     const handleSubmit = async (e) => {
         e.preventDefault();
-        console.log("Form Data:", formData); // Add this line to check the data
+        console.log("Form Data Before Sending:", formData); // Debugging
         try {
             const response = await fetch('http://localhost:5000/api/itinerary', {
                 method: 'POST',
@@ -63,17 +69,17 @@ const TravelItineraryGenerator = () => {
             });
             const data = await response.json();
             if (response.ok) {
-                alert("Itinerary saved successfully!");
+                alert("✅ Itinerary saved successfully!");
                 navigate('/pearl', { state: { formData } });
             } else {
-                alert("Error: " + data.message);
+                console.error("❌ API Error Response:", data);
+                alert("❌ Error: " + data.message);
             }
         } catch (error) {
-            console.error("Error submitting form:", error);
-            alert("Failed to save itinerary.");
+            console.error("❌ Network or Fetch Error:", error);
+            alert("❌ Failed to save itinerary.");
         }
-    };    
-    
+    };     
 
     return (
         <div className="page-container">
@@ -268,7 +274,6 @@ const TravelItineraryGenerator = () => {
                     </button>
                 </form>
             </div>
-
             <Footer />
         </div>
     );
