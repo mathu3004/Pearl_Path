@@ -50,12 +50,30 @@ const TravelItineraryGenerator = () => {
             setFormData({ ...formData, [name]: value });
         }
     };
+    
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
-        console.log('Form Data:', formData);
-        navigate('/visualization', { state: { formData } });
-    };
+        console.log("Form Data:", formData); // Add this line to check the data
+        try {
+            const response = await fetch('http://localhost:5000/api/itinerary', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(formData),
+            });
+            const data = await response.json();
+            if (response.ok) {
+                alert("Itinerary saved successfully!");
+                navigate('/pearl', { state: { formData } });
+            } else {
+                alert("Error: " + data.message);
+            }
+        } catch (error) {
+            console.error("Error submitting form:", error);
+            alert("Failed to save itinerary.");
+        }
+    };    
+    
 
     return (
         <div className="page-container">
@@ -206,7 +224,7 @@ const TravelItineraryGenerator = () => {
                                 <label key={preference} className="flex items-center p-2 bg-green-50 border-2 border-green-300 rounded-lg shadow-sm hover:bg-green-100 transition">
                                     <input
                                         type="radio"
-                                        name="foodPreference"
+                                        name="foodPreferences"
                                         value={preference}
                                         onChange={handleChange}
                                         className="mr-2"

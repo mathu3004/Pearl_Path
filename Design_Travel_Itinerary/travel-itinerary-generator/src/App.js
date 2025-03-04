@@ -1,5 +1,5 @@
 // src/App.js
-         //
+         //    
 import Pearl from './Pearl'
 
 import React from 'react';
@@ -12,8 +12,9 @@ const App = () => {
     return (
         <Router>
             <Routes>
-            <Route path="/" element={<Pearl />} />
+
             <Route path="/" element={<TravelItineraryGenerator />} />
+            <Route path="/pearl" element={<Pearl />} />        
                 <Route path="/visualization" element={<VisualizationItinerary />} />
             </Routes>
         </Router>
