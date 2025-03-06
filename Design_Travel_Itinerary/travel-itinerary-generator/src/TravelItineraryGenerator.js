@@ -35,7 +35,41 @@ const TravelItineraryGenerator = () => {
         peopleCount: '',
     });
 
+    const [errors, setErrors] = useState({});
     const navigate = useNavigate(); 
+
+    // Function to validate the form
+    const validateForm = () => {
+        let errors = {};
+        let isValid = true;
+
+        // Validate Name: Must be uppercase letters only
+        if (!/^[A-Z\s]+$/.test(formData.name) || formData.name.length === 0) {
+            errors.name = "Name must contain only capital letters.";
+            isValid = false;
+        }
+
+        // Validate Starting Destination: Must be in the selected destinations
+        if (!formData.destinations.includes(formData.startingDestination)) {
+            errors.startingDestination = "Starting destination must be one of the selected destinations.";
+            isValid = false;
+        }
+
+        // Validate Number of Days: Must be between 1 and 7
+        if (formData.numberOfDays < 1 || formData.numberOfDays > 7) {
+            errors.numberOfDays = "Number of days must be between 1 and 7.";
+            isValid = false;
+        }
+
+        // Validate Maximum Distance: Must be between 20 and 40 km
+        if (formData.maxDistance < 20 || formData.maxDistance > 40) {
+            errors.maxDistance = "Maximum distance must be between 20 and 40 km.";
+            isValid = false;
+        }
+
+        setErrors(errors);
+        return isValid;
+    };
 
     const handleChange = (e) => {
         const { name, value, type, checked } = e.target;
@@ -61,6 +95,12 @@ const TravelItineraryGenerator = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         console.log("Form Data Before Sending:", formData); // Debugging
+        
+        if (!validateForm()) {
+            alert("❌ Please fix the errors in the form before submitting.");
+            return;
+        }
+        
         try {
             const response = await fetch('http://localhost:5000/api/itinerary', {
                 method: 'POST',
@@ -99,6 +139,7 @@ const TravelItineraryGenerator = () => {
                             className="w-full p-3 border-2 border-green-500 rounded-md focus:border-green-700 focus:outline-none shadow-sm"
                             required
                         />
+                        {errors.name && <p className="error-text">{errors.name}</p>}
                     </div>
                     <br></br>
 
@@ -136,6 +177,7 @@ const TravelItineraryGenerator = () => {
                             <option value="Kandy">Kandy</option>
                             <option value="Nuwara Eliya">Nuwara Eliya</option>
                         </select>
+                        {errors.startingDestination && <p className="error-text">{errors.startingDestination}</p>}
                     </div>
                     <br></br>
 
@@ -148,8 +190,10 @@ const TravelItineraryGenerator = () => {
                             value={formData.numberOfDays}
                             onChange={handleChange}
                             className="w-full p-3 border-2 border-green-500 rounded-md focus:border-green-700 focus:outline-none shadow-sm"
+                            
                             required
                         />
+                        {errors.numberOfDays && <p className="error-text">{errors.numberOfDays}</p>}
                     </div>
                     <br></br>
 
@@ -163,6 +207,7 @@ const TravelItineraryGenerator = () => {
                             onChange={handleChange}
                             className="w-full p-3 border-2 border-green-500 rounded-md focus:border-green-700 focus:outline-none shadow-sm"
                         />
+                        {errors.maxDistance && <p className="error-text">{errors.maxDistance}</p>}
                     </div>
                     <br></br>
 
