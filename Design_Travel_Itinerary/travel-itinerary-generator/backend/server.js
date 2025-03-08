@@ -3,6 +3,8 @@ require('dotenv').config(); // Load environment variables from .env file
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
+const { exec } = require('child_process');
+const path = require('path');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -35,12 +37,30 @@ const itinerarySchema = new mongoose.Schema({
     cuisines: { type: [String], required: true },
     foodPreferences: { type: String, required: true },
     transportationMode: { type: [String], required: true },
-    maxDistance: { type: Number, required: true },  // Fixed: Use Number instead of Int16Array
-    numberOfDays: { type: Number, required: true },  // Fixed: Use Number instead of Int16Array
-    peopleCount: { type: String, required: true }  // Fixed: Change to Number if it's a count
+    maxDistance: { type: Number, required: true },
+    numberOfDays: { type: Number, required: true }, 
+    peopleCount: { type: String, required: true }
 });
 
 const Itinerary = mongoose.model('Itinerary', itinerarySchema);
+
+// Function to run Python scripts
+const runPythonScript = (scriptPath, callback) => {
+    const fullPath = path.resolve(scriptPath);  // ✅ Ensures correct absolute path
+    console.log(`📌 EXECUTING: python ${fullPath}`);
+
+    const process = exec(`python ${fullPath}`, (error, stdout, stderr) => {
+        if (error) {
+            console.error(`❌ ERROR (${scriptPath}):`, error.message);
+            return callback(error);
+        }
+        if (stderr) {
+            console.error(`⚠️ STDERR (${scriptPath}):`, stderr);
+        }
+        console.log(`✅ SUCCESS (${scriptPath}):`, stdout);
+        callback(null, stdout);
+    });
+};
 
 // API Endpoint to Save Itinerary Data
 app.post('/api/itinerary', async (req, res) => {
@@ -66,40 +86,54 @@ app.post('/api/itinerary', async (req, res) => {
         numberOfDays = Number(numberOfDays);  // Convert to Number
         peopleCount = String(peopleCount);  // Ensure it's a String
 
-        console.log("Converted Data Before Saving:", { 
-            name, 
-            startingDestination, 
-            destinations, 
-            activities, 
-            cuisines, 
-            foodPreferences, 
-            transportationMode, 
-            maxDistance, 
-            numberOfDays, 
-            peopleCount 
-        });
-
+        
         const newItinerary = new Itinerary({
-            name,
-            startingDestination,
-            destinations,
-            activities,
-            cuisines,
-            foodPreferences,
-            transportationMode,
-            maxDistance,
-            numberOfDays,
-            peopleCount
+            name, startingDestination, destinations, activities, cuisines, foodPreferences, transportationMode, maxDistance, numberOfDays, peopleCount
         });
-
         await newItinerary.save();
+        console.log("✅ Itinerary saved successfully!");
         res.status(201).json({ message: "✅ Itinerary saved successfully!" });
+
+        // Run Preprocessing and Itinerary Generation in Sequence
+        runPythonScript(path.resolve('RadiusBasedGenerator.py'), (error) => {
+
+            if (error) {
+                console.error("❌ ERROR: Preprocessing failed.");
+                return;
+            }
+            console.log("✅ SUCCESS (backend/RadiusBasedGenerator.py): Preprocessing done!");
+
+            // Run app.py for Itinerary Generation
+            runPythonScript(path.resolve('app.py'), (appError) => {
+
+                if (appError) {
+                    console.error("❌ ERROR: Itinerary generation failed.");
+                    return;
+                }
+                console.log("✅ SUCCESS (backend/app.py): Itinerary Generated!");
+            });
+        });
     } catch (err) {
-        console.error("❌ Error saving itinerary:", err);
-        res.status(500).json({ message: "❌ Error saving itinerary", error: err.message });
+        console.error("❌ Error during processing:", err);
+        res.status(500).json({ error: "Processing failed.", details: err.message });
     }
 });
 
+// New API Endpoint to Fetch a Specific Itinerary by Name or ID
+app.get('/api/itinerary/:name', async (req, res) => {
+    try {
+        const itineraryName = req.params.name;
+        const itinerary = await Itinerary.findOne({ name: itineraryName });
 
+        if (!itinerary) {
+            return res.status(404).json({ message: "❌ Itinerary not found" });
+        }
+
+        res.json(itinerary);
+    } catch (err) {
+        console.error("❌ Error fetching itinerary:", err);
+        res.status(500).json({ message: "❌ Error fetching itinerary", error: err.message });
+    }
+});
 
 app.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));

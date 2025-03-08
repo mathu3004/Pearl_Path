@@ -43,9 +43,9 @@ const TravelItineraryGenerator = () => {
         let errors = {};
         let isValid = true;
 
-        // Validate Name: Must be uppercase letters only
-        if (!/^[A-Z\s]+$/.test(formData.name) || formData.name.length === 0) {
-            errors.name = "Name must contain only capital letters.";
+        // ✅ Name Validation: Must contain only letters (A-Z, a-z)
+        if (!/^[A-Za-z\s]+$/.test(formData.name) || formData.name.length === 0) {
+            errors.name = "Name must contain only alphabetical characters.";
             isValid = false;
         }
 
@@ -110,16 +110,33 @@ const TravelItineraryGenerator = () => {
             const data = await response.json();
             if (response.ok) {
                 alert("✅ Itinerary saved successfully!");
-                navigate('/pearl', { state: { formData } });
-            } else {
-                console.error("❌ API Error Response:", data);
-                alert("❌ Error: " + data.message);
+                // Check if preprocessing is done before navigating
+            let success = false;
+            for (let i = 0; i < 5; i++) {  // Try 5 times with a delay
+                const checkResponse = await fetch(`http://localhost:5000/api/itinerary/${formData.name}`);
+                if (checkResponse.ok) {
+                    success = true;
+                    break;
+                }
+                await new Promise(resolve => setTimeout(resolve, 3000)); // Wait 3 seconds before retrying
             }
-        } catch (error) {
-            console.error("❌ Network or Fetch Error:", error);
-            alert("❌ Failed to save itinerary.");
+
+            if (success) {
+                alert("✅ Processing completed! Redirecting...");
+                navigate('/visualization', { state: { formData } });
+            } else {
+                alert("❌ Processing timeout. Try again later.");
+            }
+
+        } else {
+            console.error("❌ API Error Response:", data);
+            alert("❌ Error: " + data.message);
         }
-    };     
+    } catch (error) {
+        console.error("❌ Network or Fetch Error:", error);
+        alert("❌ Failed to save itinerary.");
+    }
+};    
 
     return (
         <div className="page-container">
@@ -202,7 +219,7 @@ const TravelItineraryGenerator = () => {
                         <input
                             type="number"
                             name="maxDistance"
-                            placeholder="Enter maximum distance"
+                            placeholder="Maximum distance from hotel"
                             value={formData.maxDistance}
                             onChange={handleChange}
                             className="w-full p-3 border-2 border-green-500 rounded-md focus:border-green-700 focus:outline-none shadow-sm"
@@ -323,6 +340,22 @@ const TravelItineraryGenerator = () => {
         </div>
     );
 };
+
+// ✅ CSS Styling for Green Error Messages
+const styles = `
+  .error-text {
+    color: green;
+    font-size: 14px;
+    font-weight: bold;
+    margin-top: 5px;
+  }
+`;
+
+// Append styles to document head
+const styleSheet = document.createElement("style");
+styleSheet.type = "text/css";
+styleSheet.innerText = styles;
+document.head.appendChild(styleSheet);
 
 const Footer = () => {
   return (
