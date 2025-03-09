@@ -16,13 +16,14 @@ const Header = () => {
         <Link to="/about-us">AboutUs</Link>
         <Link to="/features">Features</Link>
       </ul>
-
+      
     </header>
   );
 };
 
 const TravelItineraryGenerator = () => {
     const [formData, setFormData] = useState({
+        username: '',
         name: '',
         startingDestination: '',
         destinations: [],
@@ -112,13 +113,13 @@ const TravelItineraryGenerator = () => {
                 alert("✅ Itinerary saved successfully!");
                 // Check if preprocessing is done before navigating
             let success = false;
-            for (let i = 0; i < 5; i++) {  // Try 5 times with a delay
+            for (let i = 0; i < 8; i++) {  // Try 5 times with a delay
                 const checkResponse = await fetch(`http://localhost:5000/api/itinerary/${formData.name}`);
                 if (checkResponse.ok) {
                     success = true;
                     break;
                 }
-                await new Promise(resolve => setTimeout(resolve, 3000)); // Wait 3 seconds before retrying
+                await new Promise(resolve => setTimeout(resolve, 5000)); // Wait 3 seconds before retrying
             }
 
             if (success) {
@@ -129,8 +130,12 @@ const TravelItineraryGenerator = () => {
             }
 
         } else {
+            if (response.status === 400) {
+                alert("❌ Error: " + data.error); // Show message if itinerary name already exists
+            } else{
             console.error("❌ API Error Response:", data);
             alert("❌ Error: " + data.message);
+            }
         }
     } catch (error) {
         console.error("❌ Network or Fetch Error:", error);
@@ -144,6 +149,20 @@ const TravelItineraryGenerator = () => {
             <div className="glass-card">
                 <h2 className="page-title">Heal to Nature : Craft your Dream</h2>
                 <form onSubmit={handleSubmit} className="form-grid">
+
+                    <div className="col-span-2">
+                        <label className="form-label">Username:</label>
+                        <input
+                            type="text"
+                            name="username"
+                            placeholder="Enter your username"
+                            value={formData.username}
+                            onChange={handleChange}
+                            className="w-full p-3 border-2 border-green-500 rounded-md focus:border-green-700 focus:outline-none shadow-sm"
+                            required
+                        />
+                    </div>
+                    <br></br>
 
                     <div className="col-span-2">
                         <label className="form-label">Itinerary Name:</label>
@@ -250,7 +269,7 @@ const TravelItineraryGenerator = () => {
                     <div className="col-span-2">
                         <label className="form-label">Cuisines:</label>
                         <div className="checkbox-grid">
-                            {['Italian', 'Chinese', 'Indian', 'Mexican', 'Sri-Lankan', 'Western', 'Thai'].map((cuisine) => (
+                            {['Italian', 'Chinese', 'Indian', 'Mexican', 'Sri Lankan', 'Western', 'Thai'].map((cuisine) => (
                                 <label key={cuisine} className="flex items-center">
                                     <input
                                         type="checkbox"

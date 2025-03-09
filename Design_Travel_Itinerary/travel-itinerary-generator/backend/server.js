@@ -30,6 +30,7 @@ mongoose.connect(process.env.MONGO_URI, {
 
 // Define Itinerary Schema
 const itinerarySchema = new mongoose.Schema({
+    username: { type: String, required: true },
     name: { type: String, required: true },
     startingDestination: { type: String, required: true },
     destinations: { type: [String], required: true },
@@ -38,9 +39,12 @@ const itinerarySchema = new mongoose.Schema({
     foodPreferences: { type: String, required: true },
     transportationMode: { type: [String], required: true },
     maxDistance: { type: Number, required: true },
-    numberOfDays: { type: Number, required: true }, 
+    numberOfDays: { type: Number, required: true },
     peopleCount: { type: String, required: true }
-});
+}, { timestamps: true });
+
+// ✅ Ensure (username, name) is unique
+itinerarySchema.index({ username: 1, name: 1 }, { unique: true });
 
 const Itinerary = mongoose.model('Itinerary', itinerarySchema);
 
@@ -66,6 +70,7 @@ const runPythonScript = (scriptPath, callback) => {
 app.post('/api/itinerary', async (req, res) => {
     try {
         let {
+            username,
             name,
             startingDestination,
             destinations,
@@ -86,8 +91,23 @@ app.post('/api/itinerary', async (req, res) => {
         numberOfDays = Number(numberOfDays);  // Convert to Number
         peopleCount = String(peopleCount);  // Ensure it's a String
 
-        
+        // ✅ Trim and convert to lowercase for case-insensitive matching
+        username = username.trim().toLowerCase();
+        name = name.trim().toLowerCase();
+
+        console.log("📌 Checking for existing itinerary:", { username, name });
+
+        // ✅ Check if the itinerary already exists for this user
+        const existingItinerary = await Itinerary.findOne({ username, name });
+
+        if (existingItinerary) {
+            console.log("❌ Error: Itinerary name already exists for this user.");
+            return res.status(400).json({ error: "Itinerary name must be unique for each user." });
+        }
+
+        // ✅ Create a new itinerary if it doesn't exist
         const newItinerary = new Itinerary({
+            username,
             name, startingDestination, destinations, activities, cuisines, foodPreferences, transportationMode, maxDistance, numberOfDays, peopleCount
         });
         await newItinerary.save();
@@ -95,7 +115,7 @@ app.post('/api/itinerary', async (req, res) => {
         res.status(201).json({ message: "✅ Itinerary saved successfully!" });
 
         // Run Preprocessing and Itinerary Generation in Sequence
-        runPythonScript(path.resolve('RadiusBasedGenerator.py'), (error) => {
+        runPythonScript(path.resolve(`RadiusBasedGenerator.py ${username} ${name}`,), (error) => {
 
             if (error) {
                 console.error("❌ ERROR: Preprocessing failed.");
@@ -104,7 +124,7 @@ app.post('/api/itinerary', async (req, res) => {
             console.log("✅ SUCCESS (backend/RadiusBasedGenerator.py): Preprocessing done!");
 
             // Run app.py for Itinerary Generation
-            runPythonScript(path.resolve('app.py'), (appError) => {
+            runPythonScript(path.resolve('`app.py ${username} ${name}`'), (appError) => {
 
                 if (appError) {
                     console.error("❌ ERROR: Itinerary generation failed.");
