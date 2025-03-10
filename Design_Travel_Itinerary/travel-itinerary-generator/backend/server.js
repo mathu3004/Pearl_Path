@@ -49,11 +49,12 @@ itinerarySchema.index({ username: 1, name: 1 }, { unique: true });
 const Itinerary = mongoose.model('Itinerary', itinerarySchema);
 
 // Function to run Python scripts
-const runPythonScript = (scriptPath, callback) => {
-    const fullPath = path.resolve(scriptPath);  // ✅ Ensures correct absolute path
-    console.log(`📌 EXECUTING: python ${fullPath}`);
+const runPythonScript = (scriptPath, args, callback) => {
+    const fullPath = path.resolve(__dirname, scriptPath);
+    const command = `python "${fullPath}" ${args.join(" ")}`; // ✅ Properly format command
+    console.log(`📌 EXECUTING: ${command}`);
 
-    const process = exec(`python ${fullPath}`, (error, stdout, stderr) => {
+    exec(command, (error, stdout, stderr) => {
         if (error) {
             console.error(`❌ ERROR (${scriptPath}):`, error.message);
             return callback(error);
@@ -115,17 +116,15 @@ app.post('/api/itinerary', async (req, res) => {
         res.status(201).json({ message: "✅ Itinerary saved successfully!" });
 
         // Run Preprocessing and Itinerary Generation in Sequence
-        runPythonScript(path.resolve(`RadiusBasedGenerator.py ${username} ${name}`,), (error) => {
-
+        runPythonScript("RadiusBasedGenerator.py", [username, name], (error) => {
             if (error) {
                 console.error("❌ ERROR: Preprocessing failed.");
                 return;
             }
             console.log("✅ SUCCESS (backend/RadiusBasedGenerator.py): Preprocessing done!");
-
-            // Run app.py for Itinerary Generation
-            runPythonScript(path.resolve('`app.py ${username} ${name}`'), (appError) => {
-
+        
+            // ✅ Corrected Execution of app.py
+            runPythonScript("app.py", [username, name], (appError) => {
                 if (appError) {
                     console.error("❌ ERROR: Itinerary generation failed.");
                     return;
@@ -133,6 +132,7 @@ app.post('/api/itinerary', async (req, res) => {
                 console.log("✅ SUCCESS (backend/app.py): Itinerary Generated!");
             });
         });
+        
     } catch (err) {
         console.error("❌ Error during processing:", err);
         res.status(500).json({ error: "Processing failed.", details: err.message });

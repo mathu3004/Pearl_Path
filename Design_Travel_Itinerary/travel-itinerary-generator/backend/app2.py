@@ -16,6 +16,7 @@ from collections import Counter
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 
+
 # Initialize Flask App
 app = Flask(__name__)
 CORS(app)  # Enable CORS for frontend communication
@@ -25,7 +26,7 @@ mongo_uri = "mongodb+srv://Pearlpath:DMEN2425@pearlpath.lq9jq.mongodb.net/?retry
 client = MongoClient(mongo_uri)
 db = client["test"]
 
-# Fetch data from MongoDB
+# Fetch latest data from MongoDB
 def fetch_latest_data():
     hotels = pd.DataFrame(list(db["Hotels"].find()))
     restaurants = pd.DataFrame(list(db["Restaurants"].find()))
@@ -46,19 +47,31 @@ def train_hotel_gmm(hotels, n_clusters=5):
     hotels['cluster'] = hotel_clusters
     return gmm, hotels
 
-# Train RandomForest Classifier
+# Train and optimize RandomForest
 def train_optimized_hotel_classifier(X_train, y_train):
-    model = RandomForestClassifier(n_estimators=50, max_depth=10, min_samples_split=5, random_state=42)
+    model = RandomForestClassifier(
+        n_estimators=50,  
+        max_depth=10, 
+        min_samples_split=5,  
+        random_state=42
+    )
     model.fit(X_train, y_train)
     return model
 
 # Train XGBoost model
 def train_xgboost_classifier(X_train, y_train):
-    model = XGBClassifier(n_estimators=50, max_depth=6, learning_rate=0.1, random_state=42)
+    model = XGBClassifier(
+        n_estimators=50,
+        max_depth=6,
+        learning_rate=0.1,
+        colsample_bytree=0.8,
+        subsample=0.8,
+        random_state=42
+    )
     model.fit(X_train, y_train)
     return model
 
-# Allocate days to destinations
+# Function to allocate days to destinations
 def allocate_days_to_destinations(destinations, num_days):
     allocation_rules = {1: (1, 1), 2: (1, 2), 3: (1, 3), 4: (1, 4), 5: (1, 4)}
     min_dest, max_dest = allocation_rules.get(num_days, (1, 1))
@@ -77,7 +90,7 @@ def allocate_days_to_destinations(destinations, num_days):
 
     return days_per_destination
 
-# Get nearby options based on distance
+# Function to get nearby options
 def get_nearby_options(lat, lon, options, max_distance_km):
     return sorted([
         (row, geodesic((lat, lon), (row['latitude'], row['longitude'])).km)
@@ -85,38 +98,32 @@ def get_nearby_options(lat, lon, options, max_distance_km):
         if geodesic((lat, lon), (row['latitude'], row['longitude'])).km <= max_distance_km
     ], key=lambda x: x[1])
 
-# Generate Itinerary
-def generate_itinerary(username, itinerary_name):
-    print(f"✅ Generating Itinerary for User: {username}, Itinerary: {itinerary_name}")
+# Generate Itinerary API
+@app.route('/generate_itinerary', methods=['POST'])
+def generate_itinerary():
+    data = request.json  
+    itinerary_name = data.get('name', 'default_itinerary')
 
     hotels, restaurants, attractions, itineraries = fetch_latest_data()
-    user_itinerary = itineraries[itineraries["username"] == username]
+    user_itinerary = itineraries[itineraries["name"] == itinerary_name].to_dict(orient="records")
+    
+    if not user_itinerary:
+        return jsonify({"error": "Itinerary not found"}), 404
 
-    if user_itinerary.empty:
-        print(f"❌ Error: No itinerary found for user '{username}'")
-        return
-
-    user_itinerary = user_itinerary.iloc[0]
+    user_itinerary = user_itinerary[0]
     num_days = int(user_itinerary['numberofdays'])
     max_distance = float(user_itinerary['maximum_distance'])
-    if 'destination' in user_itinerary:
-        selected_destinations = user_itinerary['destination']
-    elif 'destinations' in user_itinerary:
-        selected_destinations = user_itinerary['destinations']
-    else:
-        print("❌ Error: No column for destinations found in user_itinerary!")
-        print("Available columns:", user_itinerary.keys())
-        return
+    selected_destinations = user_itinerary['destination']
 
     # Train Hotel Model
     gmm_model, hotels = train_hotel_gmm(hotels)
-
     features = ['latitude', 'longitude', 'hotelclass', 'rating']
     X = hotels[features]
     y = hotels['cluster']
     
     smote = SMOTE(random_state=42, k_neighbors=1)
     X_resampled, y_resampled = smote.fit_resample(X, y)
+
     X_train, X_test, y_train, y_test = train_test_split(X_resampled, y_resampled, test_size=0.2, random_state=42)
     
     rf_model = train_optimized_hotel_classifier(X_train, y_train)
@@ -146,30 +153,22 @@ def generate_itinerary(username, itinerary_name):
         nearby_attractions = get_nearby_options(selected_hotel['latitude'], selected_hotel['longitude'], attraction_options, max_distance)
         itinerary[destination]["attractions"] = [attr[0]['name'] for attr in nearby_attractions[:4]]
 
-    db["generated_itineraries"].insert_one({"username": username, "name": itinerary_name, "itinerary": itinerary})
-
-    return itinerary
-
-@app.route('/generate_itinerary', methods=['POST'])
-def generate_itinerary_api():
-    data = request.json  
-    username = data.get('username')
-    itinerary_name = data.get('name')
-
-    if not username or not itinerary_name:
-        return jsonify({"error": "Username and itinerary name required"}), 400
-
-    itinerary = generate_itinerary(username, itinerary_name)
+    db["generated_itineraries"].insert_one({"name": itinerary_name, "itinerary": itinerary})
 
     return jsonify({"itinerary": itinerary})
 
 @app.route('/')
 def home():
-    return "✅ Flask Server is Running!"
+    return "✅ Flask Server is Running! Use /generate_itinerary for API calls."
+
+# API to store user input in MongoDB
+@app.route('/api/itinerary', methods=['POST'])
+def save_itinerary():
+    data = request.json  # Get user data from frontend
+
+    # Save data in MongoDB
+    db["itineraries"].insert_one(data)
+    return jsonify({"message": "✅ Itinerary stored successfully!"}), 201
 
 if __name__ == '__main__':
-    if len(sys.argv) == 3:
-        generate_itinerary(sys.argv[1], sys.argv[2])
-    else:
-        print("ℹ️ Running Flask Server...")
-        app.run(debug=True, port=5001)
+    app.run(debug=True, port=5001)  # ✅ Change port to 5001
