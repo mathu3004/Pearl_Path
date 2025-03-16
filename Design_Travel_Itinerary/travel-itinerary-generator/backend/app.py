@@ -99,14 +99,19 @@ def generate_itinerary(username, itinerary_name):
     user_itinerary = user_itinerary.iloc[0]
     num_days = int(user_itinerary['numberofdays'])
     max_distance = float(user_itinerary['maximum_distance'])
-    if 'destination' in user_itinerary:
-        selected_destinations = user_itinerary['destination']
-    elif 'destinations' in user_itinerary:
-        selected_destinations = user_itinerary['destinations']
-    else:
-        print("❌ Error: No column for destinations found in user_itinerary!")
+    # ✅ Extract destinations dynamically from one-hot encoding
+    destination_columns = [col for col in user_itinerary.index if col.startswith('destination_') and user_itinerary[col] == 1]
+
+    # ✅ Convert column names to actual destination names
+    selected_destinations = [col.replace('destination_', '').strip() for col in destination_columns]
+
+    if not selected_destinations:
+        print("❌ Error: No destinations found for this itinerary!")
         print("Available columns:", user_itinerary.keys())
         return
+
+    print(f"✅ Selected Destinations: {selected_destinations}")
+
 
     # Train Hotel Model
     gmm_model, hotels = train_hotel_gmm(hotels)
@@ -133,7 +138,15 @@ def generate_itinerary(username, itinerary_name):
             "attractions": []
         }
 
+        # ✅ Check for city columns dynamically (one-hot encoding)
+        city_columns = [col for col in hotels.columns if col.startswith('city_')]
+
+        # ✅ Extract cities from one-hot encoding
+        hotels['city'] = hotels[city_columns].idxmax(axis=1).str.replace('city_', '')
+
+        # ✅ Now filter by city name
         hotel_options = hotels[hotels['city'].str.contains(destination, case=False, na=False)]
+
         if not hotel_options.empty:
             selected_hotel = hotel_options.sample(1).iloc[0]
             itinerary[destination]["hotels"].append(selected_hotel['name'])
