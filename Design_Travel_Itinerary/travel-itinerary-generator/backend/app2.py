@@ -16,7 +16,6 @@ from collections import Counter
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 
-
 # Initialize Flask App
 app = Flask(__name__)
 CORS(app)  # Enable CORS for frontend communication

@@ -3,7 +3,6 @@ from flask_pymongo import PyMongo
 import pandas as pd
 import numpy as np
 import os
-import pickle
 from geopy.distance import geodesic
 from sklearn.preprocessing import StandardScaler
 from pymongo import MongoClient
@@ -19,7 +18,7 @@ app = Flask(__name__)
 MONGO_URI = os.getenv("MONGO_URI")
 if not MONGO_URI:
     print("❌ Error: MONGO_URI is not set in .env file!")
-    exit(1)  # Exit script if MONGO_URI is missing
+    exit(1)
 
 # ✅ Initialize MongoDB connection
 client = MongoClient(MONGO_URI)
@@ -28,7 +27,7 @@ db = client["test"]  # ✅ Explicitly define the database
 # ✅ Debugging: Print MongoDB cluster connection
 print("🔍 Connecting to MongoDB cluster:", MONGO_URI.split('@')[-1])
 
-# ✅ Check MongoDB connection
+# Check MongoDB connection
 def check_mongo_connection():
     retry_count = 5
     for attempt in range(retry_count):
@@ -47,7 +46,7 @@ def check_mongo_connection():
 check_mongo_connection()
 
 # ✅ Load pre-trained models
-MODEL_FOLDER = "Design_Travel_Itinerary/travel-itinerary-generator/backend/models"  # Updated path for uploaded models
+MODEL_FOLDER = "/workspaces/Pearl_Path/Design_Travel_Itinerary/travel-itinerary-generator/backend/models"  # Updated path for uploaded models
 
 file_paths = {
     "hotel": os.path.join(MODEL_FOLDER, "hotel_model.pkl"),
@@ -62,6 +61,9 @@ for key, path in file_paths.items():
     print(f"📂 {key}: {path} {'✅ Exists' if os.path.exists(path) else '❌ Missing'}")
 
 # ✅ Function to safely load models
+import joblib
+
+# ✅ Function to safely load models using joblib
 def load_model(model_key):
     model_path = file_paths[model_key]
     
@@ -70,15 +72,14 @@ def load_model(model_key):
         return None
     
     try:
-        with open(model_path, "rb") as f:
-            model = pickle.load(f)
+        model = joblib.load(model_path)  # ✅ Use joblib instead of pickle
         print(f"✅ Model '{model_key}' loaded successfully!")
         return model
     except Exception as e:
         print(f"❌ Error loading model '{model_key}': {e}")
         return None
 
-# ✅ Load models
+# ✅ Load models using joblib
 hotel_model = load_model("hotel")
 restaurant_model = load_model("restaurant")
 attraction_model_dbscan = load_model("attraction_dbscan")
@@ -86,11 +87,12 @@ attraction_model_pca = load_model("attraction_pca")
 
 # ✅ Load PCA Data
 try:
-    attractions_pca_data = np.load(file_paths["attractions_pca_data"], allow_pickle=True)
+    attractions_pca_data = joblib.load(file_paths["attractions_pca_data"])  # ✅ Use joblib
     print("✅ PCA data loaded successfully!")
 except Exception as e:
     print(f"❌ Error loading PCA data: {e}")
     attractions_pca_data = None
+
 
 # ✅ Load datasets from MongoDB safely
 def load_data_from_mongo(collection_name):
@@ -109,13 +111,24 @@ hotels = load_data_from_mongo("Hotels")
 restaurants = load_data_from_mongo("Restaurants")
 attractions = load_data_from_mongo("Attractions")
 
-# ✅ Check missing columns and handle errors
+# Check missing columns and handle errors
 def ensure_columns(df, required_columns):
     for col in required_columns:
         if col not in df.columns:
             print(f"⚠️ Warning: Column '{col}' is missing in the dataset.")
             df[col] = np.nan  # Assign NaN to avoid KeyError
     return df
+
+# Updating dataset column names to lowercase to ensure consistency
+# Function to convert column names to lowercase
+def convert_columns_to_lowercase(df):
+    df.columns = map(str.lower, df.columns)
+    return df
+
+# Convert all datasets
+hotels = convert_columns_to_lowercase(hotels)
+restaurants = convert_columns_to_lowercase(restaurants)
+attractions = convert_columns_to_lowercase(attractions)
 
 hotels = ensure_columns(hotels, ["rating", "pricelevel"])
 restaurants = ensure_columns(restaurants, ["rating", "pricelevel_lkr"])
@@ -202,7 +215,9 @@ def generate_itinerary():
 
     # Fetch user data from preitineraries
     user = db.preitineraries.find_one({"username": username, "name": itinerary_name}, {'_id': 0})
+    
     if not user:
+        print(f"❌ No itinerary found for user '{username}' with name '{itinerary_name}'")
         return jsonify({"error": "User itinerary not found"}), 404
 
     # Allocate days to destinations
@@ -225,14 +240,24 @@ def generate_itinerary():
                 'Attractions': attractions_list
             }
 
+    # Debugging print before inserting
+    print(f"🔍 Attempting to save itinerary to DB: {itinerary}")
+
     # Save itinerary to MongoDB under generated_itineraries
-    db.generated_itineraries.insert_one({
+    result = db.generated_itineraries.insert_one({
         "username": username,
         "itinerary_name": itinerary_name,
         "itinerary": itinerary
     })
 
+    # Debugging print after inserting
+    if result.acknowledged:
+        print("✅ Itinerary successfully inserted into MongoDB.")
+    else:
+        print("❌ MongoDB insertion failed!")
+
     return jsonify({"message": "Itinerary generated successfully", "itinerary": itinerary}), 201
 
+
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(debug=True, port=5001)  # ✅ Change port to 5001
