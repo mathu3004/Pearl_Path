@@ -2,49 +2,105 @@ from flask import Flask, request, jsonify
 from flask_pymongo import PyMongo
 import pandas as pd
 import numpy as np
-import random
+import os
+import pickle
 from geopy.distance import geodesic
 from sklearn.preprocessing import StandardScaler
-from sklearn.ensemble import RandomForestRegressor
-from sklearn.mixture import GaussianMixture
-from sklearn.model_selection import train_test_split
-import pickle
+from pymongo import MongoClient
+import time
+
+# ✅ Load environment variables
+from dotenv import load_dotenv
+load_dotenv()
 
 app = Flask(__name__)
 
-# MongoDB Connection
-app.config["MONGO_URI"] = "mongodb+srv://Pearlpath:DMEN2425@pearlpath.lq9jq.mongodb.net/?retryWrites=true&w=majority&appName=PearlPath"
-mongo = PyMongo(app)
+# ✅ Get MongoDB URI from .env file
+MONGO_URI = os.getenv("MONGO_URI")
+if not MONGO_URI:
+    print("❌ Error: MONGO_URI is not set in .env file!")
+    exit(1)  # Exit script if MONGO_URI is missing
 
-# Load pre-trained models
-import pickle
+# ✅ Initialize MongoDB connection
+client = MongoClient(MONGO_URI)
+db = client["test"]  # ✅ Explicitly define the database
 
-file_path_hotel = "hotel_model.pkl"
-file_path_rest = "restaurant_model.pkl"
-file_path_attraction = "attraction_model.pkl"
+# ✅ Debugging: Print MongoDB cluster connection
+print("🔍 Connecting to MongoDB cluster:", MONGO_URI.split('@')[-1])
 
+# ✅ Check MongoDB connection
+def check_mongo_connection():
+    retry_count = 5
+    for attempt in range(retry_count):
+        try:
+            print(f"🔍 Attempting to connect to MongoDB (Attempt {attempt+1}/{retry_count})...")
+            db.command("ping")  # Check if database is accessible
+            print("✅ Connected to MongoDB successfully!")
+            return True
+        except Exception as e:
+            print(f"❌ MongoDB Error: {e}")
+        time.sleep(3)  # Wait before retrying
+
+    print("❌ Could not establish MongoDB connection. Exiting.")
+    exit(1)
+
+check_mongo_connection()
+
+# ✅ Load pre-trained models
+MODEL_FOLDER = "Design_Travel_Itinerary/travel-itinerary-generator/backend/models"  # Updated path for uploaded models
+
+file_paths = {
+    "hotel": os.path.join(MODEL_FOLDER, "hotel_model.pkl"),
+    "restaurant": os.path.join(MODEL_FOLDER, "restaurant_model.pkl"),
+    "attraction_dbscan": os.path.join(MODEL_FOLDER, "attraction_dbscan.pkl"),
+    "attraction_pca": os.path.join(MODEL_FOLDER, "attraction_pca.pkl"),
+    "attractions_pca_data": os.path.join(MODEL_FOLDER, "attractions_pca_data.pkl"),
+}
+
+print("🔍 Checking model files in 'models/' directory...")
+for key, path in file_paths.items():
+    print(f"📂 {key}: {path} {'✅ Exists' if os.path.exists(path) else '❌ Missing'}")
+
+# ✅ Function to safely load models
+def load_model(model_key):
+    model_path = file_paths[model_key]
+    
+    if not os.path.exists(model_path):
+        print(f"❌ Error: Model file not found -> {model_path}")
+        return None
+    
+    try:
+        with open(model_path, "rb") as f:
+            model = pickle.load(f)
+        print(f"✅ Model '{model_key}' loaded successfully!")
+        return model
+    except Exception as e:
+        print(f"❌ Error loading model '{model_key}': {e}")
+        return None
+
+# ✅ Load models
+hotel_model = load_model("hotel")
+restaurant_model = load_model("restaurant")
+attraction_model_dbscan = load_model("attraction_dbscan")
+attraction_model_pca = load_model("attraction_pca")
+
+# ✅ Load PCA Data
 try:
-    with open(file_path_hotel, "rb") as f:
-        hotel_model = pickle.load(f)
-    with open(file_path_rest, "rb") as f:
-        rest_model = pickle.load(f)
-    with open(file_path_attraction, "rb") as f:
-        attraction_model = pickle.load(f)
-    print("✅ Model loaded successfully!")
+    attractions_pca_data = np.load(file_paths["attractions_pca_data"], allow_pickle=True)
+    print("✅ PCA data loaded successfully!")
 except Exception as e:
-    print(f"❌ Error loading model: {e}")
+    print(f"❌ Error loading PCA data: {e}")
+    attractions_pca_data = None
 
-
-# Load datasets from MongoDB
+# ✅ Load datasets from MongoDB safely
 def load_data_from_mongo(collection_name):
-    if collection_name not in mongo.db.list_collection_names():
+    if collection_name not in db.list_collection_names():
         print(f"❌ Collection '{collection_name}' does not exist in the database!")
         return pd.DataFrame()  # Return an empty DataFrame
     
-    data = list(mongo.db[collection_name].find({}, {'_id': 0}))  # Exclude _id field
-    
+    data = list(db[collection_name].find({}, {'_id': 0}))  # Exclude _id field
     if not data:  # Check if collection is empty
-        print(f"❌ No data found in '{collection_name}' collection!")
+        print(f"⚠️ No data found in '{collection_name}' collection!")
         return pd.DataFrame()
     
     return pd.DataFrame(data)
@@ -53,11 +109,23 @@ hotels = load_data_from_mongo("Hotels")
 restaurants = load_data_from_mongo("Restaurants")
 attractions = load_data_from_mongo("Attractions")
 
-# Standardize Data
+# ✅ Check missing columns and handle errors
+def ensure_columns(df, required_columns):
+    for col in required_columns:
+        if col not in df.columns:
+            print(f"⚠️ Warning: Column '{col}' is missing in the dataset.")
+            df[col] = np.nan  # Assign NaN to avoid KeyError
+    return df
+
+hotels = ensure_columns(hotels, ["rating", "pricelevel"])
+restaurants = ensure_columns(restaurants, ["rating", "pricelevel_lkr"])
+attractions = ensure_columns(attractions, ["rating", "latitude", "longitude"])
+
+# ✅ Standardize Data
 scaler = StandardScaler()
-hotels_scaled = scaler.fit_transform(hotels[['rating', 'pricelevel']])
-restaurants_scaled = scaler.fit_transform(restaurants[['rating', 'pricelevel_lkr']])
-attractions_scaled = scaler.fit_transform(attractions[['rating', 'latitude', 'longitude']])
+hotels_scaled = scaler.fit_transform(hotels[['rating', 'pricelevel']].fillna(0))
+restaurants_scaled = scaler.fit_transform(restaurants[['rating', 'pricelevel_lkr']].fillna(0))
+attractions_scaled = scaler.fit_transform(attractions[['rating', 'latitude', 'longitude']].fillna(0))
 
 # Function to allocate days
 def allocate_days(user):
@@ -76,31 +144,50 @@ def get_nearby_options(lat, lon, options_df, max_distance_km):
         if geodesic((lat, lon), (row['latitude'], row['longitude'])).km <= max_distance_km
     ], key=lambda x: x[1])
 
-# Function to recommend hotels
+# Function to Recommend Hotels (Using Hotel Model)
 def recommend_hotels(user):
-    city_col = f"city_{user['startingDestination'].lower().replace(' ', '_')}"
-    filtered_hotels = hotels[hotels[city_col] == 1].copy()
-    budget = user["hotelBudget"]
-    budget_hotels = filtered_hotels[filtered_hotels["pricelevel"] <= budget]
-    if budget_hotels.empty:
-        budget_hotels = filtered_hotels
-    best_hotel = budget_hotels.sort_values(by="rating", ascending=False).iloc[0]["name"]
+    user_features = np.array([[user["hotelBudget"]]])
+    predicted_ratings = hotel_model.predict(user_features)
+    hotels["predicted_rating"] = predicted_ratings
+    best_hotel = hotels.sort_values(by="predicted_rating", ascending=False).iloc[0]["name"]
     return best_hotel
 
-# Function to recommend attractions
+# Function to Recommend Attractions (Using PCA + DBSCAN)
 def recommend_attractions(user, lat, lon):
     max_distance_km = user["maximum_distance"]
-    city_col = f"city_{user['startingDestination'].lower().replace(' ', '_')}"
-    filtered_attractions = attractions[attractions[city_col] == 1]
+    user_features = np.array([[user["activities_preference_Historical Sites"], user["activities_preference_Religious"]]])
+    
+    # Transform features using PCA
+    user_pca_transformed = attraction_model_pca.transform(user_features)
+    
+    # Predict the cluster
+    cluster_label = attraction_model_dbscan.fit_predict(user_pca_transformed.reshape(1, -1))
+    
+    # Select attractions from the predicted cluster
+    filtered_attractions = attractions[attractions["cluster"] == cluster_label[0]]
+    
+    if filtered_attractions.empty:
+        return ["No attractions available"]
+    
+    # Find nearby attractions
     nearby = get_nearby_options(lat, lon, filtered_attractions, max_distance_km)
     return [x[0]['name'] for x in nearby[:4]]
 
-# Function to recommend restaurants
+# Function to Recommend Restaurants (Using Restaurant Model)
 def recommend_restaurants(user, lat, lon):
     max_distance_km = user["maximum_distance"]
-    city_col = f"city_{user['startingDestination'].lower().replace(' ', '_')}"
-    filtered_restaurants = restaurants[restaurants[city_col] == 1]
+    user_features = np.array([[user["cuisine_preference_Chinese"], user["cuisine_preference_Italian"], user["food_preference"]]])
+    
+    # Predict restaurant category
+    predicted_class = restaurant_model.predict(user_features)
+    filtered_restaurants = restaurants[restaurants["rating_class"] == predicted_class]
+    
+    if filtered_restaurants.empty:
+        return {"breakfast": "No Restaurant Available", "lunch": "No Restaurant Available", "dinner": "No Restaurant Available"}
+    
+    # Find nearby restaurants
     nearby = get_nearby_options(lat, lon, filtered_restaurants, max_distance_km)
+    
     return {
         "breakfast": nearby[0][0]['name'] if len(nearby) > 0 else "No Restaurant Available",
         "lunch": nearby[1][0]['name'] if len(nearby) > 1 else "No Restaurant Available",
@@ -114,7 +201,7 @@ def generate_itinerary():
     itinerary_name = data["name"]
 
     # Fetch user data from preitineraries
-    user = mongo.db.preitineraries.find_one({"username": username, "name": itinerary_name}, {'_id': 0})
+    user = db.preitineraries.find_one({"username": username, "name": itinerary_name}, {'_id': 0})
     if not user:
         return jsonify({"error": "User itinerary not found"}), 404
 
@@ -139,7 +226,7 @@ def generate_itinerary():
             }
 
     # Save itinerary to MongoDB under generated_itineraries
-    mongo.db.generated_itineraries.insert_one({
+    db.generated_itineraries.insert_one({
         "username": username,
         "itinerary_name": itinerary_name,
         "itinerary": itinerary
