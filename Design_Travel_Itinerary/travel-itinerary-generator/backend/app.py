@@ -1,188 +1,151 @@
-import sys
 from flask import Flask, request, jsonify
-from flask_cors import CORS
-from pymongo import MongoClient
+from flask_pymongo import PyMongo
 import pandas as pd
 import numpy as np
+import random
 from geopy.distance import geodesic
-from sklearn.ensemble import RandomForestClassifier
-from sklearn.mixture import GaussianMixture
-from sklearn.metrics import accuracy_score, confusion_matrix, classification_report
-from sklearn.model_selection import train_test_split, cross_val_score
 from sklearn.preprocessing import StandardScaler
-from imblearn.over_sampling import SMOTE
-from xgboost import XGBClassifier
-from collections import Counter
-from sklearn.feature_extraction.text import TfidfVectorizer
-from sklearn.metrics.pairwise import cosine_similarity
+from sklearn.ensemble import RandomForestRegressor
+from sklearn.mixture import GaussianMixture
+from sklearn.model_selection import train_test_split
+import pickle
 
-# Initialize Flask App
 app = Flask(__name__)
-CORS(app)  # Enable CORS for frontend communication
 
 # MongoDB Connection
-mongo_uri = "mongodb+srv://Pearlpath:DMEN2425@pearlpath.lq9jq.mongodb.net/?retryWrites=true&w=majority&appName=PearlPath"
-client = MongoClient(mongo_uri)
-db = client["test"]
+app.config["MONGO_URI"] = "mongodb+srv://Pearlpath:DMEN2425@pearlpath.lq9jq.mongodb.net/?retryWrites=true&w=majority&appName=PearlPath"
+mongo = PyMongo(app)
 
-# Fetch data from MongoDB
-def fetch_latest_data():
-    hotels = pd.DataFrame(list(db["Hotels"].find()))
-    restaurants = pd.DataFrame(list(db["Restaurants"].find()))
-    attractions = pd.DataFrame(list(db["Attractions"].find()))
-    itineraries = pd.DataFrame(list(db["preitineraries"].find()))
+# Load pre-trained models
+import pickle
 
-    for df in [hotels, restaurants, attractions, itineraries]:
-        if "_id" in df.columns:
-            df.drop(columns=["_id"], inplace=True)
+file_path_hotel = "hotel_model.pkl"
+file_path_rest = "restaurant_model.pkl"
+file_path_attraction = "attraction_model.pkl"
 
-    return hotels, restaurants, attractions, itineraries
+try:
+    with open(file_path_hotel, "rb") as f:
+        hotel_model = pickle.load(f)
+    with open(file_path_rest, "rb") as f:
+        rest_model = pickle.load(f)
+    with open(file_path_attraction, "rb") as f:
+        attraction_model = pickle.load(f)
+    print("✅ Model loaded successfully!")
+except Exception as e:
+    print(f"❌ Error loading model: {e}")
 
-# Train GMM for hotel clustering
-def train_hotel_gmm(hotels, n_clusters=5):
-    features = hotels[['latitude', 'longitude', 'pricelevel', 'hotelclass', 'rating']].fillna(0)
-    gmm = GaussianMixture(n_components=n_clusters, random_state=42)
-    hotel_clusters = gmm.fit_predict(features)
-    hotels['cluster'] = hotel_clusters
-    return gmm, hotels
 
-# Train RandomForest Classifier
-def train_optimized_hotel_classifier(X_train, y_train):
-    model = RandomForestClassifier(n_estimators=50, max_depth=10, min_samples_split=5, random_state=42)
-    model.fit(X_train, y_train)
-    return model
+# Load datasets from MongoDB
+def load_data_from_mongo(collection_name):
+    if collection_name not in mongo.db.list_collection_names():
+        print(f"❌ Collection '{collection_name}' does not exist in the database!")
+        return pd.DataFrame()  # Return an empty DataFrame
+    
+    data = list(mongo.db[collection_name].find({}, {'_id': 0}))  # Exclude _id field
+    
+    if not data:  # Check if collection is empty
+        print(f"❌ No data found in '{collection_name}' collection!")
+        return pd.DataFrame()
+    
+    return pd.DataFrame(data)
 
-# Train XGBoost model
-def train_xgboost_classifier(X_train, y_train):
-    model = XGBClassifier(n_estimators=50, max_depth=6, learning_rate=0.1, random_state=42)
-    model.fit(X_train, y_train)
-    return model
+hotels = load_data_from_mongo("Hotels")
+restaurants = load_data_from_mongo("Restaurants")
+attractions = load_data_from_mongo("Attractions")
 
-# Allocate days to destinations
-def allocate_days_to_destinations(destinations, num_days):
-    allocation_rules = {1: (1, 1), 2: (1, 2), 3: (1, 3), 4: (1, 4), 5: (1, 4)}
-    min_dest, max_dest = allocation_rules.get(num_days, (1, 1))
-    num_destinations = min(max_dest, len(destinations))
-    selected_destinations = destinations[:num_destinations]
+# Standardize Data
+scaler = StandardScaler()
+hotels_scaled = scaler.fit_transform(hotels[['rating', 'pricelevel']])
+restaurants_scaled = scaler.fit_transform(restaurants[['rating', 'pricelevel_lkr']])
+attractions_scaled = scaler.fit_transform(attractions[['rating', 'latitude', 'longitude']])
 
-    days_per_destination = {dest: 1 for dest in selected_destinations}
-    remaining_days = num_days - len(selected_destinations)
-
-    index = 0
-    while remaining_days > 0 and selected_destinations:
-        dest = selected_destinations[index]
-        days_per_destination[dest] += 1
-        remaining_days -= 1
-        index = (index + 1) % len(selected_destinations)
-
+# Function to allocate days
+def allocate_days(user):
+    destinations = [col.replace("destination_", "").lower().replace(" ", "_") for col in user if col.startswith("destination_") and user[col] == 1]
+    num_days = user["numberofdays"]
+    days_per_destination = {dest: num_days // len(destinations) for dest in destinations}
+    for i in range(num_days % len(destinations)):
+        days_per_destination[destinations[i]] += 1
     return days_per_destination
 
-# Get nearby options based on distance
-def get_nearby_options(lat, lon, options, max_distance_km):
+# Function to get nearby options
+def get_nearby_options(lat, lon, options_df, max_distance_km):
     return sorted([
         (row, geodesic((lat, lon), (row['latitude'], row['longitude'])).km)
-        for _, row in options.iterrows()
+        for _, row in options_df.iterrows()
         if geodesic((lat, lon), (row['latitude'], row['longitude'])).km <= max_distance_km
     ], key=lambda x: x[1])
 
-# Generate Itinerary
-def generate_itinerary(username, itinerary_name):
-    print(f"✅ Generating Itinerary for User: {username}, Itinerary: {itinerary_name}")
+# Function to recommend hotels
+def recommend_hotels(user):
+    city_col = f"city_{user['startingDestination'].lower().replace(' ', '_')}"
+    filtered_hotels = hotels[hotels[city_col] == 1].copy()
+    budget = user["hotelBudget"]
+    budget_hotels = filtered_hotels[filtered_hotels["pricelevel"] <= budget]
+    if budget_hotels.empty:
+        budget_hotels = filtered_hotels
+    best_hotel = budget_hotels.sort_values(by="rating", ascending=False).iloc[0]["name"]
+    return best_hotel
 
-    hotels, restaurants, attractions, itineraries = fetch_latest_data()
-    user_itinerary = itineraries[itineraries["username"] == username]
+# Function to recommend attractions
+def recommend_attractions(user, lat, lon):
+    max_distance_km = user["maximum_distance"]
+    city_col = f"city_{user['startingDestination'].lower().replace(' ', '_')}"
+    filtered_attractions = attractions[attractions[city_col] == 1]
+    nearby = get_nearby_options(lat, lon, filtered_attractions, max_distance_km)
+    return [x[0]['name'] for x in nearby[:4]]
 
-    if user_itinerary.empty:
-        print(f"❌ Error: No itinerary found for user '{username}'")
-        return
-
-    user_itinerary = user_itinerary.iloc[0]
-    num_days = int(user_itinerary['numberofdays'])
-    max_distance = float(user_itinerary['maximum_distance'])
-    # ✅ Extract destinations dynamically from one-hot encoding
-    destination_columns = [col for col in user_itinerary.index if col.startswith('destination_') and user_itinerary[col] == 1]
-
-    # ✅ Convert column names to actual destination names
-    selected_destinations = [col.replace('destination_', '').strip() for col in destination_columns]
-
-    if not selected_destinations:
-        print("❌ Error: No destinations found for this itinerary!")
-        print("Available columns:", user_itinerary.keys())
-        return
-
-    print(f"✅ Selected Destinations: {selected_destinations}")
-
-
-    # Train Hotel Model
-    gmm_model, hotels = train_hotel_gmm(hotels)
-
-    features = ['latitude', 'longitude', 'hotelclass', 'rating']
-    X = hotels[features]
-    y = hotels['cluster']
-    
-    smote = SMOTE(random_state=42, k_neighbors=1)
-    X_resampled, y_resampled = smote.fit_resample(X, y)
-    X_train, X_test, y_train, y_test = train_test_split(X_resampled, y_resampled, test_size=0.2, random_state=42)
-    
-    rf_model = train_optimized_hotel_classifier(X_train, y_train)
-    xgb_model = train_xgboost_classifier(X_train, y_train)
-
-    days_per_destination = allocate_days_to_destinations(selected_destinations, num_days)
-    itinerary = {}
-
-    for destination, days in days_per_destination.items():
-        itinerary[destination] = {
-            "days_allocated": days,
-            "hotels": [],
-            "restaurants": [],
-            "attractions": []
-        }
-
-        # ✅ Check for city columns dynamically (one-hot encoding)
-        city_columns = [col for col in hotels.columns if col.startswith('city_')]
-
-        # ✅ Extract cities from one-hot encoding
-        hotels['city'] = hotels[city_columns].idxmax(axis=1).str.replace('city_', '')
-
-        # ✅ Now filter by city name
-        hotel_options = hotels[hotels['city'].str.contains(destination, case=False, na=False)]
-
-        if not hotel_options.empty:
-            selected_hotel = hotel_options.sample(1).iloc[0]
-            itinerary[destination]["hotels"].append(selected_hotel['name'])
-
-        restaurant_options = restaurants[restaurants['city'].str.contains(destination, case=False, na=False)]
-        nearby_restaurants = get_nearby_options(selected_hotel['latitude'], selected_hotel['longitude'], restaurant_options, max_distance)
-        itinerary[destination]["restaurants"] = [res[0]['name'] for res in nearby_restaurants[:3]]
-
-        attraction_options = attractions[attractions['city'].str.contains(destination, case=False, na=False)]
-        nearby_attractions = get_nearby_options(selected_hotel['latitude'], selected_hotel['longitude'], attraction_options, max_distance)
-        itinerary[destination]["attractions"] = [attr[0]['name'] for attr in nearby_attractions[:4]]
-
-    db["generated_itineraries"].insert_one({"username": username, "name": itinerary_name, "itinerary": itinerary})
-
-    return itinerary
+# Function to recommend restaurants
+def recommend_restaurants(user, lat, lon):
+    max_distance_km = user["maximum_distance"]
+    city_col = f"city_{user['startingDestination'].lower().replace(' ', '_')}"
+    filtered_restaurants = restaurants[restaurants[city_col] == 1]
+    nearby = get_nearby_options(lat, lon, filtered_restaurants, max_distance_km)
+    return {
+        "breakfast": nearby[0][0]['name'] if len(nearby) > 0 else "No Restaurant Available",
+        "lunch": nearby[1][0]['name'] if len(nearby) > 1 else "No Restaurant Available",
+        "dinner": nearby[2][0]['name'] if len(nearby) > 2 else "No Restaurant Available"
+    }
 
 @app.route('/generate_itinerary', methods=['POST'])
-def generate_itinerary_api():
-    data = request.json  
-    username = data.get('username')
-    itinerary_name = data.get('name')
+def generate_itinerary():
+    data = request.json
+    username = data["username"]
+    itinerary_name = data["name"]
 
-    if not username or not itinerary_name:
-        return jsonify({"error": "Username and itinerary name required"}), 400
+    # Fetch user data from preitineraries
+    user = mongo.db.preitineraries.find_one({"username": username, "name": itinerary_name}, {'_id': 0})
+    if not user:
+        return jsonify({"error": "User itinerary not found"}), 404
 
-    itinerary = generate_itinerary(username, itinerary_name)
+    # Allocate days to destinations
+    days_per_destination = allocate_days(user)
 
-    return jsonify({"itinerary": itinerary})
+    itinerary = {}
+    for destination, days in days_per_destination.items():
+        formatted_destination = destination.replace("_", " ").title()
+        hotel_name = recommend_hotels(user)
+        hotel_info = hotels[hotels["name"] == hotel_name].iloc[0]
+        hotel_lat, hotel_lon = hotel_info["latitude"], hotel_info["longitude"]
 
-@app.route('/')
-def home():
-    return "✅ Flask Server is Running!"
+        for day in range(days):
+            attractions_list = recommend_attractions(user, hotel_lat, hotel_lon)
+            restaurants_list = recommend_restaurants(user, hotel_lat, hotel_lon)
+
+            itinerary[f'{formatted_destination} - Day {day + 1}'] = {
+                'Hotel': hotel_name,
+                'Restaurants': restaurants_list,
+                'Attractions': attractions_list
+            }
+
+    # Save itinerary to MongoDB under generated_itineraries
+    mongo.db.generated_itineraries.insert_one({
+        "username": username,
+        "itinerary_name": itinerary_name,
+        "itinerary": itinerary
+    })
+
+    return jsonify({"message": "Itinerary generated successfully", "itinerary": itinerary}), 201
 
 if __name__ == '__main__':
-    if len(sys.argv) == 3:
-        generate_itinerary(sys.argv[1], sys.argv[2])
-    else:
-        print("ℹ️ Running Flask Server...")
-        app.run(debug=True, port=5001)
+    app.run(debug=True)

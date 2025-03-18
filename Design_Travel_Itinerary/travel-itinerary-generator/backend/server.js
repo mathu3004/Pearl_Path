@@ -34,6 +34,7 @@ const itinerarySchema = new mongoose.Schema({
     name: { type: String, required: true },
     startingDestination: { type: String, required: true },
     destinations: { type: [String], required: true },
+    hotelBudget: {type: Number, required: true},
     activities: { type: [String], required: true },
     cuisines: { type: [String], required: true },
     foodPreferences: { type: String, required: true },
@@ -75,6 +76,7 @@ app.post('/api/itinerary', async (req, res) => {
             name,
             startingDestination,
             destinations,
+            hotelBudget,
             activities,
             cuisines,
             foodPreferences,
@@ -91,6 +93,7 @@ app.post('/api/itinerary', async (req, res) => {
         maxDistance = Number(maxDistance);  // Convert to Number
         numberOfDays = Number(numberOfDays);  // Convert to Number
         peopleCount = String(peopleCount);  // Ensure it's a String
+        hotelBudget = Number(hotelBudget);
 
         // ✅ Trim and convert to lowercase for case-insensitive matching
         username = username.trim().toLowerCase();
@@ -109,7 +112,7 @@ app.post('/api/itinerary', async (req, res) => {
         // ✅ Create a new itinerary if it doesn't exist
         const newItinerary = new Itinerary({
             username,
-            name, startingDestination, destinations, activities, cuisines, foodPreferences, transportationMode, maxDistance, numberOfDays, peopleCount
+            name, startingDestination, destinations, hotelBudget, activities, cuisines, foodPreferences, transportationMode, maxDistance, numberOfDays, peopleCount
         });
         await newItinerary.save();
         console.log("✅ Itinerary saved successfully!");

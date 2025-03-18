@@ -27,6 +27,7 @@ const TravelItineraryGenerator = () => {
         name: '',
         startingDestination: '',
         destinations: [],
+        hotelBudget: '',
         activities: [],
         cuisines: [],
         foodPreferences: '',
@@ -214,6 +215,22 @@ const TravelItineraryGenerator = () => {
                             <option value="Nuwara Eliya">Nuwara Eliya</option>
                         </select>
                         {errors.startingDestination && <p className="error-text">{errors.startingDestination}</p>}
+                    </div>
+                    <br></br>
+
+                    <div>
+                        <label className="form-label">Hotel budget per day: </label>
+                        <input
+                            type="number"
+                            name="hotelBudget"
+                            placeholder="Enter hotel budget per day:"
+                            value={formData.hotelBudget}
+                            onChange={handleChange}
+                            className="w-full p-3 border-2 border-green-500 rounded-md focus:border-green-700 focus:outline-none shadow-sm"
+                            
+                            required
+                        />
+                        {errors.hotelBudget && <p className="error-text">{errors.hotelBudget}</p>}
                     </div>
                     <br></br>
 
