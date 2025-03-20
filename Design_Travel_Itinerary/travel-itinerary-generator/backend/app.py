@@ -147,40 +147,81 @@ hotels_scaled = scaler.fit_transform(hotels[['rating', 'pricelevel']].fillna(0))
 restaurants_scaled = scaler.fit_transform(restaurants[['rating', 'pricelevel_lkr']].fillna(0))
 attractions_scaled = scaler.fit_transform(attractions[['rating', 'latitude', 'longitude']].fillna(0))
 
-
 # Allocate Days
-def allocate_days(user):
-    destinations = [col.replace("destination_", "").lower() for col in user if col.startswith("destination_") and user[col] == 1]
-    num_days = user["numberofdays"]
-    starting_destination = user.get("startingDestination", "").lower().replace(" ", "_")
-    if starting_destination in destinations:
+def allocate_days_to_destinations(user, destinations, num_days):
+    starting_destination = user['startingdestination'].lower().replace(" ", "_")
+    destinations = [dest.lower().replace(" ", "_") for dest in destinations]
+
+    if starting_destination not in destinations:
+        destinations.insert(0, starting_destination)
+    else:
         destinations.remove(starting_destination)
-    destinations.insert(0, starting_destination)
-    days_per_destination = {dest: num_days // len(destinations) for dest in destinations}
-    for i in range(num_days % len(destinations)):
+        destinations.insert(0, starting_destination)
+
+    num_destinations = len(destinations)
+    base_days = num_days // num_destinations
+    extra_days = num_days % num_destinations
+    
+    days_per_destination = {dest: base_days for dest in destinations}
+    for i in range(extra_days):
         days_per_destination[destinations[i]] += 1
+    
     return days_per_destination
 
-# Assign Hotels
+def get_nearby_options(lat, lon, options, max_distance_km):
+    return sorted([
+        (row, geodesic((lat, lon), (row['latitude'], row['longitude'])).km)
+        for _, row in options.iterrows()
+        if geodesic((lat, lon), (row['latitude'], row['longitude'])).km <= max_distance_km
+    ], key=lambda x: x[1])
+
 def assign_hotels_for_user(user):
-    budget = user['hotelBudget']
-    max_distance = user['maximum_distance']
+    budget = user.get('hotelBudget', None)
+    max_distance = user.get('maximum_distance', None)
+
+    if budget is None or max_distance is None:
+        print("❌ Error: 'hotelBudget' or 'maximum_distance' is missing in user data!")
+        return None
+
+    print(f"🏨 Searching for hotels within budget: {budget} and max distance: {max_distance} km...")
+
     filtered_hotels = hotels[(hotels['pricelevel'] <= budget)]
+    
+    if filtered_hotels.empty:
+        print("❌ No hotels found within the budget range!")
+        return None
+
     sorted_hotels = filtered_hotels.sort_values(by='rating', ascending=False)
+
     for _, hotel in sorted_hotels.iterrows():
-        distance = geodesic((hotel['latitude'], hotel['longitude']), (user['starting_latitude'], user['starting_longitude'])).km
-        if distance <= max_distance:
-            return hotel['name']
-    return "No suitable hotels available"
+        if 'latitude' in hotel and 'longitude' in hotel:
+            return hotel['name']  # ✅ Returns hotel name
+        else:
+            print(f"❌ Warning: Hotel {hotel['name']} is missing latitude/longitude!")
+    
+    return None
 
 # Recommend Attractions
 def recommend_attractions(user, hotel_lat, hotel_lon):
-    max_distance_km = user["maximum_distance"]
+    max_distance_km = user.get("maximum_distance", 10)  # Default to 10 km if missing
+
+    # ✅ Ensure DataFrame columns are lowercase
     filtered_attractions = attractions.copy()
+    
+    if 'latitude' not in filtered_attractions.columns or 'longitude' not in filtered_attractions.columns:
+        print("❌ Error: 'latitude' or 'longitude' column is missing in attractions DataFrame!")
+        return ["No attractions available"]
+
     filtered_attractions['distance'] = filtered_attractions.apply(
-        lambda row: geodesic((hotel_lat, hotel_lon), (row['Latitude'], row['Longitude'])).km, axis=1)
+        lambda row: geodesic((hotel_lat, hotel_lon), (row['latitude'], row['longitude'])).km, axis=1)
+
     filtered_attractions = filtered_attractions[filtered_attractions['distance'] <= max_distance_km]
-    return filtered_attractions.sort_values(by="Rating", ascending=False)["Name"].tolist()[:4] if not filtered_attractions.empty else ["No attractions available"]
+
+    if filtered_attractions.empty:
+        print("❌ No attractions found within the specified distance!")
+        return ["No attractions available"]
+
+    return filtered_attractions.sort_values(by="rating", ascending=False)["name"].tolist()[:4]
 
 # Recommend Restaurants
 def recommend_restaurants(user, hotel_lat, hotel_lon):
@@ -191,32 +232,91 @@ def recommend_restaurants(user, hotel_lat, hotel_lon):
     filtered_restaurants = filtered_restaurants[filtered_restaurants['distance'] <= max_distance_km]
     return filtered_restaurants.sort_values(by="rating", ascending=False)["name"].tolist()[:3] if not filtered_restaurants.empty else ["No restaurants available"]
 
-# Generate Itinerary
 @app.route('/generate_itinerary', methods=['POST'])
 def generate_itinerary():
-    data = request.json
-    username = data["username"]
-    itinerary_name = data["name"]
+    print("🔍 Received request to generate itinerary...")
 
-    user = db.preitineraries.find_one({"username": username, "name": itinerary_name}, {'_id': 0})
-    if not user:
-        return jsonify({"error": "User itinerary not found"}), 404
+    try:
+        data = request.json
+        if not data:
+            raise ValueError("❌ Error: No JSON data received!")
 
-    days_per_destination = allocate_days(user)
-    itinerary = {}
-    
-    for destination, days in days_per_destination.items():
+        username = data.get("username")
+        itinerary_name = data.get("name")
+
+        if not username or not itinerary_name:
+            raise ValueError("❌ Error: 'username' and 'name' fields are required!")
+
+        print(f"🔍 Searching for itinerary in MongoDB: username={username}, name={itinerary_name}")
+
+        # Fetch user itinerary from MongoDB
+        user = db.preitineraries.find_one({"username": username, "name": itinerary_name}, {'_id': 0})
+
+        if not user:
+            raise ValueError("❌ Error: User itinerary not found in MongoDB!")
+
+        print("✅ User itinerary found! Allocating days...")
+
+        # ✅ Assign starting latitude/longitude from selected hotel
         hotel_name = assign_hotels_for_user(user)
-        hotel_info = hotels[hotels['name'] == hotel_name].iloc[0] if hotel_name else None
-        hotel_lat, hotel_lon = hotel_info['latitude'], hotel_info['longitude'] if hotel_info is not None else (0, 0)
-        for day in range(days):
-            itinerary[f'{destination} - Day {day + 1}'] = {
-                'Hotel': hotel_name,
-                'Restaurants': recommend_restaurants(user, hotel_lat, hotel_lon),
-                'Attractions': recommend_attractions(user, hotel_lat, hotel_lon)
-            }
+        print(f"🏨 Selected Hotel: {hotel_name}")
 
-    return jsonify({"message": "Itinerary generated successfully", "itinerary": itinerary}), 201
+        if hotel_name:
+            hotel_info = hotels[hotels['name'] == hotel_name]
+            if not hotel_info.empty:
+                user['starting_latitude'] = hotel_info.iloc[0]['latitude']
+                user['starting_longitude'] = hotel_info.iloc[0]['longitude']
+                print(f"📍 Assigned 'starting_latitude': {user['starting_latitude']}, 'starting_longitude': {user['starting_longitude']}")
+            else:
+                print("❌ No hotel found in database! Assigning default coordinates.")
+                user['starting_latitude'], user['starting_longitude'] = None, None
+
+        # If still missing, return an error
+        if 'starting_latitude' not in user or 'starting_longitude' not in user or user['starting_latitude'] is None:
+            raise ValueError("❌ Error: Could not determine starting latitude and longitude!")
+
+        days_per_destination = allocate_days_to_destinations(user, destination, user['numberofdays'])
+        itinerary = {}
+
+        for destination, days in days_per_destination.items():
+            print(f"🔍 Processing destination: {destination} for {days} days...")
+            for day in range(days):
+                print(f"📅 Generating itinerary for {destination} - Day {day + 1}")
+
+                itinerary[f'{destination} - Day {day + 1}'] = {
+                    'Hotel': hotel_name,
+                    'Restaurants': recommend_restaurants(user, user['starting_latitude'], user['starting_longitude']),
+                    'Attractions': recommend_attractions(user, user['starting_latitude'], user['starting_longitude'])
+                }
+
+        print("✅ Itinerary generation complete!")
+
+        # ✅ Attempt to update existing itinerary or insert if new
+        print("🔍 Attempting to save itinerary to MongoDB...")
+
+        try:
+            save_result = db.generated_itineraries.update_one(
+                {"username": username, "name": itinerary_name},  # ✅ Find by username + name
+                {"$set": {"itinerary": itinerary}},  # ✅ Update itinerary
+                upsert=True  # ✅ If not found, insert a new document
+            )
+            
+            if save_result.matched_count > 0:
+                print(f"✅ Existing itinerary updated successfully for {username}, {itinerary_name}")
+            elif save_result.upserted_id:
+                print(f"✅ New itinerary created with ID: {save_result.upserted_id}")
+            else:
+                print("⚠️ Warning: No modifications were made.")
+
+        except Exception as e:
+            print(f"❌ Error saving itinerary to MongoDB: {e}")
+            return jsonify({"error": str(e)}), 500
+
+    except Exception as e:
+        print(f"🚨 CRITICAL ERROR: {e}")
+        return jsonify({"error": str(e)}), 500
+
 
 if __name__ == '__main__':
-    app.run(debug=True, port=5004)
+    print("🚀 Starting Flask server on port 5004...")
+    app.run(debug=True, port=5005)
