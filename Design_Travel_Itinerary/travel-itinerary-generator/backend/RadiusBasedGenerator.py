@@ -83,13 +83,13 @@ try:
 
     # One-Hot Encoding for 'startingDestination' (single category column)
     if 'startingDestination' in df.columns:
-        startingDestination_encoded = pd.get_dummies(df['startingDestination'], prefix='startingDestination')
+        startingDestination_encoded = pd.get_dummies(df['startingDestination'], prefix='startingDestination').astype(int)
         df = df.drop(columns=['startingDestination'])
         df = pd.concat([df, startingDestination_encoded], axis=1)
 
     # One-Hot Encoding for 'food_preference' (single category column)
     if 'food_preference' in df.columns:
-        food_preference_encoded = pd.get_dummies(df['food_preference'], prefix='food_preference')
+        food_preference_encoded = pd.get_dummies(df['food_preference'], prefix='food_preference').astype(int)
         df = df.drop(columns=['food_preference'])
         df = pd.concat([df, food_preference_encoded], axis=1)
 
