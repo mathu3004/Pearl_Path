@@ -319,17 +319,24 @@ def generate_itinerary():
                     'Attractions': recommend_attractions(user, user['starting_latitude'], user['starting_longitude'])
                 }
 
-        print("✅ Itinerary generation complete!")
+        print("Itinerary generation complete!")
 
-        # ✅ Attempt to update existing itinerary or insert if new
-        print("🔍 Attempting to save itinerary to MongoDB...")
+        # Attempt to update existing itinerary or insert if new
+        print("Attempting to save itinerary to MongoDB...")
 
         try:
             save_result = db.generated_itineraries.update_one(
-                {"username": username, "name": itinerary_name},  # ✅ Find by username + name
-                {"$set": {"itinerary": itinerary}},  # ✅ Update itinerary
-                upsert=True  # ✅ If not found, insert a new document
-            )
+    {"username": username, "name": itinerary_name},
+    {
+        "$set": {
+            "username": username,
+            "name": itinerary_name,
+            "itinerary": itinerary
+        }
+    },
+    upsert=True
+)
+
             
             if save_result.matched_count > 0:
                 print(f"✅ Existing itinerary updated successfully for {username}, {itinerary_name}")
@@ -365,5 +372,6 @@ if __name__ == '__main__':
         'username': username,
         'name': itinerary_name
     }):
-        response = generate_itinerary()
-        print("Response:", response.get_json())
+        response, status_code = generate_itinerary()
+        print("✅ Response JSON:", response.get_json())
+        print("📦 Status Code:", status_code)

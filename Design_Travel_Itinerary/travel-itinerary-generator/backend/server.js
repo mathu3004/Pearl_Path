@@ -150,6 +150,31 @@ app.post('/api/itinerary', async (req, res) => {
     }
 });
 
+app.get('/api/itineraries/:username/:name', async (req, res) => {
+    try {
+        const { username, name } = req.params;
+        console.log("🔍 Searching for itinerary:", { username, name });
+
+        const itinerary = await mongoose.connection.db
+            .collection("generated_itineraries")
+            .findOne({ 
+                username: username.trim().toLowerCase(), 
+                name: name.trim().toLowerCase()
+            });
+
+        if (!itinerary) {
+            console.log("❌ No itinerary found for:", username, name);
+            return res.status(404).json({ message: "No itinerary found for this user." });
+        }
+
+        console.log("✅ Found itinerary:", itinerary);
+        res.json(itinerary);
+            } catch (err) {
+        console.error("❌ Error fetching itinerary:", err);
+        res.status(500).json({ message: "Server error", error: err.message });
+    }
+});
+
 // New API Endpoint to Fetch a Specific Itinerary by Name or ID
 app.get('/api/itinerary/:name', async (req, res) => {
     try {
@@ -164,31 +189,6 @@ app.get('/api/itinerary/:name', async (req, res) => {
     } catch (err) {
         console.error("❌ Error fetching itinerary:", err);
         res.status(500).json({ message: "❌ Error fetching itinerary", error: err.message });
-    }
-});
-
-app.get('/api/itinerary/:name', async (req, res) => {
-    try {
-        const name = req.params.name.toLowerCase();
-        
-        console.log(`🔍 Fetching itinerary for: ${name}`); // Debugging
-
-        // Fetching from the correct MongoDB collection
-        const itineraryDoc = await mongoose.connection.db.collection("generated_itineraries")
-            .findOne({ name: { $regex: new RegExp(`^${name}$`, "i") } }); // Case-insensitive
-
-
-        if (!itineraryDoc) {
-            console.error("❌ Itinerary not found in generated_itineraries!");
-            return res.status(404).json({ error: "❌ Itinerary not found" });
-        }
-
-        console.log("✅ Itinerary found:", itineraryDoc);
-        res.json({ itinerary: itineraryDoc.itinerary });
-
-    } catch (err) {
-        console.error("🚨 Error fetching itinerary:", err);
-        res.status(500).json({ error: err.message });
     }
 });
 

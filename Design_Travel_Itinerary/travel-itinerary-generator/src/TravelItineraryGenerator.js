@@ -132,7 +132,7 @@ const TravelItineraryGenerator = () => {
     
                 if (success) {
                     alert("✅ Processing completed! Redirecting...");
-                    navigate('/Visual', { state: { formData } });
+                    navigate(`/visual/${formData.username.toLowerCase()}/${formData.name.toLowerCase()}`);
                 } else {
                     alert("❌ Processing timeout. Try again later.");
                 }

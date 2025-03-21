@@ -1,9 +1,8 @@
 // src/App.js
-
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import TravelItineraryGenerator from './TravelItineraryGenerator';
-import Visual from './Visual';
+import TravelItinerary from './Visual';
 
 
 const App = () => {
@@ -11,7 +10,8 @@ const App = () => {
         <Router>
             <Routes>
                 <Route path="/" element={<TravelItineraryGenerator />} />  
-                <Route path="/Visual" element={<Visual />} />
+                <Route path="/visual/:username/:name" element={<TravelItinerary />} />
+                
             </Routes>
         </Router>
     );

@@ -1,6 +1,9 @@
-import React from "react";
-import { GoogleMap, LoadScript, Marker } from "@react-google-maps/api";
-import { FaHotel, FaUtensils, FaMapMarkerAlt, FaStar, FaTrain } from "react-icons/fa";
+//Visual.js
+import React, { useState, useEffect } from "react";
+import { useParams } from "react-router-dom";
+import axios from "axios";
+//import { GoogleMap, LoadScript, Marker } from "@react-google-maps/api";
+import { FaHotel, FaUtensils, FaMapMarkerAlt, FaTrain } from "react-icons/fa";
 import { FaInstagram, FaFacebook } from "react-icons/fa";
 import { Link } from "react-router-dom";
 import "./App.css";
@@ -20,87 +23,103 @@ const Header = () => {
   );
 };
 
-const itinerary = {
-  name: "Minal's Itinerary",
-  days: [
-    {
-      day: 1,
-      destination: "Colombo",
-      activities: [
-        { type: "Hotel", name: "Cinnamon Grand", location: "Colombo 03", rating: 4.5, lat: 6.9271, lng: 79.8612, icon: <FaHotel /> },
-        { type: "Breakfast", name: "The English Cake Company", location: "Park Road, Colombo", rating: 4.7, lat: 6.9170, lng: 79.8750, icon: <FaUtensils /> },
-        { type: "Attraction", name: "Galle Face Green", location: "Galle Road, Colombo", rating: 4.6, lat: 6.9271, lng: 79.8449, icon: <FaMapMarkerAlt /> },
-        { type: "Lunch", name: "Ministry of Crab", location: "Old Dutch Hospital, Colombo", rating: 4.8, lat: 6.9344, lng: 79.8428, icon: <FaUtensils /> },
-        { type: "Attraction", name: "National Museum", location: "Sir Marcus Fernando Mawatha, Colombo", rating: 4.5, lat: 6.9271, lng: 79.8659, icon: <FaMapMarkerAlt /> },
-        { type: "Dinner", name: "Nuga Gama", location: "Colombo 02", rating: 4.7, lat: 6.9260, lng: 79.8496, icon: <FaUtensils /> },
-      ],
-    },
-  ],
-};
-
-const mapContainerStyle = {
-  width: "100%",
-  height: "910px",
-  borderRadius: "20px",
-  boxShadow: "0 10px 30px rgba(0, 0, 0, 0.2)",
-};
-
-const center = {
-  lat: 6.9271,
-  lng: 79.8612,
-};
+//const mapContainerStyle = { width: "100%", height: "910px", borderRadius: "20px", boxShadow: "0 10px 30px rgba(0, 0, 0, 0.2)",};
 
 const TravelItinerary = () => {
+  const [itineraries, setItineraries] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  const { username, name } = useParams();
+  const lowerUsername = username ? username.toLowerCase() : null;
+  const lowerName = name ? name.toLowerCase() : null;
+ 
+  useEffect(() => {
+    console.log("📡 useEffect triggered for:", lowerUsername, lowerName);
+    if (!lowerUsername || !lowerName) {
+      console.warn("⚠️ Username or name missing from URL params");
+      return;
+    }    
+
+    const fetchItinerary = async () => {
+      try {
+          console.log("🔍 Fetching itinerary for:", lowerUsername, lowerName);
+          console.log(`🌐 Fetching from URL: http://localhost:5000/api/itineraries/${lowerUsername}/${lowerName}`);
+
+          const response = await axios.get(`http://localhost:5000/api/itineraries/${lowerUsername}/${lowerName}`);
+  
+          console.log("✅ API Response:", response.data);  // Debugging log
+  
+          if (!response.data || !response.data.itinerary) {
+              console.error("❌ No valid itinerary data received.");
+              setItineraries(null);
+          } else {
+              setItineraries(response.data);  // ✅ Store object, not array
+              console.log("📦 Stored itinerary:", response.data);
+          }
+      } catch (error) {
+          console.error("❌ Error fetching itinerary:", error);
+      } finally {
+          console.log("🔄 Setting loading to false");
+          setLoading(false);
+      }
+  };  
+        fetchItinerary();
+      }, [lowerUsername, lowerName]);
+
+if (loading) {
+  return <p>Loading itineraries...</p>;
+}
+
+console.log("🖥️ Rendering itineraries:", itineraries);
+
+
+if (!itineraries || !itineraries.itinerary) {
+  console.log("🖥️ Rendering itineraries:", itineraries);
+  return <p>No itinerary data available.</p>;
+}
+
   return (
     <div>
-    <div className="page-containers">
-      <Header />
-      <div className="main-layout">
-        <div className="itinerary-card">
-          <h2 className="itinerary-title">{itinerary.name}</h2>
-          {itinerary.days.map((day, index) => (
-            <div key={index}>
-              <h3 className="itinerary-subtitle">Day {day.day}: {day.destination}</h3>
-              <ul className="itinerary-list">
-                {day.activities.map((activity, idx) => (
-                  <li key={idx} className="itinerary-item">
-                  {/* First row: Name with icon */}
-                  <div className="activity-header">
-                    <span className="activity-icon">{activity.icon}</span>
-                    <span className="activity-type">{activity.type}:</span> {activity.name}
-                  </div>
-                  
-                  {/* Second row: Location and Rating */}
-                  <div className="activity-second-row">
-                    <span className="activity-location"><FaMapMarkerAlt /> {activity.location}</span>
-                    <span className="activity-rating"><FaStar /> {activity.rating.toFixed(1)}</span>
-                  </div>
-                </li>
-                
+      <div className="page-containers">
+        <Header />
+        <div className="main-layout">
+          <div className="itinerary-card">
+            <h2>Itineraries for {username}</h2>
+            <h2>{itineraries?.name?.toUpperCase()}'s ITINERARY</h2>
 
-                
-                ))}
-              </ul>
-            </div>
-          ))}
+              {itineraries && itineraries.itinerary ? (
+  Object.entries(itineraries.itinerary).length > 0 ? (
+    Object.entries(itineraries.itinerary).map(([dayKey, details]) => {
+      const dayNumberMatch = dayKey.match(/Day (\d+)/);
+      const dayNumber = dayNumberMatch ? dayNumberMatch[1] : "Unknown";
+
+      return (
+        <div key={dayKey} className="day-plan">
+          <h3>Day {dayNumber}: {dayKey.split(" - ")[0]}</h3>
+          <div className="card">
+            <p><FaHotel /> <strong>Hotel:</strong> {details?.Hotel || "Not available"}</p>
+          </div>
+          <div className="card">
+            <p><FaUtensils /> <strong>Restaurants:</strong> {details?.Restaurants?.join(", ") || "No restaurants listed"}</p>
+          </div>
+          <div className="card">
+            <p><FaMapMarkerAlt /> <strong>Attractions:</strong> {details?.Attractions?.join(", ") || "No attractions listed"}</p>
+          </div>
         </div>
+      );
+    })
+  ) : (
+    <p>No itinerary details available.</p>
+  )
+) : (
+  <p>No itinerary found for {username}.</p>
+)}
+
+          </div>
+
+        {/* ✅ Ensure map loads dynamically after data */}
         <div className="map-container">
-          <LoadScript googleMapsApiKey="AIzaSyBmfj-U3U-CXmdqT6bpn_WdIQUub-JO0gk">
-            <GoogleMap mapContainerStyle={mapContainerStyle} center={center} zoom={13}>
-              {itinerary.days[0].activities.map((place, index) => (
-                <Marker 
-                  key={index} 
-                  position={{ lat: place.lat, lng: place.lng }} 
-                  title={`${index + 1}. ${place.name}`} 
-                  label={{ text: `${index + 1}`, color: "white", fontWeight: "bold" }}
-                  icon={window.google && window.google.maps ? {
-                    url: `https://chart.googleapis.com/chart?chst=d_map_pin_letter&chld=${index + 1}|0f766e|ffffff`,
-                    scaledSize: new window.google.maps.Size(40, 40)
-                  } : undefined}
-                />
-              ))}
-            </GoogleMap>
-          </LoadScript>
+             {/* Future Google Maps integration here */}
         </div>
       </div>
       <div className="button-container">
