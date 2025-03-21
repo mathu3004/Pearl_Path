@@ -1,10 +1,18 @@
-require('dotenv').config(); // Load environment variables from .env file
+// Top of server.js
+import dotenv from 'dotenv';
+dotenv.config();
 
-const express = require('express');
-const mongoose = require('mongoose');
-const cors = require('cors');
-const { exec } = require('child_process');
-const path = require('path');
+import express from 'express';
+import mongoose from 'mongoose';
+import cors from 'cors';
+import { exec } from 'child_process';
+import path from 'path';
+import { fileURLToPath } from 'url';
+import { dirname } from 'path';
+
+// Get __dirname equivalent in ES modules
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -145,8 +153,8 @@ app.post('/api/itinerary', async (req, res) => {
 // New API Endpoint to Fetch a Specific Itinerary by Name or ID
 app.get('/api/itinerary/:name', async (req, res) => {
     try {
-        const itineraryName = req.params.name;
-        const itinerary = await Itinerary.findOne({ name: itineraryName });
+        const name = req.params.name.toLowerCase(); // Normalize casing
+        const itinerary = await Itinerary.findOne({ name });
 
         if (!itinerary) {
             return res.status(404).json({ message: "❌ Itinerary not found" });
@@ -156,6 +164,31 @@ app.get('/api/itinerary/:name', async (req, res) => {
     } catch (err) {
         console.error("❌ Error fetching itinerary:", err);
         res.status(500).json({ message: "❌ Error fetching itinerary", error: err.message });
+    }
+});
+
+app.get('/api/itinerary/:name', async (req, res) => {
+    try {
+        const name = req.params.name.toLowerCase();
+        
+        console.log(`🔍 Fetching itinerary for: ${name}`); // Debugging
+
+        // Fetching from the correct MongoDB collection
+        const itineraryDoc = await mongoose.connection.db.collection("generated_itineraries")
+            .findOne({ name: { $regex: new RegExp(`^${name}$`, "i") } }); // Case-insensitive
+
+
+        if (!itineraryDoc) {
+            console.error("❌ Itinerary not found in generated_itineraries!");
+            return res.status(404).json({ error: "❌ Itinerary not found" });
+        }
+
+        console.log("✅ Itinerary found:", itineraryDoc);
+        res.json({ itinerary: itineraryDoc.itinerary });
+
+    } catch (err) {
+        console.error("🚨 Error fetching itinerary:", err);
+        res.status(500).json({ error: err.message });
     }
 });
 

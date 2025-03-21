@@ -102,7 +102,6 @@ try:
     # Drop `_id` column to avoid duplicate key errors
     if "_id" in df.columns:
         df = df.drop(columns=["_id"])
-
     # ✅ Check if itinerary already exists in preprocessed collection
     existing_preprocessed = preprocessed_collection.find_one({"username": username, "name": itinerary_name})
 
@@ -112,7 +111,7 @@ try:
             {"username": username, "name": itinerary_name},
             {"$set": df.to_dict(orient='records')[0]}
         )
-        print(f"🔄 Updated existing preprocessed itinerary for '{username}' - '{itinerary_name}'")
+        print(f"Updated existing preprocessed itinerary for '{username}' - '{itinerary_name}'")
     else:
         # ✅ Insert a new preprocessed itinerary
         preprocessed_collection.insert_one(df.to_dict(orient='records')[0])

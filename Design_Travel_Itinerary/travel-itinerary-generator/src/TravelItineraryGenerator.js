@@ -96,53 +96,63 @@ const TravelItineraryGenerator = () => {
     
     const handleSubmit = async (e) => {
         e.preventDefault();
-        console.log("Form Data Before Sending:", formData); // Debugging
-        
+        console.log("Form Data Before Sending:", formData);
+    
         if (!validateForm()) {
             alert("❌ Please fix the errors in the form before submitting.");
             return;
         }
-        
+    
         try {
+            // Send form data to the backend
             const response = await fetch('http://localhost:5000/api/itinerary', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(formData),
             });
+    
             const data = await response.json();
+    
             if (response.ok) {
                 alert("✅ Itinerary saved successfully!");
-                // Check if preprocessing is done before navigating
-            let success = false;
-            for (let i = 0; i < 8; i++) {  // Try 5 times with a delay
-                const checkResponse = await fetch(`http://localhost:5000/api/itinerary/${formData.name}`);
-                if (checkResponse.ok) {
-                    success = true;
-                    break;
+    
+                // Now poll until itinerary is available (max 8 attempts, 5 seconds apart)
+                let success = false;
+                const itineraryName = formData.name.toLowerCase(); // ✅ normalize for GET
+    
+                for (let i = 0; i < 8; i++) {
+                    const checkResponse = await fetch(`http://localhost:5000/api/itinerary/${itineraryName}`);
+                    if (checkResponse.ok) {
+                        success = true;
+                        break;
+                    }
+                    console.log(`🔄 Attempt ${i + 1}: Itinerary not ready yet...`);
+                    await new Promise(resolve => setTimeout(resolve, 5000));
                 }
-                await new Promise(resolve => setTimeout(resolve, 5000)); // Wait 3 seconds before retrying
-            }
-
-            if (success) {
-                alert("✅ Processing completed! Redirecting...");
-                navigate('/visualization', { state: { formData } });
+    
+                if (success) {
+                    alert("✅ Processing completed! Redirecting...");
+                    navigate('/Visual', { state: { formData } });
+                } else {
+                    alert("❌ Processing timeout. Try again later.");
+                }
+    
             } else {
-                alert("❌ Processing timeout. Try again later.");
+                // Handle client errors (e.g., duplicate itinerary)
+                if (response.status === 400 && data.error) {
+                    alert("❌ Error: " + data.error);
+                } else {
+                    console.error("❌ API Error:", data);
+                    alert("❌ Unexpected error: " + data.message);
+                }
             }
-
-        } else {
-            if (response.status === 400) {
-                alert("❌ Error: " + data.error); // Show message if itinerary name already exists
-            } else{
-            console.error("❌ API Error Response:", data);
-            alert("❌ Error: " + data.message);
-            }
+    
+        } catch (error) {
+            console.error("❌ Network or Fetch Error:", error);
+            alert("❌ Failed to connect to the server. Is it running on port 5000?");
         }
-    } catch (error) {
-        console.error("❌ Network or Fetch Error:", error);
-        alert("❌ Failed to save itinerary.");
-    }
-};    
+    };
+    
 
     return (
         <div className="page-container">

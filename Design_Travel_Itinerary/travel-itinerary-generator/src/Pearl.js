@@ -16,7 +16,6 @@ const Header = () => {
         <Link to="/about-us">AboutUs</Link>
         <Link to="/features">Features</Link>
       </ul>
-
     </header>
   );
 };

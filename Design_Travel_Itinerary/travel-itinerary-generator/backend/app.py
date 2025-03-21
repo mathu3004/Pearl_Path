@@ -7,7 +7,7 @@ from geopy.distance import geodesic
 from sklearn.preprocessing import StandardScaler
 from pymongo import MongoClient
 import time
-
+import joblib
 # Load environment variables
 from dotenv import load_dotenv
 load_dotenv()
@@ -22,7 +22,7 @@ if not MONGO_URI:
 
 # ✅ Initialize MongoDB connection
 client = MongoClient(MONGO_URI)
-db = client["test"]  # ✅ Explicitly define the database
+db = client["test"]  # Explicitly define the database
 
 # ✅ Debugging: Print MongoDB cluster connection
 print("🔍 Connecting to MongoDB cluster:", MONGO_URI.split('@')[-1])
@@ -53,9 +53,16 @@ def home():
 def favicon():
     return '', 204  # Returns an empty response with HTTP 204 (No Content)
 
-
 # ✅ Load pre-trained models
 MODEL_FOLDER = "/workspaces/Pearl_Path/Design_Travel_Itinerary/travel-itinerary-generator/backend/models"  # Updated path for uploaded models
+
+@app.route('/api/itinerary/<name>', methods=['GET'])
+def get_itinerary_by_name(name):
+    itinerary = db.generated_itineraries.find_one({"name": name.lower()}, {'_id': 0})
+    if itinerary:
+        return jsonify(itinerary), 200
+    else:
+        return jsonify({"error": "Itinerary not found"}), 404
 
 file_paths = {
     "hotel": os.path.join(MODEL_FOLDER, "hotel_model.pkl"),
@@ -147,26 +154,49 @@ hotels_scaled = scaler.fit_transform(hotels[['rating', 'pricelevel']].fillna(0))
 restaurants_scaled = scaler.fit_transform(restaurants[['rating', 'pricelevel_lkr']].fillna(0))
 attractions_scaled = scaler.fit_transform(attractions[['rating', 'latitude', 'longitude']].fillna(0))
 
+# Unique tracking sets
+visited_restaurants = set()
+visited_attractions = set()
+
 # Allocate Days
-def allocate_days_to_destinations(user, destinations, num_days):
-    starting_destination = user['startingdestination'].lower().replace(" ", "_")
-    destinations = [dest.lower().replace(" ", "_") for dest in destinations]
+def allocate_days_to_destinations(user, num_days):
+    # Extract destinations and starting destination
+    destinations = [
+        col.replace("destination_", "").lower().replace(" ", "_") 
+        for col in user.keys() if col.startswith("destination_") and user[col] == 1
+    ]
 
-    if starting_destination not in destinations:
-        destinations.insert(0, starting_destination)
-    else:
-        destinations.remove(starting_destination)
-        destinations.insert(0, starting_destination)
+    starting_destination_list = [
+        col.replace("startingDestination_", "").lower().replace(" ", "_") 
+        for col in user.keys() if col.startswith("startingDestination_") and user[col] == 1
+    ]
 
+    # Ensure starting_destination is a string, not a list
+    starting_destination = starting_destination_list[0] if starting_destination_list else None
+
+    # Ensure starting destination is at the beginning
+    if starting_destination:
+        if starting_destination in destinations:
+            destinations.remove(starting_destination)  # Remove if exists
+        destinations.insert(0, starting_destination)  # Insert at start
+
+    # **Edge Case: If destinations are empty**
+    if not destinations:
+        return {}  # Return an empty dictionary instead of causing ZeroDivisionError
+
+    # Allocate days evenly across destinations
     num_destinations = len(destinations)
     base_days = num_days // num_destinations
     extra_days = num_days % num_destinations
-    
+
     days_per_destination = {dest: base_days for dest in destinations}
+
+    # Distribute extra days to the first `extra_days` destinations
     for i in range(extra_days):
         days_per_destination[destinations[i]] += 1
-    
+
     return days_per_destination
+
 
 def get_nearby_options(lat, lon, options, max_distance_km):
     return sorted([
@@ -239,21 +269,21 @@ def generate_itinerary():
     try:
         data = request.json
         if not data:
-            raise ValueError("❌ Error: No JSON data received!")
+            return jsonify({"error": "No JSON data received!"}), 400
 
         username = data.get("username")
         itinerary_name = data.get("name")
 
-        if not username or not itinerary_name:
-            raise ValueError("❌ Error: 'username' and 'name' fields are required!")
+        if not isinstance(username, str) or not isinstance(itinerary_name, str):
+            return jsonify({"error": "username and itinerary name must be strings"}), 400
 
         print(f"🔍 Searching for itinerary in MongoDB: username={username}, name={itinerary_name}")
 
-        # Fetch user itinerary from MongoDB
+        # ✅ Fetch user itinerary from MongoDB
         user = db.preitineraries.find_one({"username": username, "name": itinerary_name}, {'_id': 0})
 
-        if not user:
-            raise ValueError("❌ Error: User itinerary not found in MongoDB!")
+        if not user or not isinstance(user, dict):
+            return jsonify({"error": "User itinerary not found or invalid format!"}), 404
 
         print("✅ User itinerary found! Allocating days...")
 
@@ -273,9 +303,9 @@ def generate_itinerary():
 
         # If still missing, return an error
         if 'starting_latitude' not in user or 'starting_longitude' not in user or user['starting_latitude'] is None:
-            raise ValueError("❌ Error: Could not determine starting latitude and longitude!")
+            raise jsonify("❌ Error: Could not determine starting latitude and longitude!")
 
-        days_per_destination = allocate_days_to_destinations(user, destination, user['numberofdays'])
+        days_per_destination = allocate_days_to_destinations(user, user['numberofdays'])
         itinerary = {}
 
         for destination, days in days_per_destination.items():
@@ -311,12 +341,29 @@ def generate_itinerary():
         except Exception as e:
             print(f"❌ Error saving itinerary to MongoDB: {e}")
             return jsonify({"error": str(e)}), 500
+        
+        # ✅ Return successful response
+        return jsonify({
+            "message": "✅ Itinerary generated successfully!",
+            "itinerary": itinerary
+        }), 200
 
     except Exception as e:
         print(f"🚨 CRITICAL ERROR: {e}")
         return jsonify({"error": str(e)}), 500
 
-
+# At the bottom of app.py
 if __name__ == '__main__':
-    print("🚀 Starting Flask server on port 5004...")
-    app.run(debug=True, port=5005)
+    import sys
+
+    username = sys.argv[1]
+    itinerary_name = sys.argv[2]
+
+    print(f"Running itinerary generation for {username}, {itinerary_name}")
+
+    with app.test_request_context(method='POST', json={
+        'username': username,
+        'name': itinerary_name
+    }):
+        response = generate_itinerary()
+        print("Response:", response.get_json())
