@@ -7,6 +7,9 @@ import { FaHotel, FaUtensils, FaMapMarkerAlt, FaTrain, FaStar} from "react-icons
 import { FaInstagram, FaFacebook } from "react-icons/fa";
 import { Link } from "react-router-dom";
 import "./App.css";
+import html2canvas from "html2canvas";
+import jsPDF from "jspdf";
+import { useNavigate } from "react-router-dom";
 
 const Header = () => {
   return (
@@ -24,16 +27,66 @@ const Header = () => {
 };
 
 const TravelItinerary = () => {
+  const navigate = useNavigate();
   const [itineraries, setItineraries] = useState(null);
   const [loading, setLoading] = useState(true);
   const [locations, setLocations] = useState([]);
   const [activeLocation, setActiveLocation] = useState(null);
   const [selectedLocation, setSelectedLocation] = useState(null);
   const scrollRefs = useRef([]);
+  const itineraryRef = useRef();
 
   const { username, name } = useParams();
   const lowerUsername = username ? username.toLowerCase() : null;
   const lowerName = name ? name.toLowerCase() : null;
+
+  const handleExportPDF = async () => {
+    const element = itineraryRef.current;
+    if (!element) return;
+  
+    const hiddenElements = document.querySelectorAll(".hide-on-export");
+    hiddenElements.forEach((el) => (el.style.display = "none")); // 👈 hide buttons
+  
+    try {
+      const canvas = await html2canvas(element, {
+        scrollY: -window.scrollY,
+        useCORS: true,
+        backgroundColor: null, // Preserve background styles
+      });
+  
+      const imgData = canvas.toDataURL("image/png");
+      const pdf = new jsPDF({
+        orientation: "portrait",
+        unit: "px",
+        format: [canvas.width, canvas.height],
+      });
+  
+      pdf.addImage(imgData, "PNG", 0, 0, canvas.width, canvas.height);
+      pdf.save(`${itineraries.name}_itinerary.pdf`);
+    } catch (error) {
+      console.error("Failed to export PDF:", error);
+    } finally {
+      hiddenElements.forEach((el) => (el.style.display = "")); // 👈 show buttons again
+    }
+  };
+
+  const handleSaveItinerary = async () => {
+    try {
+      const response = await axios.post("http://localhost:5000/api/save-itinerary", {
+        username: lowerUsername,
+        name: lowerName
+      });
+  
+      if (response.status === 201) {
+        alert("✅ Itinerary saved to favorites!");
+      } else {
+        alert("⚠️ Could not save itinerary.");
+      }
+    } catch (error) {
+      console.error("Error saving itinerary:", error);
+      alert("❌ Failed to save itinerary. Check console.");
+    }
+  };  
  
   useEffect(() => {
     if (!lowerUsername || !lowerName) {
@@ -123,8 +176,18 @@ if (!itineraries || !itineraries.itinerary) {
 
   return (
     <div>
-      <div className="page-containers">
-        <Header />
+      
+      <Header />
+      <div
+  className="page-containers"
+  ref={itineraryRef}
+  style={{
+    backgroundImage: 'url("https://i0.wp.com/www.tourbooking.lk/wp-content/uploads/2023/03/merlin_148552275_74c0d250-949c-46e0-b8a1-e6d499e992cf-superJumbo-edited.jpg?fit=2048%2C1151&ssl=1")',
+    backgroundPosition: 'center',
+    backgroundAttachment: 'fixed',
+    minHeight: '200vh'
+  }}
+>
         <div className="main-layout">
           <div className="itinerary-card">
           <h2 className="itinerary-title">Itineraries for {username}</h2>
@@ -213,11 +276,12 @@ if (!itineraries || !itineraries.itinerary) {
 />
         </div>
       </div>
-      <div className="button-container">
-        <button className="button">Edit</button>
-        <button className="button">Save Itinerary</button>
-        <button className="button">Export</button>
-      </div>
+      <div className="button-container hide-on-export">
+      <button className="button" onClick={() => navigate(`/modify/${lowerUsername}/${lowerName}`)}>Edit</button>
+  <button className="button" onClick={handleSaveItinerary}>Save Itinerary</button>
+  <button className="button" onClick={handleExportPDF}>Export</button>
+</div>
+
       <p className="thank-you-message">Thank You! Enjoy Your Trip! <FaTrain /> </p>
 
     </div> <Footer />
@@ -225,6 +289,8 @@ if (!itineraries || !itineraries.itinerary) {
   );
  
 };
+
+
 
 const Footer = () => {
   return (

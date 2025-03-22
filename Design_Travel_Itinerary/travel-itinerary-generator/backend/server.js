@@ -168,6 +168,67 @@ app.get('/api/itineraries/:username/:name', async (req, res) => {
     }
 });
 
+app.post('/api/save-itinerary', async (req, res) => {
+    try {
+      const { username, name } = req.body;
+      if (!username || !name) {
+        return res.status(400).json({ error: 'Missing username or itinerary name' });
+      }
+  
+      const db = mongoose.connection.db;
+      const sourceItinerary = await db.collection("generated_itineraries").findOne({
+        username: username.toLowerCase(),
+        name: name.toLowerCase()
+      });
+  
+      if (!sourceItinerary) {
+        return res.status(404).json({ error: 'Itinerary not found' });
+      }
+  
+      await db.collection("saved_itineraries").insertOne({
+        ...sourceItinerary,
+        saved_at: new Date()
+      });
+  
+      return res.status(201).json({ message: "Itinerary saved successfully!" });
+    } catch (error) {
+      console.error("Save itinerary failed:", error);
+      res.status(500).json({ error: "Failed to save itinerary", details: error.message });
+    }
+  });  
+
+  app.post('/api/save-edited-itinerary', async (req, res) => {
+    try {
+      const { username, name, itinerary } = req.body;
+      if (!username || !name || !itinerary) {
+        return res.status(400).json({ error: 'Missing data' });
+      }
+      await mongoose.connection.db.collection('generated_itineraries').updateOne(
+        { username: username.toLowerCase(), name: name.toLowerCase() },
+        { $set: { itinerary, last_updated: new Date() } }
+      );
+      res.status(200).json({ message: 'Itinerary updated successfully' });
+    } catch (err) {
+      res.status(500).json({ error: 'Failed to update itinerary', details: err.message });
+    }
+  });
+  
+  //For ModifyRequest.js
+  app.get('/api/user-itineraries/:username', async (req, res) => {
+    try {
+      const { username } = req.params;
+      const itineraries = await mongoose.connection.db.collection('generated_itineraries')
+  .find({ username: username.toLowerCase() })
+  .toArray();
+
+      res.json(itineraries);
+    } catch (error) {
+      console.error('Error fetching user itineraries:', error);
+      res.status(500).send('Server error');
+    }
+  });
+  
+
 // New API Endpoint to Fetch a Specific Itinerary by Name or ID
 app.get('/api/itinerary/:name', async (req, res) => {
     try {
