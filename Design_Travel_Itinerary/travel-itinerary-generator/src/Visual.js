@@ -138,7 +138,7 @@ const TravelItinerary = () => {
               });
             }
       
-            day?.Restaurants?.forEach(rest => {
+            Object.values(day?.Restaurants || {}).forEach(rest => {
               if (rest.latitude && rest.longitude) {
                 extractedLocations.push({
                   lat: rest.latitude,
@@ -163,7 +163,7 @@ const TravelItinerary = () => {
         };
       
         loadCoordinates();
-      }, [itineraries]);
+      }, [itineraries]);      
       
 
 if (loading) {
@@ -202,14 +202,14 @@ if (!itineraries || !itineraries.itinerary) {
 
               const orderedItems = [
                 { type: "Hotel", data: details?.Hotel },
-                { type: "Restaurant", data: details?.Restaurants?.[0], label: "Breakfast" },
+                { type: "Restaurant", data: details?.Restaurants?.breakfast, label: "Breakfast" },
                 { type: "Attraction", data: details?.Attractions?.[0] },
                 { type: "Attraction", data: details?.Attractions?.[1] },
-                { type: "Restaurant", data: details?.Restaurants?.[1], label: "Lunch" },
+                { type: "Restaurant", data: details?.Restaurants?.lunch, label: "Lunch" },
                 { type: "Attraction", data: details?.Attractions?.[2] },
                 { type: "Attraction", data: details?.Attractions?.[3] },
-                { type: "Restaurant", data: details?.Restaurants?.[2], label: "Dinner" },
-              ];
+                { type: "Restaurant", data: details?.Restaurants?.dinner, label: "Dinner" },
+              ];              
 
               return (
                 <div key={dayKey}>

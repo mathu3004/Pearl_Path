@@ -207,181 +207,192 @@ def get_nearby_options(lat, lon, options, max_distance_km):
         if geodesic((lat, lon), (row['latitude'], row['longitude'])).km <= max_distance_km
     ], key=lambda x: x[1])
 
-def assign_hotels_for_user(user):
+def assign_hotel_for_destination(user, destination):
     budget = user.get('hotelBudget', None)
-    max_distance = user.get('maximum_distance', None)
+    if budget is None:
+        return None, []
 
-    if budget is None or max_distance is None:
-        print("Error: 'hotelBudget' or 'maximum_distance' is missing in user data!")
-        return None
+    city_col = f"city_{destination.lower().replace(' ', '_')}"
+    if city_col not in hotels.columns:
+        return None, []
 
-    print(f"Searching for hotels within budget: {budget} and max distance: {max_distance} km...")
+    city_hotels = hotels[hotels[city_col] == 1]
+    city_hotels = city_hotels[city_hotels['pricelevel'] <= budget]
+    if city_hotels.empty:
+        city_hotels = hotels[hotels[city_col] == 1]  # fallback without budget
+    if city_hotels.empty:
+        return None, []
 
-    filtered_hotels = hotels[(hotels['pricelevel'] <= budget)]
-    
-    if filtered_hotels.empty:
-        print("No hotels found within the budget range!")
-        return None
+    sorted_hotels = city_hotels.sort_values(by='rating', ascending=False)
+    hotel = sorted_hotels.iloc[0]
+    alternatives = sorted_hotels.iloc[1:4]['name'].tolist()
 
-    sorted_hotels = filtered_hotels.sort_values(by='rating', ascending=False)
+    return {
+    "name": str(hotel["name"]),
+    "latitude": float(hotel["latitude"]),
+    "longitude": float(hotel["longitude"]),
+    "rating": float(hotel["rating"]),
+    "pricelevel": int(hotel["pricelevel"]),
+    "city": str(destination.title())
+}, [str(name) for name in alternatives]
 
-    for _, hotel in sorted_hotels.iterrows():
-        if 'latitude' in hotel and 'longitude' in hotel:
-             return {
-                "name": hotel["name"],
-                "latitude": hotel["latitude"],
-                "longitude": hotel["longitude"],
-                "city": next((col.replace("city_", "").replace("_", " ") 
-                          for col in hotel.keys() 
-                          if col.startswith("city_") and hotel[col] == 1), "Unknown"),
-                "rating": hotel.get("rating", None),
-                "pricelevel": hotel.get("pricelevel", None)
-            }
-        else:
-            print(f"Warning: Hotel {hotel['name']} is missing latitude/longitude!")
-
-    return None
 
 # Recommend Attractions
-def recommend_attractions(user, hotel_lat, hotel_lon):
+def recommend_attractions_for_destination(user, destination, hotel_lat, hotel_lon, used_attractions):
     max_distance_km = user['maximum_distance']
+    city_col = f"city_{destination}"
 
-    filtered_attractions = attractions.copy()
+    city_attractions = attractions[attractions[city_col] == 1] if city_col in attractions.columns else attractions
+    user_activities = [col for col in user.keys() if col.startswith("activities_preference_") and user[col] == 1]
+    matching_cols = [col for col in user_activities if col in city_attractions.columns]
+    if matching_cols:
+        city_attractions = city_attractions[city_attractions[matching_cols].sum(axis=1) > 0]
 
-    if 'latitude' not in filtered_attractions.columns or 'longitude' not in filtered_attractions.columns:
-        print("Error: 'latitude' or 'longitude' column is missing in attractions DataFrame!")
-        return [{"name": "No attractions available"}]
-
-    filtered_attractions['distance'] = filtered_attractions.apply(
+    city_attractions['distance'] = city_attractions.apply(
         lambda row: geodesic((hotel_lat, hotel_lon), (row['latitude'], row['longitude'])).km, axis=1)
+    city_attractions = city_attractions[city_attractions['distance'] <= max_distance_km]
 
-    filtered_attractions = filtered_attractions[filtered_attractions['distance'] <= max_distance_km]
+    top_attractions = city_attractions[
+    ~city_attractions['name'].isin(used_attractions)
+    ].sort_values(by="rating", ascending=False).head(10)
 
-    if filtered_attractions.empty:
-        print("No attractions found within the specified distance!")
-        return [{"name": "No attractions available"}]
+    # Store used ones
+    used_attractions.update(top_attractions['name'].tolist())
+        
+    main = [{
+    "name": str(row["name"]),
+    "latitude": float(row["latitude"]),
+    "longitude": float(row["longitude"]),
+    "city": next((col.replace("city_", "").replace("_", " ") for col in row.keys() if col.startswith("city") and row[col] == 1), "Unknown"),
+    "rating": float(row["rating"])
+} for _, row in top_attractions.iterrows()]
 
-    sorted_attractions = filtered_attractions.sort_values(by="rating", ascending=False).head(4)
-
-    return [{
-        "name": row["name"],
-        "latitude": row["latitude"],
-        "longitude": row["longitude"],
-        "city": next((col.replace("city_", "").replace("", " ") for col in row.keys() if col.startswith("city") and row[col] == 1), "Unknown"),
-        "rating": row["rating"]
-    } for _, row in sorted_attractions.iterrows()]
+    
+    alternatives = [str(name) for name in top_attractions.iloc[4:7]['name'].tolist()]
+    
+    return main, alternatives
 
 # Recommend Restaurants
-def recommend_restaurants(user, hotel_lat, hotel_lon):
+def recommend_restaurants_for_destination(user, destination, hotel_lat, hotel_lon, used_restaurants):
     max_distance_km = user['maximum_distance']
-    filtered_restaurants = restaurants.copy()
-    filtered_restaurants['distance'] = filtered_restaurants.apply(
+    city_col = f"city_{destination}"
+
+    city_restaurants = restaurants[restaurants[city_col] == 1] if city_col in restaurants.columns else restaurants
+
+    # Dietary filtering
+    dietary = 'dietary_veg' if user.get('food_preference_veg') == 1 else 'dietary_non-veg'
+    if dietary in city_restaurants.columns:
+        city_restaurants = city_restaurants[city_restaurants[dietary] == 1]
+
+    # Cuisine filtering
+    user_cuisines = [col.replace("cuisine_preference_", "cuisine_") for col in user.keys()
+                     if col.startswith("cuisine_preference_") and user[col] == 1]
+    valid_cuisines = [c for c in user_cuisines if c in city_restaurants.columns]
+    if valid_cuisines:
+        city_restaurants = city_restaurants[city_restaurants[valid_cuisines].sum(axis=1) > 0]
+
+    city_restaurants['distance'] = city_restaurants.apply(
         lambda row: geodesic((hotel_lat, hotel_lon), (row['latitude'], row['longitude'])).km, axis=1)
-    filtered_restaurants = filtered_restaurants[filtered_restaurants['distance'] <= max_distance_km]
+    city_restaurants = city_restaurants[city_restaurants['distance'] <= max_distance_km]
 
-    if filtered_restaurants.empty:
-        return [{"name": "No restaurants available"}]
+    top_restaurants = city_restaurants[
+    ~city_restaurants['name'].isin(used_restaurants)
+    ].sort_values(by="rating", ascending=False).head(6)
 
-    sorted_restaurants = filtered_restaurants.sort_values(by="rating", ascending=False).head(3)
+    # Track used restaurant names
+    used_restaurants.update(top_restaurants['name'].tolist())
 
-    return [{
-        "name": row["name"],
-        "latitude": row["latitude"],
-        "longitude": row["longitude"],
-        "city": next((col.replace("city_", "").replace("", " ") for col in row.keys() if col.startswith("city") and row[col] == 1), "Unknown"),
-        "rating": row["rating"]
-    } for _, row in sorted_restaurants.iterrows()]
+    meals = ['breakfast', 'lunch', 'dinner']
+    best = {}
+    alternatives = {}
+    for i, meal in enumerate(meals):
+        if i < len(top_restaurants):
+            rest_row = top_restaurants.iloc[i]
+            best[meal] = {
+    "name": str(rest_row['name']),
+    "latitude": float(rest_row['latitude']),
+    "longitude": float(rest_row['longitude']),
+    "city": str(next((col.replace("city_", "").replace("_", " ") for col in rest_row.index if col.startswith("city") and rest_row[col] == 1), "Unknown")),
+    "rating": float(rest_row['rating'])
+}
 
+        if i + 3 < len(top_restaurants):
+            alternatives[meal] = [str(name) for name in top_restaurants.iloc[i+3:i+6]['name'].tolist()]
+        else:
+            alternatives[meal] = []
+
+    return best, alternatives
+# Flask route for itinerary generation
 @app.route('/generate_itinerary', methods=['POST'])
 def generate_itinerary():
-    print("Received request to generate itinerary...")
-
     try:
         data = request.json
-        if not data:
-            return jsonify({"error": "No JSON data received!"}), 400
-
         username = data.get("username")
         itinerary_name = data.get("name")
 
-        if not isinstance(username, str) or not isinstance(itinerary_name, str):
-            return jsonify({"error": "username and itinerary name must be strings"}), 400
-
-        print(f"Searching for itinerary in MongoDB: username={username}, name={itinerary_name}")
-
-        # Fetch user itinerary from MongoDB
         user = db.preitineraries.find_one({"username": username, "name": itinerary_name}, {'_id': 0})
-
-        if not user or not isinstance(user, dict):
-            return jsonify({"error": "User itinerary not found or invalid format!"}), 404
-
-        print("User itinerary found! Allocating days...")
-
-        # Assign starting latitude/longitude from selected hotel
-        hotel_details = assign_hotels_for_user(user)
-        if hotel_details:
-            print(f"Selected Hotel: {hotel_details['name']}")
-            user['starting_latitude'] = hotel_details['latitude']
-            user['starting_longitude'] = hotel_details['longitude']
-        else:
-            print("No suitable hotel found. Assigning default coordinates.")
-            user['starting_latitude'], user['starting_longitude'] = None, None
-
-        # If still missing, return an error
-        if 'starting_latitude' not in user or 'starting_longitude' not in user or user['starting_latitude'] is None:
-            raise jsonify("Error: Could not determine starting latitude and longitude!")
+        if not user:
+            return jsonify({"error": "User itinerary not found"}), 404
 
         days_per_destination = allocate_days_to_destinations(user, user['numberofdays'])
         itinerary = {}
+        used_attractions = set()
+        used_restaurants = set()
+
 
         for destination, days in days_per_destination.items():
-            print(f"Processing destination: {destination} for {days} days...")
+            destination_key = destination.replace('_', ' ').title()
             for day in range(days):
-                print(f"Generating itinerary for {destination} - Day {day + 1}")
+                hotel, alt_hotels = assign_hotel_for_destination(user, destination)
+                if not hotel:
+                    continue
 
-                itinerary[f'{destination} - Day {day + 1}'] = {
-                    'Hotel': hotel_details if hotel_details else {"name": "No hotel found"},
-                    'Restaurants': recommend_restaurants(user, user['starting_latitude'], user['starting_longitude']),
-                    'Attractions': recommend_attractions(user, user['starting_latitude'], user['starting_longitude'])
+                user['starting_latitude'] = hotel['latitude']
+                user['starting_longitude'] = hotel['longitude']
+
+                attractions_list, alt_attractions = recommend_attractions_for_destination(
+                    user, destination, hotel['latitude'], hotel['longitude'], used_attractions
+                )
+
+                restaurants_list, alt_restaurants = recommend_restaurants_for_destination(
+                    user, destination, hotel['latitude'], hotel['longitude'], used_restaurants
+                )
+
+                itinerary[f'{destination_key} - Day {day+1}'] = {
+                    "Hotel": hotel,
+                    "Alternative Hotels": alt_hotels,
+                    "Attractions": attractions_list,
+                    "Alternative Attractions": alt_attractions,
+                    "Restaurants": restaurants_list,
+                    "Alternative Restaurants": alt_restaurants
                 }
 
-        print("Itinerary generation complete!")
-
-        # Attempt to update existing itinerary or insert if new
-        print("Attempting to save itinerary to MongoDB...")
-
-        try:
-            save_result = db.generated_itineraries.update_one(
+        db.generated_itineraries.update_one(
             {"username": username, "name": itinerary_name},
-            {
-                "$set": {
-                    "username": username,
-                    "name": itinerary_name,
-                    "itinerary": itinerary,
-                    "last_updated": datetime.now(timezone.utc)
-                }
-            },
-            upsert=True)    
-            if save_result.matched_count > 0:
-                print(f"Existing itinerary updated successfully for {username}, {itinerary_name}")
-            elif save_result.upserted_id:
-                print(f"New itinerary created with ID: {save_result.upserted_id}")
-            else:
-                print("Warning: No modifications were made.")
+            {"$set": {
+                "username": username,
+                "name": itinerary_name,
+                "itinerary": itinerary,
+                "last_updated": datetime.now(timezone.utc)
+            }},
+            upsert=True
+        )
 
-        except Exception as e:
-            print(f"Error saving itinerary to MongoDB: {e}")
-            return jsonify({"error": str(e)}), 500
-        
-        # Return successful response
-        return jsonify({
-            "message": "Itinerary generated successfully!",
-            "itinerary": itinerary
-        }), 200
+        return jsonify({"message": "Itinerary generated successfully", "itinerary": itinerary}), 200
 
     except Exception as e:
-        print(f"CRITICAL ERROR: {e}")
+        print("Error in itinerary generation:", e)
         return jsonify({"error": str(e)}), 500
+
+@app.route('/api/itineraries/<username>/<name>', methods=['GET'])
+def get_itinerary_by_user_and_name(username, name):
+    itinerary = db.generated_itineraries.find_one(
+        {"username": username, "name": name}, {'_id': 0}
+    )
+    if itinerary:
+        return jsonify(itinerary), 200
+    else:
+        return jsonify({"error": "Itinerary not found"}), 404
 
 # At the bottom of app.py
 if __name__ == '__main__':
