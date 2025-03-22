@@ -73,19 +73,21 @@ const Modify = () => {
     fetchData();
   }, [username, name]);
 
-  const handleReplace = (dayKey, type, index, newItem) => {
+  const handleReplace = (dayKey, type, indexOrKey, newItem) => {
     const updated = { ...itinerary };
     if (type === 'Hotel') updated.itinerary[dayKey].Hotel = newItem;
-    else updated.itinerary[dayKey][type][index] = newItem;
+    else if (type === 'Restaurants') updated.itinerary[dayKey][type][indexOrKey] = newItem;
+    else updated.itinerary[dayKey][type][indexOrKey] = newItem;
     setItinerary(updated);
   };
-
-  const handleRemove = (dayKey, type, index) => {
+  
+  const handleRemove = (dayKey, type, indexOrKey) => {
     const updated = { ...itinerary };
     if (type === 'Hotel') updated.itinerary[dayKey].Hotel = null;
-    else updated.itinerary[dayKey][type].splice(index, 1);
+    else if (type === 'Restaurants') delete updated.itinerary[dayKey][type][indexOrKey];
+    else updated.itinerary[dayKey][type].splice(indexOrKey, 1);
     setItinerary(updated);
-  };
+  };  
 
   const handleSave = async () => {
     try {
@@ -119,29 +121,33 @@ const Modify = () => {
                 </div>
               ) : <p>No hotel selected</p>}
   
-              {alternatives[dayKey]?.Hotels?.map((h, i) => (
-                <button key={i} onClick={() => handleReplace(dayKey, 'Hotel', 0, h)}>
-                  Replace with: {h.name}
-                </button>
-              ))}
+          {Object.entries(alternatives[dayKey]?.AlternativeRestaurants || {}).map(([meal, altList]) => (
+          altList.slice(0, 3).map((alt, aIdx) => (
+            <button key={aIdx} onClick={() => handleReplace(dayKey, 'Restaurants', meal, alt)}>
+              Replace {meal} with: {alt.name}
+            </button>
+          ))
+        ))}
             </div>
   
             {/* Restaurants */}
             <div>
               <h4>Restaurants</h4>
-              {day.Restaurants?.map((rest, idx) => (
+              {Object.entries(day.Restaurants || {}).map(([meal, rest], idx) => (
                 <div key={idx} className="edit-item">
-                  <span>{rest.name}</span>
-                  <button onClick={() => handleRemove(dayKey, 'Restaurants', idx)}>Remove</button>
+                  <span>{meal.toUpperCase()}: {rest.name}</span>
+                  <button onClick={() => handleRemove(dayKey, 'Restaurants', meal)}>Remove</button>
+
                   <div className="alt-row">
-                    {[...alternatives[dayKey].Restaurants].slice(0, 3).map((alt, aIdx) => (
-                      <button key={aIdx} onClick={() => handleReplace(dayKey, 'Restaurants', idx, alt)}>
+                    {(alternatives[dayKey]?.AlternativeRestaurants?.[meal] || []).slice(0, 3).map((alt, aIdx) => (
+                      <button key={aIdx} onClick={() => handleReplace(dayKey, 'Restaurants', meal, alt)}>
                         Replace with: {alt.name}
                       </button>
                     ))}
                   </div>
                 </div>
               ))}
+
             </div>
   
             {/* Attractions */}

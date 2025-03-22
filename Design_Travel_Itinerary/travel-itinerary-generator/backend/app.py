@@ -225,7 +225,15 @@ def assign_hotel_for_destination(user, destination):
 
     sorted_hotels = city_hotels.sort_values(by='rating', ascending=False)
     hotel = sorted_hotels.iloc[0]
-    alternatives = sorted_hotels.iloc[1:4]['name'].tolist()
+    alternatives = [{
+        "name": str(row["name"]),
+        "latitude": float(row["latitude"]),
+        "longitude": float(row["longitude"]),
+        "rating": float(row["rating"]),
+        "pricelevel": int(row["pricelevel"]),
+        "city": str(destination.title())
+    } for _, row in sorted_hotels.iloc[1:4].iterrows()]
+
 
     return {
     "name": str(hotel["name"]),
@@ -268,7 +276,15 @@ def recommend_attractions_for_destination(user, destination, hotel_lat, hotel_lo
 } for _, row in top_attractions.iterrows()]
 
     
-    alternatives = [str(name) for name in top_attractions.iloc[4:7]['name'].tolist()]
+    alternatives = [{
+        "name": str(row["name"]),
+        "latitude": float(row["latitude"]),
+        "longitude": float(row["longitude"]),
+        "rating": float(row["rating"]),
+        "city": next((col.replace("city_", "").replace("_", " ") 
+                      for col in row.keys() if col.startswith("city") and row[col] == 1), "Unknown")
+    } for _, row in top_attractions.iloc[4:7].iterrows()]
+
     
     return main, alternatives
 
@@ -316,8 +332,15 @@ def recommend_restaurants_for_destination(user, destination, hotel_lat, hotel_lo
     "rating": float(rest_row['rating'])
 }
 
-        if i + 3 < len(top_restaurants):
-            alternatives[meal] = [str(name) for name in top_restaurants.iloc[i+3:i+6]['name'].tolist()]
+            if i + 3 < len(top_restaurants):
+                alternatives[meal] = [{
+                    "name": str(row["name"]),
+                    "latitude": float(row["latitude"]),
+                    "longitude": float(row["longitude"]),
+                    "rating": float(row["rating"]),
+                    "city": next((col.replace("city_", "").replace("_", " ") 
+                                for col in row.keys() if col.startswith("city") and row[col] == 1), "Unknown")
+                } for _, row in top_restaurants.iloc[i+3:i+6].iterrows()]
         else:
             alternatives[meal] = []
 
