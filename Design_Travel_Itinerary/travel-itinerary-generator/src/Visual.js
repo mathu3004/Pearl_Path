@@ -1,9 +1,8 @@
 //Visual.js
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useParams } from "react-router-dom";
 import axios from "axios";
 import MapComponent from "./MapComponent";
-import { fetchCoordinates } from "./fetchCoordinates";
 import { FaHotel, FaUtensils, FaMapMarkerAlt, FaTrain, FaStar} from "react-icons/fa";
 import { FaInstagram, FaFacebook } from "react-icons/fa";
 import { Link } from "react-router-dom";
@@ -24,13 +23,13 @@ const Header = () => {
   );
 };
 
-//const mapContainerStyle = { width: "100%", height: "910px", borderRadius: "20px", boxShadow: "0 10px 30px rgba(0, 0, 0, 0.2)",};
-
 const TravelItinerary = () => {
   const [itineraries, setItineraries] = useState(null);
   const [loading, setLoading] = useState(true);
   const [locations, setLocations] = useState([]);
   const [activeLocation, setActiveLocation] = useState(null);
+  const [selectedLocation, setSelectedLocation] = useState(null);
+  const scrollRefs = useRef([]);
 
   const { username, name } = useParams();
   const lowerUsername = username ? username.toLowerCase() : null;
@@ -42,24 +41,28 @@ const TravelItinerary = () => {
       return;
     }    
 
-    const fetchItinerary = async () => {
+    const fetchItinerary = async (retries = 5) => {
       try {
           console.log("Fetching itinerary for:", lowerUsername, lowerName);
           console.log(`Fetching from URL: http://localhost:5000/api/itineraries/${lowerUsername}/${lowerName}`);
-
           const response = await axios.get(`http://localhost:5000/api/itineraries/${lowerUsername}/${lowerName}`);
-  
           console.log("API Response:", response.data);  // Debugging log
   
           if (!response.data || !response.data.itinerary) {
               console.error("No valid itinerary data received.");
-              setItineraries(null);
+              throw new Error("Itinerary data not ready.");
           } else {
               setItineraries(response.data);  // Store object, not array
               console.log("Stored itinerary:", response.data);
           }
       } catch (error) {
           console.error("Error fetching itinerary:", error);
+          if (retries > 0) {
+            console.log(`Retrying... (${6 - retries}/5)`);
+            setTimeout(() => fetchItinerary(retries - 1), 500); // wait 2 seconds and try again
+          } else {
+            console.error("Itinerary generation timeout.");
+          }
       } finally {
           console.log("Setting loading to false");
           setLoading(false);
@@ -114,12 +117,8 @@ if (loading) {
   return <p>Loading itineraries...</p>;
 }
 
-console.log("Rendering itineraries:", itineraries);
-
-
 if (!itineraries || !itineraries.itinerary) {
-  console.log("Rendering itineraries:", itineraries);
-  return <p>No itinerary data available.</p>;
+  return <p>No itinerary found.</p>;
 }
 
   return (
@@ -129,7 +128,10 @@ if (!itineraries || !itineraries.itinerary) {
         <div className="main-layout">
           <div className="itinerary-card">
           <h2 className="itinerary-title">Itineraries for {username}</h2>
-          <h2 className="itinerary-subtitle">{itineraries.name?.toUpperCase()}'s Itinerary</h2>
+          {itineraries?.name && (
+  <h2 className="itinerary-subtitle">{itineraries.name.toUpperCase()}'s Itinerary</h2>
+)}
+
           {Object.entries(itineraries.itinerary).map(([dayKey, details], index) => {
               const dayNumberMatch = dayKey.match(/Day (\d+)/);
               const dayNumber = dayNumberMatch ? dayNumberMatch[1] : index + 1;
@@ -155,12 +157,36 @@ if (!itineraries || !itineraries.itinerary) {
                       const icon = item.type === "Hotel" ? <FaHotel className="activity-icon" />
                         : item.type === "Restaurant" ? <FaUtensils className="activity-icon" />
                         : <FaMapMarkerAlt className="activity-icon" />;
+                                     
+                      // Identify if this is the active one
+                      const isActive =
+                        activeLocation &&
+                        `${item.data.latitude}-${item.data.longitude}` === `${activeLocation?.lat}-${activeLocation?.lng}`;
+
+                        const refIndex = `${dayKey}-${i}`;
+                        scrollRefs.current[refIndex] = React.createRef();
 
                       return (
                         <li
                           key={i}
+                          ef={scrollRefs.current[refIndex]}
                           className="itinerary-item"
-                          onClick={() => setActiveLocation({ lat: item.data.latitude, lng: item.data.longitude, name: item.data.name })}
+                          style={{
+                            backgroundColor: isActive ? "#c4f1eb" : "",
+                            cursor: "pointer",
+                          }}
+                          onClick={() => {
+                            const newLocation = {
+                              lat: item.data.latitude,
+                              lng: item.data.longitude,
+                              name: item.data.name
+                            };
+                            setActiveLocation(newLocation);
+                            setSelectedLocation(newLocation);
+                            setTimeout(() => {
+                              scrollRefs.current[refIndex]?.current?.scrollIntoView({ behavior: "smooth", block: "center" });
+                            }, 100);
+                          }}
                         >
                           <div className="activity-header">
                             {icon}
@@ -180,7 +206,11 @@ if (!itineraries || !itineraries.itinerary) {
           </div>
         {/* Ensure map loads dynamically after data */}
         <div className="map-container">
-        <MapComponent locations={locations} activeLocation={activeLocation} />
+        <MapComponent
+  locations={locations}
+  activeLocation={activeLocation}
+  selectedLocation={selectedLocation}
+/>
         </div>
       </div>
       <div className="button-container">

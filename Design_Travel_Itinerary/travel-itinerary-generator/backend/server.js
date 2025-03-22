@@ -10,9 +10,8 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import { dirname } from 'path';
 
-// Get __dirname equivalent in ES modules
 const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
+const __dirname = dirname(__filename); 
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -33,8 +32,8 @@ mongoose.connect(process.env.MONGO_URI, {
     useNewUrlParser: true,
     useUnifiedTopology: true
 })
-.then(() => console.log("✅ MongoDB Connected"))
-.catch(err => console.error("❌ MongoDB Connection Error:", err));
+.then(() => console.log("MongoDB Connected"))
+.catch(err => console.error("MongoDB Connection Error:", err));
 
 // Define Itinerary Schema
 const itinerarySchema = new mongoose.Schema({
@@ -52,7 +51,7 @@ const itinerarySchema = new mongoose.Schema({
     peopleCount: { type: String, required: true }
 }, { timestamps: true });
 
-// ✅ Ensure (username, name) is unique
+// Ensure (username, name) is unique
 itinerarySchema.index({ username: 1, name: 1 }, { unique: true });
 
 const Itinerary = mongoose.model('Itinerary', itinerarySchema);
@@ -60,21 +59,21 @@ const Itinerary = mongoose.model('Itinerary', itinerarySchema);
 // Function to run Python scripts
 const runPythonScript = (scriptPath, args, callback) => {
     const fullPath = path.resolve(__dirname, scriptPath);
-    const command = `python "${fullPath}" ${args.join(" ")}`; // ✅ Properly format command
-    console.log(`📌 EXECUTING: ${command}`);
+    const command = `python "${fullPath}" ${args.join(" ")}`;
+    console.log(`EXECUTING: ${command}`); 
 
     exec(command, (error, stdout, stderr) => {
         if (error) {
-            console.error(`❌ ERROR (${scriptPath}):`, error.message);
-            return callback(error);
+        console.error(`ERROR (${scriptPath}):`, error.message); 
+        return callback(error);
         }
         if (stderr) {
-            console.error(`⚠️ STDERR (${scriptPath}):`, stderr);
+        console.error(`STDERR (${scriptPath}):`, stderr);
         }
-        console.log(`✅ SUCCESS (${scriptPath}):`, stdout);
+        console.log(`SUCCESS (${scriptPath}):`, stdout);
         callback(null, stdout);
     });
-};
+    };
 
 // API Endpoint to Save Itinerary Data
 app.post('/api/itinerary', async (req, res) => {
@@ -94,58 +93,52 @@ app.post('/api/itinerary', async (req, res) => {
             peopleCount
         } = req.body;
 
-        // Log received data
-        console.log("Received data:", req.body);
-
         // 🔹 Ensure proper type conversion
         maxDistance = Number(maxDistance);  // Convert to Number
         numberOfDays = Number(numberOfDays);  // Convert to Number
         peopleCount = String(peopleCount);  // Ensure it's a String
         hotelBudget = Number(hotelBudget);
 
-        // ✅ Trim and convert to lowercase for case-insensitive matching
+        // Trim and convert to lowercase for case-insensitive matching
         username = username.trim().toLowerCase();
         name = name.trim().toLowerCase();
 
-        console.log("📌 Checking for existing itinerary:", { username, name });
-
-        // ✅ Check if the itinerary already exists for this user
+        // Check if the itinerary already exists for this user
         const existingItinerary = await Itinerary.findOne({ username, name });
 
         if (existingItinerary) {
-            console.log("❌ Error: Itinerary name already exists for this user.");
             return res.status(400).json({ error: "Itinerary name must be unique for each user." });
         }
 
-        // ✅ Create a new itinerary if it doesn't exist
+        // Create a new itinerary if it doesn't exist
         const newItinerary = new Itinerary({
             username,
             name, startingDestination, destinations, hotelBudget, activities, cuisines, foodPreferences, transportationMode, maxDistance, numberOfDays, peopleCount
         });
         await newItinerary.save();
-        console.log("✅ Itinerary saved successfully!");
-        res.status(201).json({ message: "✅ Itinerary saved successfully!" });
+        console.log("User Inputs saved successfully!");
 
-        // Run Preprocessing and Itinerary Generation in Sequence
-        runPythonScript("RadiusBasedGenerator.py", [username, name], (error) => {
-            if (error) {
-                console.error("❌ ERROR: Preprocessing failed.");
-                return;
-            }
-            console.log("✅ SUCCESS (backend/RadiusBasedGenerator.py): Preprocessing done!");
-        
-            // ✅ Corrected Execution of app.py
-            runPythonScript("app.py", [username, name], (appError) => {
-                if (appError) {
-                    console.error("❌ ERROR: Itinerary generation failed.");
-                    return;
-                }
-                console.log("✅ SUCCESS (backend/app.py): Itinerary Generated!");
-            });
-        });
-        
+runPythonScript("RadiusBasedGenerator.py", [username, name], (error) => {
+    if (error) {
+        console.error("ERROR: Preprocessing failed.");
+        return res.status(500).json({ error: "Preprocessing failed." });
+    }
+
+    console.log("SUCCESS: Preprocessing done!");
+
+    runPythonScript("app.py", [username, name], (appError) => {
+        if (appError) {
+            console.error("ERROR: Itinerary generation failed.");
+            return res.status(500).json({ error: "Itinerary generation failed." });
+        }
+
+        console.log("SUCCESS: Itinerary Generated!");
+        return res.status(201).json({ message: "Itinerary generated successfully!" });
+    });
+});
+
     } catch (err) {
-        console.error("❌ Error during processing:", err);
+        console.error("Error during processing:", err);
         res.status(500).json({ error: "Processing failed.", details: err.message });
     }
 });
@@ -163,14 +156,14 @@ app.get('/api/itineraries/:username/:name', async (req, res) => {
             });
 
         if (!itinerary) {
-            console.log("❌ No itinerary found for:", username, name);
+            console.log("No itinerary found for:", username, name);
             return res.status(404).json({ message: "No itinerary found for this user." });
         }
 
-        console.log("✅ Found itinerary:", itinerary);
+        console.log("Found itinerary:", itinerary);
         res.json(itinerary);
             } catch (err) {
-        console.error("❌ Error fetching itinerary:", err);
+        console.error("Error fetching itinerary:", err);
         res.status(500).json({ message: "Server error", error: err.message });
     }
 });
@@ -182,14 +175,14 @@ app.get('/api/itinerary/:name', async (req, res) => {
         const itinerary = await Itinerary.findOne({ name });
 
         if (!itinerary) {
-            return res.status(404).json({ message: "❌ Itinerary not found" });
+            return res.status(404).json({ message: "Itinerary not found" });
         }
 
         res.json(itinerary);
     } catch (err) {
-        console.error("❌ Error fetching itinerary:", err);
-        res.status(500).json({ message: "❌ Error fetching itinerary", error: err.message });
+        console.error("Error fetching itinerary:", err);
+        res.status(500).json({ message: "Error fetching itinerary", error: err.message });
     }
 });
 
-app.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));
+app.listen(PORT, () => console.log(`Server running on port ${PORT}`));

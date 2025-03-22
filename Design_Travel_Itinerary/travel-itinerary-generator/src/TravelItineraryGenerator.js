@@ -1,4 +1,4 @@
-// src/TravelItineraryGenerator.js
+// TravelItineraryGenerator.js
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Link } from 'react-router-dom';
@@ -45,7 +45,7 @@ const TravelItineraryGenerator = () => {
         let errors = {};
         let isValid = true;
 
-        // ✅ Name Validation: Must contain only letters (A-Z, a-z)
+        // Name Validation: Must contain only letters (A-Z, a-z)
         if (!/^[A-Za-z\s]+$/.test(formData.name) || formData.name.length === 0) {
             errors.name = "Name must contain only alphabetical characters.";
             isValid = false;
@@ -99,7 +99,7 @@ const TravelItineraryGenerator = () => {
         console.log("Form Data Before Sending:", formData);
     
         if (!validateForm()) {
-            alert("❌ Please fix the errors in the form before submitting.");
+            alert("Please fix the errors in the form before submitting.");
             return;
         }
     
@@ -114,11 +114,11 @@ const TravelItineraryGenerator = () => {
             const data = await response.json();
     
             if (response.ok) {
-                alert("✅ Itinerary saved successfully!");
+                alert("Itinerary saved successfully!");
     
                 // Now poll until itinerary is available (max 8 attempts, 5 seconds apart)
                 let success = false;
-                const itineraryName = formData.name.toLowerCase(); // ✅ normalize for GET
+                const itineraryName = formData.name.toLowerCase();
     
                 for (let i = 0; i < 8; i++) {
                     const checkResponse = await fetch(`http://localhost:5000/api/itinerary/${itineraryName}`);
@@ -126,30 +126,30 @@ const TravelItineraryGenerator = () => {
                         success = true;
                         break;
                     }
-                    console.log(`🔄 Attempt ${i + 1}: Itinerary not ready yet...`);
+                    console.log(`Attempt ${i + 1}: Itinerary not ready yet...`);
                     await new Promise(resolve => setTimeout(resolve, 5000));
                 }
     
                 if (success) {
-                    alert("✅ Processing completed! Redirecting...");
+                    alert("Processing completed! Redirecting...");
                     navigate(`/visual/${formData.username.toLowerCase()}/${formData.name.toLowerCase()}`);
                 } else {
-                    alert("❌ Processing timeout. Try again later.");
+                    alert("Processing timeout. Try again later.");
                 }
     
             } else {
                 // Handle client errors (e.g., duplicate itinerary)
                 if (response.status === 400 && data.error) {
-                    alert("❌ Error: " + data.error);
+                    alert("Error: " + data.error);
                 } else {
-                    console.error("❌ API Error:", data);
-                    alert("❌ Unexpected error: " + data.message);
+                    console.error("API Error:", data);
+                    alert("Unexpected error: " + data.message);
                 }
             }
     
         } catch (error) {
-            console.error("❌ Network or Fetch Error:", error);
-            alert("❌ Failed to connect to the server. Is it running on port 5000?");
+            console.error("Network or Fetch Error:", error);
+            alert("Failed to connect to the server. Is it running on port 5000?");
         }
     };
     
@@ -387,7 +387,7 @@ const TravelItineraryGenerator = () => {
     );
 };
 
-// ✅ CSS Styling for Green Error Messages
+// CSS Styling for Green Error Messages
 const styles = `
   .error-text {
     color: green;
