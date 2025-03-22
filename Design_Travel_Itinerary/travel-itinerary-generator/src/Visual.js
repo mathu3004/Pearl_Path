@@ -2,8 +2,9 @@
 import React, { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import axios from "axios";
-//import { GoogleMap, LoadScript, Marker } from "@react-google-maps/api";
-import { FaHotel, FaUtensils, FaMapMarkerAlt, FaTrain } from "react-icons/fa";
+import MapComponent from "./MapComponent";
+import { fetchCoordinates } from "./fetchCoordinates";
+import { FaHotel, FaUtensils, FaMapMarkerAlt, FaTrain, FaStar} from "react-icons/fa";
 import { FaInstagram, FaFacebook } from "react-icons/fa";
 import { Link } from "react-router-dom";
 import "./App.css";
@@ -28,53 +29,96 @@ const Header = () => {
 const TravelItinerary = () => {
   const [itineraries, setItineraries] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [locations, setLocations] = useState([]);
+  const [activeLocation, setActiveLocation] = useState(null);
 
   const { username, name } = useParams();
   const lowerUsername = username ? username.toLowerCase() : null;
   const lowerName = name ? name.toLowerCase() : null;
  
   useEffect(() => {
-    console.log("📡 useEffect triggered for:", lowerUsername, lowerName);
     if (!lowerUsername || !lowerName) {
-      console.warn("⚠️ Username or name missing from URL params");
+      console.warn("Username or name missing from URL params");
       return;
     }    
 
     const fetchItinerary = async () => {
       try {
-          console.log("🔍 Fetching itinerary for:", lowerUsername, lowerName);
-          console.log(`🌐 Fetching from URL: http://localhost:5000/api/itineraries/${lowerUsername}/${lowerName}`);
+          console.log("Fetching itinerary for:", lowerUsername, lowerName);
+          console.log(`Fetching from URL: http://localhost:5000/api/itineraries/${lowerUsername}/${lowerName}`);
 
           const response = await axios.get(`http://localhost:5000/api/itineraries/${lowerUsername}/${lowerName}`);
   
-          console.log("✅ API Response:", response.data);  // Debugging log
+          console.log("API Response:", response.data);  // Debugging log
   
           if (!response.data || !response.data.itinerary) {
-              console.error("❌ No valid itinerary data received.");
+              console.error("No valid itinerary data received.");
               setItineraries(null);
           } else {
-              setItineraries(response.data);  // ✅ Store object, not array
-              console.log("📦 Stored itinerary:", response.data);
+              setItineraries(response.data);  // Store object, not array
+              console.log("Stored itinerary:", response.data);
           }
       } catch (error) {
-          console.error("❌ Error fetching itinerary:", error);
+          console.error("Error fetching itinerary:", error);
       } finally {
-          console.log("🔄 Setting loading to false");
+          console.log("Setting loading to false");
           setLoading(false);
       }
   };  
         fetchItinerary();
       }, [lowerUsername, lowerName]);
+      useEffect(() => {
+        const loadCoordinates = async () => {
+          if (!itineraries?.itinerary) return;
+      
+          const extractedLocations = [];
+      
+          Object.values(itineraries.itinerary).forEach(day => {
+            if (day?.Hotel?.latitude && day?.Hotel?.longitude) {
+              extractedLocations.push({
+                lat: day.Hotel.latitude,
+                lng: day.Hotel.longitude,
+                name: day.Hotel.name
+              });
+            }
+      
+            day?.Restaurants?.forEach(rest => {
+              if (rest.latitude && rest.longitude) {
+                extractedLocations.push({
+                  lat: rest.latitude,
+                  lng: rest.longitude,
+                  name: rest.name
+                });
+              }
+            });
+      
+            day?.Attractions?.forEach(att => {
+              if (att.latitude && att.longitude) {
+                extractedLocations.push({
+                  lat: att.latitude,
+                  lng: att.longitude,
+                  name: att.name
+                });
+              }
+            });
+          });
+      
+          setLocations(extractedLocations);
+        };
+      
+        loadCoordinates();
+      }, [itineraries]);
+      
 
 if (loading) {
   return <p>Loading itineraries...</p>;
 }
 
-console.log("🖥️ Rendering itineraries:", itineraries);
+console.log("Rendering itineraries:", itineraries);
 
 
 if (!itineraries || !itineraries.itinerary) {
-  console.log("🖥️ Rendering itineraries:", itineraries);
+  console.log("Rendering itineraries:", itineraries);
   return <p>No itinerary data available.</p>;
 }
 
@@ -84,42 +128,59 @@ if (!itineraries || !itineraries.itinerary) {
         <Header />
         <div className="main-layout">
           <div className="itinerary-card">
-            <h2>Itineraries for {username}</h2>
-            <h2>{itineraries?.name?.toUpperCase()}'s ITINERARY</h2>
+          <h2 className="itinerary-title">Itineraries for {username}</h2>
+          <h2 className="itinerary-subtitle">{itineraries.name?.toUpperCase()}'s Itinerary</h2>
+          {Object.entries(itineraries.itinerary).map(([dayKey, details], index) => {
+              const dayNumberMatch = dayKey.match(/Day (\d+)/);
+              const dayNumber = dayNumberMatch ? dayNumberMatch[1] : index + 1;
+              const location = dayKey.split(" - ")[0];
 
-              {itineraries && itineraries.itinerary ? (
-  Object.entries(itineraries.itinerary).length > 0 ? (
-    Object.entries(itineraries.itinerary).map(([dayKey, details]) => {
-      const dayNumberMatch = dayKey.match(/Day (\d+)/);
-      const dayNumber = dayNumberMatch ? dayNumberMatch[1] : "Unknown";
+              const orderedItems = [
+                { type: "Hotel", data: details?.Hotel },
+                { type: "Restaurant", data: details?.Restaurants?.[0], label: "Breakfast" },
+                { type: "Attraction", data: details?.Attractions?.[0] },
+                { type: "Attraction", data: details?.Attractions?.[1] },
+                { type: "Restaurant", data: details?.Restaurants?.[1], label: "Lunch" },
+                { type: "Attraction", data: details?.Attractions?.[2] },
+                { type: "Attraction", data: details?.Attractions?.[3] },
+                { type: "Restaurant", data: details?.Restaurants?.[2], label: "Dinner" },
+              ];
 
-      return (
-        <div key={dayKey} className="day-plan">
-          <h3>Day {dayNumber}: {dayKey.split(" - ")[0]}</h3>
-          <div className="card">
-            <p><FaHotel /> <strong>Hotel:</strong> {details?.Hotel || "Not available"}</p>
-          </div>
-          <div className="card">
-            <p><FaUtensils /> <strong>Restaurants:</strong> {details?.Restaurants?.join(", ") || "No restaurants listed"}</p>
-          </div>
-          <div className="card">
-            <p><FaMapMarkerAlt /> <strong>Attractions:</strong> {details?.Attractions?.join(", ") || "No attractions listed"}</p>
-          </div>
-        </div>
-      );
-    })
-  ) : (
-    <p>No itinerary details available.</p>
-  )
-) : (
-  <p>No itinerary found for {username}.</p>
-)}
+              return (
+                <div key={dayKey}>
+                  <h3 className="itinerary-subtitle">Day {dayNumber}: {location}</h3>
+                  <ul className="itinerary-list">
+                    {orderedItems.map((item, i) => {
+                      if (!item.data) return null;
+                      const icon = item.type === "Hotel" ? <FaHotel className="activity-icon" />
+                        : item.type === "Restaurant" ? <FaUtensils className="activity-icon" />
+                        : <FaMapMarkerAlt className="activity-icon" />;
 
+                      return (
+                        <li
+                          key={i}
+                          className="itinerary-item"
+                          onClick={() => setActiveLocation({ lat: item.data.latitude, lng: item.data.longitude, name: item.data.name })}
+                        >
+                          <div className="activity-header">
+                            {icon}
+                            <span className="activity-type">{item.label || item.type}:</span> {item.data.name}
+                          </div>
+                          <div className="activity-second-row">
+                            <div className="activity-location"><FaMapMarkerAlt /> <span>{item.data.city || 'Unknown'}</span></div>
+                            <div className="activity-rating"><FaStar /> <span>{item.data.rating}/5</span></div>
+                          </div>
+                        </li>
+                      );
+                    })}
+                  </ul>
+                </div>
+              );
+            })}
           </div>
-
-        {/* ✅ Ensure map loads dynamically after data */}
+        {/* Ensure map loads dynamically after data */}
         <div className="map-container">
-             {/* Future Google Maps integration here */}
+        <MapComponent locations={locations} activeLocation={activeLocation} />
         </div>
       </div>
       <div className="button-container">

@@ -10,6 +10,7 @@ import time
 import joblib
 # Load environment variables
 from dotenv import load_dotenv
+from datetime import datetime
 load_dotenv()
 
 app = Flask(__name__)
@@ -225,22 +226,30 @@ def assign_hotels_for_user(user):
 
     for _, hotel in sorted_hotels.iterrows():
         if 'latitude' in hotel and 'longitude' in hotel:
-            return hotel['name']  # ✅ Returns hotel name
+             return {
+                "name": hotel["name"],
+                "latitude": hotel["latitude"],
+                "longitude": hotel["longitude"],
+                "city": next((col.replace("city_", "").replace("_", " ") 
+                          for col in hotel.keys() 
+                          if col.startswith("city_") and hotel[col] == 1), "Unknown"),
+                "rating": hotel.get("rating", None),
+                "pricelevel": hotel.get("pricelevel", None)
+            }
         else:
             print(f"❌ Warning: Hotel {hotel['name']} is missing latitude/longitude!")
-    
+
     return None
 
 # Recommend Attractions
 def recommend_attractions(user, hotel_lat, hotel_lon):
-    max_distance_km = user.get("maximum_distance", 10)  # Default to 10 km if missing
+    max_distance_km = user['maximum_distance']  # Default to 10 km if missing
 
-    # ✅ Ensure DataFrame columns are lowercase
     filtered_attractions = attractions.copy()
-    
+
     if 'latitude' not in filtered_attractions.columns or 'longitude' not in filtered_attractions.columns:
         print("❌ Error: 'latitude' or 'longitude' column is missing in attractions DataFrame!")
-        return ["No attractions available"]
+        return [{"name": "No attractions available"}]
 
     filtered_attractions['distance'] = filtered_attractions.apply(
         lambda row: geodesic((hotel_lat, hotel_lon), (row['latitude'], row['longitude'])).km, axis=1)
@@ -249,9 +258,17 @@ def recommend_attractions(user, hotel_lat, hotel_lon):
 
     if filtered_attractions.empty:
         print("❌ No attractions found within the specified distance!")
-        return ["No attractions available"]
+        return [{"name": "No attractions available"}]
 
-    return filtered_attractions.sort_values(by="rating", ascending=False)["name"].tolist()[:4]
+    sorted_attractions = filtered_attractions.sort_values(by="rating", ascending=False).head(4)
+
+    return [{
+        "name": row["name"],
+        "latitude": row["latitude"],
+        "longitude": row["longitude"],
+        "city": next((col.replace("city_", "").replace("_", " ") for col in row.keys() if col.startswith("city_") and row[col] == 1), "Unknown"),
+        "rating": row["rating"]
+    } for _, row in sorted_attractions.iterrows()]
 
 # Recommend Restaurants
 def recommend_restaurants(user, hotel_lat, hotel_lon):
@@ -260,7 +277,19 @@ def recommend_restaurants(user, hotel_lat, hotel_lon):
     filtered_restaurants['distance'] = filtered_restaurants.apply(
         lambda row: geodesic((hotel_lat, hotel_lon), (row['latitude'], row['longitude'])).km, axis=1)
     filtered_restaurants = filtered_restaurants[filtered_restaurants['distance'] <= max_distance_km]
-    return filtered_restaurants.sort_values(by="rating", ascending=False)["name"].tolist()[:3] if not filtered_restaurants.empty else ["No restaurants available"]
+
+    if filtered_restaurants.empty:
+        return [{"name": "No restaurants available"}]
+
+    sorted_restaurants = filtered_restaurants.sort_values(by="rating", ascending=False).head(3)
+
+    return [{
+        "name": row["name"],
+        "latitude": row["latitude"],
+        "longitude": row["longitude"],
+        "city": next((col.replace("city_", "").replace("_", " ") for col in row.keys() if col.startswith("city_") and row[col] == 1), "Unknown"),
+        "rating": row["rating"]
+    } for _, row in sorted_restaurants.iterrows()]
 
 @app.route('/generate_itinerary', methods=['POST'])
 def generate_itinerary():
@@ -288,18 +317,14 @@ def generate_itinerary():
         print("✅ User itinerary found! Allocating days...")
 
         # ✅ Assign starting latitude/longitude from selected hotel
-        hotel_name = assign_hotels_for_user(user)
-        print(f"🏨 Selected Hotel: {hotel_name}")
-
-        if hotel_name:
-            hotel_info = hotels[hotels['name'] == hotel_name]
-            if not hotel_info.empty:
-                user['starting_latitude'] = hotel_info.iloc[0]['latitude']
-                user['starting_longitude'] = hotel_info.iloc[0]['longitude']
-                print(f"📍 Assigned 'starting_latitude': {user['starting_latitude']}, 'starting_longitude': {user['starting_longitude']}")
-            else:
-                print("❌ No hotel found in database! Assigning default coordinates.")
-                user['starting_latitude'], user['starting_longitude'] = None, None
+        hotel_details = assign_hotels_for_user(user)
+        if hotel_details:
+            print(f"🏨 Selected Hotel: {hotel_details['name']}")
+            user['starting_latitude'] = hotel_details['latitude']
+            user['starting_longitude'] = hotel_details['longitude']
+        else:
+            print("❌ No suitable hotel found. Assigning default coordinates.")
+            user['starting_latitude'], user['starting_longitude'] = None, None
 
         # If still missing, return an error
         if 'starting_latitude' not in user or 'starting_longitude' not in user or user['starting_latitude'] is None:
@@ -314,7 +339,7 @@ def generate_itinerary():
                 print(f"📅 Generating itinerary for {destination} - Day {day + 1}")
 
                 itinerary[f'{destination} - Day {day + 1}'] = {
-                    'Hotel': hotel_name,
+                    'Hotel': hotel_details if hotel_details else {"name": "No hotel found"},
                     'Restaurants': recommend_restaurants(user, user['starting_latitude'], user['starting_longitude']),
                     'Attractions': recommend_attractions(user, user['starting_latitude'], user['starting_longitude'])
                 }
@@ -331,7 +356,8 @@ def generate_itinerary():
         "$set": {
             "username": username,
             "name": itinerary_name,
-            "itinerary": itinerary
+            "itinerary": itinerary,
+            "last_updated": datetime.utcnow()
         }
     },
     upsert=True
