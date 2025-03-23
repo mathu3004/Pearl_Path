@@ -12,6 +12,7 @@ import time
 import joblib
 from dotenv import load_dotenv
 from datetime import datetime, timezone
+
 load_dotenv()
 
 app = Flask(__name__) 
@@ -349,6 +350,34 @@ def recommend_restaurants_for_destination(user, destination, hotel_lat, hotel_lo
 
     return best, alternatives
 
+# --- Transport Mode Helpers ---
+def get_user_transport_modes(username, name):
+    pre_itinerary = db["preitineraries"].find_one({
+        "username": username,
+        "name": name
+    })
+
+    if not pre_itinerary:
+        return ["walk"]
+
+    transport_modes = []
+    for key in pre_itinerary:
+        if key.startswith("transportation_mode_") and pre_itinerary[key] == 1:
+            mode = key.replace("transportation_mode_", "").lower()
+            transport_modes.append(mode)
+
+    return transport_modes if transport_modes else ["walk"]
+
+def assign_transport_modes_to_itinerary(itinerary, transport_modes):
+    updated_itinerary = {}
+
+    for i, (day_key, day_data) in enumerate(itinerary.items()):
+        mode = transport_modes[i % len(transport_modes)]
+        day_data["transportationMode"] = mode
+        updated_itinerary[day_key] = day_data
+
+    return updated_itinerary
+
 # Flask route for itinerary generation
 @app.route('/generate_itinerary', methods=['POST'])
 def generate_itinerary():
@@ -416,10 +445,15 @@ def get_itinerary_by_user_and_name(username, name):
     itinerary = db.generated_itineraries.find_one(
         {"username": username, "name": name}, {'_id': 0}
     )
-    if itinerary:
-        return jsonify(itinerary), 200
-    else:
+    if not itinerary or "itinerary" not in itinerary:
         return jsonify({"error": "Itinerary not found"}), 404
+
+    # ✅ Inject transport modes
+    transport_modes = get_user_transport_modes(username, name)
+    updated_itinerary = assign_transport_modes_to_itinerary(itinerary["itinerary"], transport_modes)
+    itinerary["itinerary"] = updated_itinerary
+
+    return jsonify(itinerary), 200
 
 # At the bottom of app.py
 if __name__ == '__main__':

@@ -86,11 +86,67 @@ const Modify = () => {
 
   const handleReplace = (dayKey, type, indexOrKey, newItem) => {
     const updated = { ...itinerary };
-    if (type === 'Hotel') updated.itinerary[dayKey].Hotel = newItem;
-    else if (type === 'Restaurants') updated.itinerary[dayKey][type][indexOrKey] = newItem;
-    else updated.itinerary[dayKey][type][indexOrKey] = newItem;
+    const dayData = updated.itinerary[dayKey];
+  
+    // 🏨 HOTEL
+    if (type === 'Hotel') {
+      const currentHotel = dayData.Hotel;
+  
+      // Remove selected newItem from alternatives
+      dayData['Alternative Hotels'] = (dayData['Alternative Hotels'] || []).filter(
+        h => h.name !== newItem.name
+      );
+  
+      // Push current to alternatives
+      if (currentHotel && currentHotel.name !== newItem.name) {
+        dayData['Alternative Hotels'].push(currentHotel);
+      }
+  
+      // Replace
+      dayData.Hotel = newItem;
+    }
+  
+    // 🍽 RESTAURANTS
+    else if (type === 'Restaurants') {
+      const currentRest = dayData.Restaurants[indexOrKey];
+      const existingAlts = dayData['Alternative Restaurants']?.[indexOrKey] || [];
+  
+      // Remove selected newItem
+      const updatedAlts = existingAlts.filter(r => r.name !== newItem.name);
+  
+      // Add current to alternatives if different
+      if (currentRest && currentRest.name !== newItem.name) {
+        updatedAlts.push(currentRest);
+      }
+  
+      dayData['Alternative Restaurants'] = {
+        ...(dayData['Alternative Restaurants'] || {}),
+        [indexOrKey]: updatedAlts
+      };
+  
+      dayData.Restaurants[indexOrKey] = newItem;
+    }
+  
+    // 🗺 ATTRACTIONS
+    else if (type === 'Attractions') {
+      const currentAtt = dayData.Attractions[indexOrKey];
+  
+      // Remove selected newItem
+      dayData['Alternative Attractions'] = (dayData['Alternative Attractions'] || []).filter(
+        a => a.name !== newItem.name
+      );
+  
+      // Add current to alternatives if different
+      if (currentAtt && currentAtt.name !== newItem.name) {
+        dayData['Alternative Attractions'].push(currentAtt);
+      }
+  
+      dayData.Attractions[indexOrKey] = newItem;
+    }
+  
+    updated.itinerary[dayKey] = dayData;
     setItinerary(updated);
-  };
+  };  
   
   const handleRemove = (dayKey, type, indexOrKey) => {
     const updated = { ...itinerary };
@@ -102,7 +158,12 @@ const Modify = () => {
 
   const handleSave = async () => {
     try {
-      await axios.post(`http://localhost:5000/api/save-edited-itinerary`, itinerary);
+      await axios.post(`http://localhost:5000/api/save-edited-itinerary`, {
+        username: itinerary.username,
+        name: itinerary.name,
+        itinerary: itinerary.itinerary
+      });
+      
       alert('Itinerary updated!');
       navigate(`/visual/${username}/${name}`);
     } catch (error) {
@@ -128,15 +189,15 @@ const Modify = () => {
                 {day.Hotel ? (
                   <div className="edit-item">
                     <span>{day.Hotel.name}</span>
-                    <button onClick={() => handleRemove(dayKey, 'Hotel')}>Remove</button>
                   </div>
                 ) : <p>No hotel selected</p>}
-
+                <div className="alt-row">
                 {alternatives[dayKey]?.Hotels?.slice(1, 4).map((alt, idx) => (
                   <button key={idx} onClick={() => handleReplace(dayKey, 'Hotel', null, alt)}>
                     Replace with: {alt.name}
                   </button>
-                ))}
+                  ))}
+</div>
               </div>
 
               {/* Restaurants */}
@@ -146,12 +207,13 @@ const Modify = () => {
                   <div key={idx} className="edit-item">
                     <span>{meal.toUpperCase()}: {rest.name}</span>
                     <button onClick={() => handleRemove(dayKey, 'Restaurants', meal)}>Remove</button>
-
+                    <div className="alt-row">
                     {(alternatives[dayKey]?.Restaurants?.[meal] || []).slice(0, 3).map((alt, aIdx) => (
                       <button key={aIdx} onClick={() => handleReplace(dayKey, 'Restaurants', meal, alt)}>
                         Replace {meal} with: {alt.name}
                       </button>
                     ))}
+                  </div>
                   </div>
                 ))}
               </div>
@@ -163,11 +225,13 @@ const Modify = () => {
                   <div key={idx} className="edit-item">
                     <span>{att.name}</span>
                     <button onClick={() => handleRemove(dayKey, 'Attractions', idx)}>Remove</button>
+                    <div className="alt-row">
                     {(alternatives[dayKey]?.Attractions || []).slice(0, 3).map((alt, aIdx) => (
                       <button key={aIdx} onClick={() => handleReplace(dayKey, 'Attractions', idx, alt)}>
                         Replace with: {alt.name}
                       </button>
                     ))}
+                    </div>
                   </div>
                 ))}
               </div>

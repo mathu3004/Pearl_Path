@@ -274,7 +274,9 @@ if (!itineraries || !itineraries.itinerary) {
   locations={locations}
   activeLocation={activeLocation}
   selectedLocation={selectedLocation}
+  transportModesPerDay={itineraries.itinerary}
 />
+
         </div>
       </div>
       <div className="button-container hide-on-export">

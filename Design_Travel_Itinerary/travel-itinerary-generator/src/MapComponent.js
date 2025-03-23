@@ -1,9 +1,16 @@
 import React, { useEffect } from "react";
-import { MapContainer, TileLayer, Marker, Popup, useMap } from "react-leaflet";
+import {
+  MapContainer,
+  TileLayer,
+  Marker,
+  Popup,
+  Polyline,
+  useMap
+} from "react-leaflet";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 
-// Custom green icon
+// Green marker for selected location
 const greenIcon = new L.Icon({
   iconUrl: "https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-green.png",
   shadowUrl: "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png",
@@ -13,7 +20,7 @@ const greenIcon = new L.Icon({
   shadowSize: [41, 41]
 });
 
-// Default black icon (customized)
+// Black marker for normal points
 const blackIcon = new L.Icon({
   iconUrl: "https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-black.png",
   shadowUrl: "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png",
@@ -23,31 +30,83 @@ const blackIcon = new L.Icon({
   shadowSize: [41, 41]
 });
 
-// Component to center map on selected location
+// Center and pan to selected location
 const FlyToLocation = ({ activeLocation }) => {
   const map = useMap();
 
   useEffect(() => {
     if (activeLocation) {
       const targetLatLng = L.latLng(activeLocation.lat, activeLocation.lng);
-
-      // First jump to the location
       map.setView(targetLatLng, 14, { animate: true });
 
-      // Then immediately pan left by 150px (to shift marker toward the card)
+      // Pan left to make space for sidebar
       setTimeout(() => {
-        map.panBy([-150, 0]); // shift the map view 150px to the left
-      }, 600); // wait for initial animation
+        map.panBy([-150, 0]);
+      }, 600);
     }
   }, [activeLocation, map]);
 
   return null;
 };
 
-const MapComponent = ({ locations, activeLocation }) => {
+// Get color for each transport mode
+const getColorByMode = (mode) => {
+  switch (mode) {
+    case "car":
+      return "red";
+    case "bus":
+      return "blue";
+    case "train":
+      return "purple";
+    case "walk":
+      return "green";
+    default:
+      return "gray";
+  }
+};
+
+const MapComponent = ({ locations, activeLocation, transportModesPerDay }) => {
+  const dayPolylines = [];
+
+  // Build route for each day
+  Object.entries(transportModesPerDay || {}).forEach(([dayKey, dayData]) => {
+    const path = [];
+    const mode = dayData.transportationMode || "walk"; // default mode
+
+    if (dayData?.Hotel) {
+      path.push([dayData.Hotel.latitude, dayData.Hotel.longitude]);
+    }
+
+    if (dayData?.Restaurants?.breakfast)
+      path.push([dayData.Restaurants.breakfast.latitude, dayData.Restaurants.breakfast.longitude]);
+
+    dayData?.Attractions?.forEach(att => {
+      if (att?.latitude && att?.longitude)
+        path.push([att.latitude, att.longitude]);
+    });
+
+    if (dayData?.Restaurants?.lunch)
+      path.push([dayData.Restaurants.lunch.latitude, dayData.Restaurants.lunch.longitude]);
+
+    if (dayData?.Restaurants?.dinner)
+      path.push([dayData.Restaurants.dinner.latitude, dayData.Restaurants.dinner.longitude]);
+
+    if (dayData?.Hotel) {
+      // End at the same hotel (loop route)
+      path.push([dayData.Hotel.latitude, dayData.Hotel.longitude]);
+    }
+
+    if (path.length > 1) {
+      dayPolylines.push({
+        positions: path,
+        color: getColorByMode(mode)
+      });
+    }
+  });
+
   return (
     <MapContainer
-      center={[7.8731, 80.7718]}
+      center={[7.8731, 80.7718]} // Center of Sri Lanka
       zoom={7}
       style={{ height: "100%", width: "100%", borderRadius: "15px" }}
       scrollWheelZoom={true}
@@ -57,9 +116,9 @@ const MapComponent = ({ locations, activeLocation }) => {
         attribution="&copy; OpenStreetMap contributors"
       />
 
+      {/* Place markers */}
       {locations.map((loc, i) => {
-        const isActive =
-          activeLocation &&
+        const isActive = activeLocation &&
           `${loc.lat}-${loc.lng}` === `${activeLocation.lat}-${activeLocation.lng}`;
 
         return (
@@ -72,6 +131,19 @@ const MapComponent = ({ locations, activeLocation }) => {
           </Marker>
         );
       })}
+
+      {/* Show routes per day */}
+      {dayPolylines.map((line, i) => (
+        <Polyline
+          key={i}
+          positions={line.positions}
+          pathOptions={{
+            color: line.color,
+            weight: 4,
+            opacity: 0.7
+          }}
+        />
+      ))}
 
       <FlyToLocation activeLocation={activeLocation} />
     </MapContainer>
