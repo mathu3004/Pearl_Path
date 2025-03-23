@@ -242,7 +242,7 @@ def assign_hotel_for_destination(user, destination):
     "rating": float(hotel["rating"]),
     "pricelevel": int(hotel["pricelevel"]),
     "city": str(destination.title())
-}, [str(name) for name in alternatives]
+}, [(name) for name in alternatives]
 
 
 # Recommend Attractions
@@ -322,29 +322,35 @@ def recommend_restaurants_for_destination(user, destination, hotel_lat, hotel_lo
     best = {}
     alternatives = {}
     for i, meal in enumerate(meals):
-        if i < len(top_restaurants):
-            rest_row = top_restaurants.iloc[i]
-            best[meal] = {
-    "name": str(rest_row['name']),
-    "latitude": float(rest_row['latitude']),
-    "longitude": float(rest_row['longitude']),
-    "city": str(next((col.replace("city_", "").replace("_", " ") for col in rest_row.index if col.startswith("city") and rest_row[col] == 1), "Unknown")),
-    "rating": float(rest_row['rating'])
-}
+        meal_start_index = i * 4
+        meal_end_index = meal_start_index + 4
+        meal_group = top_restaurants.iloc[meal_start_index:meal_end_index]
 
-            if i + 3 < len(top_restaurants):
-                alternatives[meal] = [{
-                    "name": str(row["name"]),
-                    "latitude": float(row["latitude"]),
-                    "longitude": float(row["longitude"]),
-                    "rating": float(row["rating"]),
-                    "city": next((col.replace("city_", "").replace("_", " ") 
-                                for col in row.keys() if col.startswith("city") and row[col] == 1), "Unknown")
-                } for _, row in top_restaurants.iloc[i+3:i+6].iterrows()]
+        if not meal_group.empty:
+            best_restaurant = meal_group.iloc[0]
+            best[meal] = {
+                "name": str(best_restaurant['name']),
+                "latitude": float(best_restaurant['latitude']),
+                "longitude": float(best_restaurant['longitude']),
+                "city": str(next((col.replace("city_", "").replace("_", " ")
+                                    for col in best_restaurant.index if col.startswith("city") and best_restaurant[col] == 1), "Unknown")),
+                "rating": float(best_restaurant['rating'])
+            }
+            alt_list = meal_group.iloc[1:4]
+            alternatives[meal] = [{
+                "name": str(row["name"]),
+                "latitude": float(row["latitude"]),
+                "longitude": float(row["longitude"]),
+                "rating": float(row["rating"]),
+                "city": next((col.replace("city_", "").replace("_", " ")
+                               for col in row.keys() if col.startswith("city") and row[col] == 1), "Unknown")
+            } for _, row in alt_list.iterrows()]
         else:
+            best[meal] = {}
             alternatives[meal] = []
 
     return best, alternatives
+
 # Flask route for itinerary generation
 @app.route('/generate_itinerary', methods=['POST'])
 def generate_itinerary():
