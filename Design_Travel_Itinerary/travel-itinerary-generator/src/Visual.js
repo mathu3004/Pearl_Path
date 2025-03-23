@@ -1,6 +1,7 @@
 //Visual.js
 import React, { useState, useEffect, useRef } from "react";
 import { useParams } from "react-router-dom";
+import Layout from '../src/components/Layout';
 import axios from "axios";
 import MapComponent from "./MapComponent";
 import { FaHotel, FaUtensils, FaMapMarkerAlt, FaTrain, FaStar} from "react-icons/fa";
@@ -284,7 +285,10 @@ if (!itineraries || !itineraries.itinerary) {
 
       <p className="thank-you-message">Thank You! Enjoy Your Trip! <FaTrain /> </p>
 
-    </div> <Footer />
+    </div> <Layout>
+      <div className="demo-content">
+      </div>
+    </Layout><Footer />
         </div>  
   );
  

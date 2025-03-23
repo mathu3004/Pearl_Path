@@ -275,7 +275,6 @@ def recommend_attractions_for_destination(user, destination, hotel_lat, hotel_lo
     "rating": float(row["rating"])
 } for _, row in top_attractions.iterrows()]
 
-    
     alternatives = [{
         "name": str(row["name"]),
         "latitude": float(row["latitude"]),
@@ -285,7 +284,6 @@ def recommend_attractions_for_destination(user, destination, hotel_lat, hotel_lo
                       for col in row.keys() if col.startswith("city") and row[col] == 1), "Unknown")
     } for _, row in top_attractions.iloc[4:7].iterrows()]
 
-    
     return main, alternatives
 
 # Recommend Restaurants
@@ -313,7 +311,7 @@ def recommend_restaurants_for_destination(user, destination, hotel_lat, hotel_lo
 
     top_restaurants = city_restaurants[
     ~city_restaurants['name'].isin(used_restaurants)
-    ].sort_values(by="rating", ascending=False).head(6)
+    ].sort_values(by="rating", ascending=False).head(12)
 
     # Track used restaurant names
     used_restaurants.update(top_restaurants['name'].tolist())

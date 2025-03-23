@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import Layout from '../src/components/Layout';
 import { useParams, useNavigate } from 'react-router-dom';
 import { FaInstagram, FaFacebook } from "react-icons/fa";
 import { Link } from 'react-router-dom';
@@ -179,6 +180,10 @@ const Modify = () => {
           <div className="placeholder-map">Map will go here</div>
         </div>
       </div>
+      <Layout>
+      <div className="demo-content">
+      </div>
+    </Layout>
       <Footer />
     </div>
   );

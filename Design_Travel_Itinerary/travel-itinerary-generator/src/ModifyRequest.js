@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import Layout from '../src/components/Layout';
 import axios from 'axios';
 import './App.css';
 
@@ -63,6 +64,10 @@ const ModifyRequest = () => {
           </div>
         )}
       </div>
+      <Layout>
+      <div className="demo-content">
+      </div>
+    </Layout>
     </div>
   );
 };

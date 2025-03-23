@@ -13,7 +13,6 @@ const App = () => {
     return (
         <Router>
             <Routes>
-            
                 <Route path="/" element={<TravelItineraryGenerator />} />  
                 <Route path="/visual/:username/:name" element={<TravelItinerary />} />
                 <Route path="/modify/:username/:name" element={<Modify />} />

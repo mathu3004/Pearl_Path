@@ -1,9 +1,11 @@
 // TravelItineraryGenerator.js
 import React, { useState } from 'react';
+import Layout from '../src/components/Layout';
 import { useNavigate } from 'react-router-dom';
 import { Link } from 'react-router-dom';
 import { FaInstagram, FaFacebook } from "react-icons/fa";
 import { FaPlaneDeparture, FaWalking, FaCar, FaBiking, FaBusAlt, FaTrain, FaShuttleVan,} from 'react-icons/fa';
+import './App.css';
 
 const Header = () => {
   return (
@@ -382,6 +384,11 @@ const TravelItineraryGenerator = () => {
                     </button>
                 </form>
             </div>
+            <Layout>
+      <div className="demo-content">
+      </div>
+    </Layout>
+
             <Footer />
         </div>
     );
