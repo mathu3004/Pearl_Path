@@ -283,6 +283,10 @@ if (!itineraries || !itineraries.itinerary) {
       <button className="button" onClick={() => navigate(`/modify/${lowerUsername}/${lowerName}`)}>Edit</button>
   <button className="button" onClick={handleSaveItinerary}>Save Itinerary</button>
   <button className="button" onClick={handleExportPDF}>Export</button>
+  <button className="button" onClick={() => navigate(`/modify-request/${lowerUsername}`)}>
+  Request Modify
+</button>
+
 </div>
 
       <p className="thank-you-message">Thank You! Enjoy Your Trip! <FaTrain /> </p>

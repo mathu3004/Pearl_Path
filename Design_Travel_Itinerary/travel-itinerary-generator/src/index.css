@@ -151,6 +151,14 @@ select {
   font-size: 3.5rem;
   font-weight: bold;
   color: #134e4a;
+  margin-bottom: 0rem;
+  text-align: center;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+}
+.page-subtitle {
+  font-size: 2rem;
+  font-weight: bold;
+  color: #134e4a;
   margin-bottom: 2rem;
   text-align: center;
   text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);

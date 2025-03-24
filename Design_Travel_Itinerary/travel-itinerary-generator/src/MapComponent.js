@@ -30,6 +30,32 @@ const blackIcon = new L.Icon({
   shadowSize: [41, 41]
 });
 
+const sortPathByProximity = (points) => {
+  if (points.length <= 2) return points;
+
+  const sorted = [points[0]]; // Start from hotel
+  const remaining = points.slice(1);
+
+  while (remaining.length) {
+    const last = sorted[sorted.length - 1];
+    let nearestIndex = 0;
+    let nearestDist = Infinity;
+
+    remaining.forEach((pt, i) => {
+      const dist = Math.hypot(pt[0] - last[0], pt[1] - last[1]);
+      if (dist < nearestDist) {
+        nearestDist = dist;
+        nearestIndex = i;
+      }
+    });
+
+    sorted.push(remaining.splice(nearestIndex, 1)[0]);
+  }
+
+  return sorted;
+};
+
+
 // Center and pan to selected location
 const FlyToLocation = ({ activeLocation }) => {
   const map = useMap();
@@ -49,7 +75,7 @@ const FlyToLocation = ({ activeLocation }) => {
   return null;
 };
 
-// Get color for each transport mode
+// Mode to color mapping
 const getColorByMode = (mode) => {
   switch (mode) {
     case "car":
@@ -58,6 +84,8 @@ const getColorByMode = (mode) => {
       return "blue";
     case "train":
       return "purple";
+    case "bike":
+      return "orange";
     case "walk":
       return "green";
     default:
@@ -96,12 +124,15 @@ const MapComponent = ({ locations, activeLocation, transportModesPerDay }) => {
       path.push([dayData.Hotel.latitude, dayData.Hotel.longitude]);
     }
 
-    if (path.length > 1) {
+    if (path.length > 2) {
+      const optimizedPath = sortPathByProximity(path);
+      optimizedPath.push(path[0]); // Return to hotel
       dayPolylines.push({
-        positions: path,
+        positions: optimizedPath,
         color: getColorByMode(mode)
       });
     }
+    
   });
 
   return (
