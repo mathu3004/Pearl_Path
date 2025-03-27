@@ -46,13 +46,13 @@ const TravelItinerary = () => {
     if (!element) return;
   
     const hiddenElements = document.querySelectorAll(".hide-on-export");
-    hiddenElements.forEach((el) => (el.style.display = "none")); // 👈 hide buttons
+    hiddenElements.forEach((el) => (el.style.display = "none")); //  hide buttons
   
     try {
       const canvas = await html2canvas(element, {
         scrollY: -window.scrollY,
         useCORS: true,
-        backgroundColor: null, // Preserve background styles
+        backgroundColor: null,
       });
   
       const imgData = canvas.toDataURL("image/png");
@@ -67,7 +67,7 @@ const TravelItinerary = () => {
     } catch (error) {
       console.error("Failed to export PDF:", error);
     } finally {
-      hiddenElements.forEach((el) => (el.style.display = "")); // 👈 show buttons again
+      hiddenElements.forEach((el) => (el.style.display = "")); //  show buttons again
     }
   };
 
@@ -79,13 +79,13 @@ const TravelItinerary = () => {
       });
   
       if (response.status === 201) {
-        alert("✅ Itinerary saved to favorites!");
+        alert(" Itinerary saved to favorites!");
       } else {
-        alert("⚠️ Could not save itinerary.");
+        alert(" Could not save itinerary.");
       }
     } catch (error) {
       console.error("Error saving itinerary:", error);
-      alert("❌ Failed to save itinerary. Check console.");
+      alert(" Failed to save itinerary. Check console.");
     }
   };  
  
@@ -181,7 +181,12 @@ if (!itineraries || !itineraries.itinerary) {
       <Header />
       <div
   className="page-containers"
-  ref={itineraryRef}
+  ref={itineraryRef} style={{
+    backgroundImage: 'url("https://i0.wp.com/www.tourbooking.lk/wp-content/uploads/2023/03/merlin_148552275_74c0d250-949c-46e0-b8a1-e6d499e992cf-superJumbo-edited.jpg?fit=2048%2C1151&ssl=1")',
+    backgroundPosition: 'center',
+    backgroundAttachment: 'fixed',
+    minHeight: '200vh'
+  }}
 >
         <div className="main-layout">
           <div className="itinerary-card">
@@ -251,7 +256,8 @@ if (!itineraries || !itineraries.itinerary) {
                             <span className="activity-type">{item.label || item.type}:</span> {item.data.name}
                           </div>
                           <div className="activity-second-row">
-                            <div className="activity-location"><FaMapMarkerAlt /> <span>{item.data.city || 'Unknown'}</span></div>
+                            <div className="activity-location"><FaMapMarkerAlt /> <span>{(item.data.city || 'Unknown').replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase())}</span>
+                            </div>
                             <div className="activity-rating"><FaStar /> <span>{item.data.rating}/5</span></div>
                           </div>
                         </li>

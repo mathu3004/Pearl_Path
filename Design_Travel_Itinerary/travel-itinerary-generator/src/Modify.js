@@ -129,12 +129,17 @@ const Modify = () => {
     else if (type === 'Attractions') {
       const currentAtt = dayData.Attractions[indexOrKey];
       dayData.Attractions[indexOrKey] = newItem;
-  
-      dayData['Alternative Attractions'] = (dayData['Alternative Attractions'] || []).map(a =>
+
+      // Safely update the correct alternatives group
+      const altList = (dayData['Alternative Attractions']?.[currentAtt.name] || []).map(a =>
         a.name === newItem.name ? currentAtt : a
       );
-  
-      // Sync with alternatives state
+
+      // Reassign updated alternatives
+      dayData['Alternative Attractions'][newItem.name] = altList;
+      delete dayData['Alternative Attractions'][currentAtt.name];
+
+      // Sync with state
       altData.Attractions = dayData['Alternative Attractions'];
     }
   
