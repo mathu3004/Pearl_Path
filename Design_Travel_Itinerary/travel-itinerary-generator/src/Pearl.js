@@ -3,7 +3,7 @@ import { GoogleMap, LoadScript, Marker } from "@react-google-maps/api";
 import { FaHotel, FaUtensils, FaMapMarkerAlt, FaStar, FaTrain } from "react-icons/fa";
 import { FaInstagram, FaFacebook } from "react-icons/fa";
 import { Link } from "react-router-dom";
-import "./App.css";
+import "./TravelItineraryRadius.css";
 
 const Header = () => {
   return (

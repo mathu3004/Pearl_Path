@@ -4,7 +4,8 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { FaInstagram, FaFacebook } from "react-icons/fa";
 import { Link } from 'react-router-dom';
 import axios from 'axios';
-import './App.css';
+import MapComponent from './MapComponent'; 
+import './TravelItineraryRadius.css';
 
 const Header = () => {
   return (
@@ -173,7 +174,7 @@ const Modify = () => {
     <div className="full-page-container">
       <Header />
       <div className="edit-page-wrapper">
-        <div className="edit-left">
+        <div className="edit-left-scrollable">
           <h2>Modify {username.toUpperCase()}'s {name.toUpperCase()} Itinerary</h2>
           {Object.entries(itinerary.itinerary).map(([dayKey, day]) => (
             <div key={dayKey} className="edit-day">
@@ -193,7 +194,7 @@ const Modify = () => {
                     Replace with: {alt.name}
                   </button>
                   ))}
-</div>
+              </div>
               </div>
 
               {/* Restaurants */}
@@ -218,32 +219,56 @@ const Modify = () => {
               <div>
                 <h4>Attractions</h4>
                 {day.Attractions?.map((att, idx) => (
-                  <div key={idx} className="edit-item">
-                    <span>{att.name}</span>
-                    <button className="remove-btn" onClick={() => handleRemove(dayKey, 'Attractions', idx)}>Remove</button>
-                    <div className="alt-row">
-                    {(alternatives[dayKey]?.Attractions || []).slice(0, 3).map((alt, aIdx) => (
-                      <button key={aIdx} className="replace-btn" onClick={() => handleReplace(dayKey, 'Attractions', idx, alt)}>
-                        Replace with: {alt.name}
-                      </button>
-                    ))}
-                    </div>
-                  </div>
-                ))}
+  <div key={idx} className="edit-item">
+    <span>{att.name}</span>
+    <button className="remove-btn" onClick={() => handleRemove(dayKey, 'Attractions', idx)}>Remove</button>
+    <div className="alt-row">
+      {(alternatives[dayKey]?.Attractions?.[att.name] || []).map((alt, aIdx) => (
+        <button key={aIdx} className="replace-btn" onClick={() => handleReplace(dayKey, 'Attractions', idx, alt)}>
+          Replace with: {alt.name}
+        </button>
+      ))}
+    </div>
+  </div>
+))}
+
               </div>
             </div>
           ))}
-          <button className="save-button" onClick={handleSave}>Save Changes</button>
         </div>
   
         <div className="edit-map">
-          <div className="placeholder-map">Map will go here</div>
-        </div>
-      </div>
-      <Layout>
+  <MapComponent
+    locations={
+      Object.values(itinerary.itinerary).flatMap((day) => {
+        const locs = [];
+
+        if (day.Hotel)
+          locs.push({ ...day.Hotel, lat: day.Hotel.latitude, lng: day.Hotel.longitude });
+
+        Object.values(day.Restaurants || {}).forEach((rest) => {
+          if (rest) locs.push({ ...rest, lat: rest.latitude, lng: rest.longitude });
+        });
+
+        (day.Attractions || []).forEach((att) => {
+          if (att) locs.push({ ...att, lat: att.latitude, lng: att.longitude });
+        });
+
+        return locs;
+      })
+    }
+    activeLocation={null}
+    transportModesPerDay={itinerary.itinerary}
+  />
+</div>
+<Layout>
       <div className="demo-content">
       </div>
     </Layout>
+
+      </div>
+      
+    <button className="save-button" onClick={handleSave}>Save Changes</button>
       <Footer />
     </div>
   );

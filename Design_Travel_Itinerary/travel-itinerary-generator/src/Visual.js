@@ -7,7 +7,7 @@ import MapComponent from "./MapComponent";
 import { FaHotel, FaUtensils, FaMapMarkerAlt, FaTrain, FaStar} from "react-icons/fa";
 import { FaInstagram, FaFacebook } from "react-icons/fa";
 import { Link } from "react-router-dom";
-import "./App.css";
+import "./TravelItineraryRadius.css";
 import html2canvas from "html2canvas";
 import jsPDF from "jspdf";
 import { useNavigate } from "react-router-dom";
@@ -290,17 +290,15 @@ if (!itineraries || !itineraries.itinerary) {
 </div>
 
       <p className="thank-you-message">Thank You! Enjoy Your Trip! <FaTrain /> </p>
-
-    </div> <Layout>
+      <Layout>
       <div className="demo-content">
       </div>
-    </Layout><Footer />
+    </Layout>
+    </div> <Footer />
         </div>  
   );
  
 };
-
-
 
 const Footer = () => {
   return (

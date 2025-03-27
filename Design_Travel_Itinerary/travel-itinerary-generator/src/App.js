@@ -1,7 +1,4 @@
 // src/App.js
-//<Route path="/" element={<ModifyRequest />} /> {/* Set as default landing page */}
-//<Route path="/modifyrequest/:username" element={<ModifyRequest />} />
-//<Route path="/generateItinerary" element={<TravelItineraryGenerator />} />
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import TravelItineraryGenerator from './TravelItineraryGenerator';

@@ -9,7 +9,6 @@
   overflow-x: hidden;
 }
 
-
 /* Main Layout */
 .main-layout {
   display: flex;
@@ -320,11 +319,11 @@ body {
 }
 
 h2 {
-    color: #065f46; /* Dark green */
+    color: #065f46; 
 }
 
 .edit-page {
-  padding: 3rem 2rem;
+  padding: 2rem 2rem;
   color: #fff;
   backdrop-filter: blur(6px);
   background-color: rgba(0, 0, 0, 0.4);
@@ -335,41 +334,51 @@ h2 {
 
 .edit-page-wrapper {
   display: flex;
-  flex: 1;
-  flex-direction: row;
-  gap: 2rem;
-  padding: 6rem 2rem 2rem 2rem;
-  min-height: 100vh;
-  width: 100%;
-  overflow-x: hidden;
-  align-items: flex-start; /* prevent children from stretching vertically */
+  align-items: flex-start;
+  padding: 2rem 3rem 2rem 3rem;
+  gap: 3rem;
+  height: 100vh;
+  overflow: hidden;
+  box-sizing: border-box;
 }
 
-.edit-left {
+/* Left scrollable content */
+.edit-left-scrollable {
   flex: 2;
-  min-width: 60%;
-  padding: 1rem 2rem;
-  max-height: unset; /* remove this so the content isn't forced into short height */
-  overflow-y: visible;
-  background-color: #fff; /* solid white */
-  backdrop-filter: none;
-  color: #000;
+  overflow-y: auto;
+  height: 100vh;
+  padding-bottom: 1rem;
+  padding: 0.5rem 2rem;
+  background-color: #fff;
   border-radius: 20px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  scrollbar-width: thin;
+  scrollbar-color: #ccc transparent;
 }
 
+.edit-left-scrollable::-webkit-scrollbar {
+  width: 6px;
+}
+
+.edit-left-scrollable::-webkit-scrollbar-thumb {
+  background-color: #bbb;
+  border-radius: 10px;
+}
+/* Sticky Map stays fixed on the right */
+/* Right sticky map */
 .edit-map {
   flex: 1;
-  min-width: 300px;
-  min-height: 85vh;
-  background-color: rgba(255, 255, 255, 0.15);
-  backdrop-filter: blur(5px);
+  position: sticky;
+  height: calc(100vh - 160px);
+  min-width: 350px;
+  background-color: #fff;
   border-radius: 20px;
   padding: 1rem;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+  box-sizing: border-box;
 }
 
 .placeholder-map {
@@ -410,7 +419,7 @@ h2 {
 .edit-day h4 {
   font-size: 1.4rem;
   font-size: 1.2rem;
-  color: #00b3a6;
+  color: #2a6461;
   text-transform: uppercase;
   margin-top: 1.5rem;
   margin-bottom: 0.5rem;
@@ -437,7 +446,7 @@ h2 {
 .edit-item .replace-btn {
   font-size: 0.75rem;
   padding: 0.3rem 0.6rem;
-  background-color: #00b3a6;
+  background-color: #30605d;
   color: white;
   border: none;
   border-radius: 6px;
@@ -453,7 +462,7 @@ h2 {
 .edit-item .remove-btn {
   font-size: 0.8rem;
   padding: 0.4rem 0.4rem;
-  background-color: #006400;
+  background-color: #269026;
   color: white;
   border: none;
   border-radius: 6px;
@@ -468,11 +477,10 @@ h2 {
   transform: scale(1.03);
 }
 
-.edit-day button,
-.save-button {
+.edit-day button {
   font-size: 0.8rem;
   padding: 0.4rem 0.8rem;
-  background-color: #00b3a6;
+  background-color: #30605d;
   color: white;
   border: none;
   border-radius: 6px;
@@ -487,19 +495,47 @@ h2 {
   margin-top: 0.5rem;
 }
 
-.edit-item button:hover,
-.save-button:hover {
+.edit-item button:hover {
   background-color: #009688;
   transform: scale(1.03);
 }
 
 .save-button {
-  margin-top: 2rem;
-  display: block;
-  margin-left: auto;
-  margin-right: auto;
+  margin: 1rem auto 0.5rem auto;
   font-weight: bold;
-  background-color: #1dd1a1;
+  background-color: #2a5d4f;
+  padding: 0.8rem 2rem;
+  font-size: 1rem;
+  border: none;
+  border-radius: 10px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+  transition: 0.2s ease;
+  display: block;
+  text-align: center;
+}
+
+.save-button:hover {
+  background-color: #10ac84;
+  transform: scale(1.05);
+}
+
+/* Responsive fix if map gets hidden */
+@media (max-width: 1000px) {
+  .edit-page-wrapper {
+    flex-direction: column;
+    height: auto;
+  }
+
+  .edit-left-scrollable {
+    max-height: unset;
+    overflow-y: visible;
+  }
+
+  .edit-map {
+    position: static;
+    height: 400px;
+    margin-top: 1rem;
+  }
 }
 
 .modify-request-form {

@@ -5,7 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import { Link } from 'react-router-dom';
 import { FaInstagram, FaFacebook } from "react-icons/fa";
 import { FaPlaneDeparture, FaWalking, FaCar, FaBiking, FaBusAlt, FaTrain, FaShuttleVan,} from 'react-icons/fa';
-import './App.css';
+import './TravelItineraryRadius.css';
 
 const Header = () => {
   return (

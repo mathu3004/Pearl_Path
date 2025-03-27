@@ -261,29 +261,42 @@ def recommend_attractions_for_destination(user, destination, hotel_lat, hotel_lo
         lambda row: geodesic((hotel_lat, hotel_lon), (row['latitude'], row['longitude'])).km, axis=1)
     city_attractions = city_attractions[city_attractions['distance'] <= max_distance_km]
 
-    top_attractions = city_attractions[
-    ~city_attractions['name'].isin(used_attractions)
-    ].sort_values(by="rating", ascending=False).head(10)
+    # Exclude already used
+    city_attractions = city_attractions[~city_attractions['name'].isin(used_attractions)]
 
-    # Store used ones
-    used_attractions.update(top_attractions['name'].tolist())
-        
-    main = [{
-    "name": str(row["name"]),
-    "latitude": float(row["latitude"]),
-    "longitude": float(row["longitude"]),
-    "city": next((col.replace("city_", "").replace("_", " ") for col in row.keys() if col.startswith("city") and row[col] == 1), "Unknown"),
-    "rating": float(row["rating"])
-} for _, row in top_attractions.iterrows()]
+    city_attractions = city_attractions.sort_values(by="rating", ascending=False).head(40)
 
-    alternatives = [{
-        "name": str(row["name"]),
-        "latitude": float(row["latitude"]),
-        "longitude": float(row["longitude"]),
-        "rating": float(row["rating"]),
-        "city": next((col.replace("city_", "").replace("_", " ") 
-                      for col in row.keys() if col.startswith("city") and row[col] == 1), "Unknown")
-    } for _, row in top_attractions.iloc[4:7].iterrows()]
+    main = []
+    alternatives = {}  # <--- changed from list to dict
+
+    for i in range(4):
+        group = city_attractions.iloc[i * 4: (i + 1) * 4]
+        if len(group) == 0:
+            continue
+
+        main_attraction = group.iloc[0]
+        alt_group = group.iloc[1:4]
+
+        main_obj = {
+            "name": str(main_attraction["name"]),
+            "latitude": float(main_attraction["latitude"]),
+            "longitude": float(main_attraction["longitude"]),
+            "rating": float(main_attraction["rating"]),
+            "city": destination.title()
+        }
+
+        alt_objs = [{
+            "name": str(row["name"]),
+            "latitude": float(row["latitude"]),
+            "longitude": float(row["longitude"]),
+            "rating": float(row["rating"]),
+            "city": destination.title()
+        } for _, row in alt_group.iterrows()]
+
+        main.append(main_obj)
+        alternatives[main_obj["name"]] = alt_objs
+
+        used_attractions.add(main_obj["name"])
 
     return main, alternatives
 

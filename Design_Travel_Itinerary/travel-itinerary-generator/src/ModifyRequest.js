@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Layout from '../src/components/Layout';
 import axios from 'axios';
-import './App.css';
+import './TravelItineraryRadius.css';
 
 const ModifyRequest = () => {
   const [username, setUsername] = useState('');
