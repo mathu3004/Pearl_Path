@@ -182,12 +182,6 @@ if (!itineraries || !itineraries.itinerary) {
       <div
   className="page-containers"
   ref={itineraryRef}
-  style={{
-    backgroundImage: 'url("https://i0.wp.com/www.tourbooking.lk/wp-content/uploads/2023/03/merlin_148552275_74c0d250-949c-46e0-b8a1-e6d499e992cf-superJumbo-edited.jpg?fit=2048%2C1151&ssl=1")',
-    backgroundPosition: 'center',
-    backgroundAttachment: 'fixed',
-    minHeight: '200vh'
-  }}
 >
         <div className="main-layout">
           <div className="itinerary-card">
@@ -289,11 +283,10 @@ if (!itineraries || !itineraries.itinerary) {
 
 </div>
 
-      <p className="thank-you-message">Thank You! Enjoy Your Trip! <FaTrain /> </p>
       <Layout>
-      <div className="demo-content">
-      </div>
     </Layout>
+    <p className="thank-you-message">Thank You! Enjoy Your Trip! <FaTrain /> </p>
+
     </div> <Footer />
         </div>  
   );

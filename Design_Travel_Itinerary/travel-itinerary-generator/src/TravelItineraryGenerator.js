@@ -43,58 +43,109 @@ const TravelItineraryGenerator = () => {
     const navigate = useNavigate(); 
 
     // Function to validate the form
-    const validateForm = () => {
-        let errors = {};
-        let isValid = true;
-
-        // Name Validation: Must contain only letters (A-Z, a-z)
-        if (!/^[A-Za-z\s]+$/.test(formData.name) || formData.name.length === 0) {
-            errors.name = "Name must contain only alphabetical characters.";
-            isValid = false;
+    const validateField = (name, value) => {
+        let error = "";
+    
+        if (name === "name") {
+            if (!/^[A-Za-z\s]+$/.test(value) || value.trim() === "") {
+                error = "Name must contain only alphabetical characters.";
+            }
         }
-
-        // Validate Starting Destination: Must be in the selected destinations
-        if (!formData.destinations.includes(formData.startingDestination)) {
-            errors.startingDestination = "Starting destination must be one of the selected destinations.";
-            isValid = false;
+    
+        if (name === "startingDestination") {
+            if (!formData.destinations.includes(value)) {
+                error = "Starting destination must be one of the selected destinations.";
+            }
         }
-
-        // Validate Number of Days: Must be between 1 and 7
-        if (formData.numberOfDays < 1 || formData.numberOfDays > 7) {
-            errors.numberOfDays = "Number of days must be between 1 and 7.";
-            isValid = false;
+    
+        if (name === "numberOfDays") {
+            if (value < 1 || value > 7) {
+                error = "Number of days must be between 1 and 7.";
+            }
         }
-
-        // Validate Maximum Distance: Must be between 20 and 40 km
-        if (formData.maxDistance < 20 || formData.maxDistance > 40) {
-            errors.maxDistance = "Maximum distance must be between 20 and 40 km.";
-            isValid = false;
+    
+        if (name === "maxDistance") {
+            if (value < 20 || value > 40) {
+                error = "Maximum distance must be between 20 and 40 km.";
+            }
         }
-
-        setErrors(errors);
-        return isValid;
-    };
+    
+        if (name === "hotelBudget") {
+            if (value <= 5000) {
+                error = "Hotel budget must be more than 5000.";
+            }
+        }
+    
+        setErrors((prevErrors) => ({
+            ...prevErrors,
+            [name]: error,
+        }));
+    };    
 
     const handleChange = (e) => {
         const { name, value, type, checked } = e.target;
     
         setFormData((prevData) => {
+            let newData;
+    
             if (type === 'checkbox') {
-                return {
+                newData = {
                     ...prevData,
                     [name]: checked
                         ? [...prevData[name], value]
                         : prevData[name].filter((item) => item !== value),
                 };
-            } else if (["numberOfDays", "maxDistance"].includes(name)) {
-                return { ...prevData, [name]: value ? Number(value) : 0 }; // Convert to number, default to 0 if empty
+            } else if (["numberOfDays", "maxDistance", "hotelBudget"].includes(name)) {
+                newData = { ...prevData, [name]: value ? Number(value) : 0 };
             } else if (name === "peopleCount") {
-                return { ...prevData, [name]: String(value) }; // Ensure it is stored as a string
+                newData = { ...prevData, [name]: String(value) };
             } else {
-                return { ...prevData, [name]: value };
+                newData = { ...prevData, [name]: value };
             }
+    
+            validateField(name, newData[name]);
+            return newData;
         });
-    };  
+    };    
+    
+    const validateForm = () => {
+        let isValid = true;
+        let newErrors = {};
+    
+        // Name Validation
+        if (!/^[A-Za-z\s]+$/.test(formData.name) || formData.name.trim() === "") {
+            newErrors.name = "Name must contain only alphabetical characters.";
+            isValid = false;
+        }
+    
+        // Starting destination check
+        if (!formData.destinations.includes(formData.startingDestination)) {
+            newErrors.startingDestination = "Starting destination must be one of the selected destinations.";
+            isValid = false;
+        }
+    
+        // Number of Days
+        if (formData.numberOfDays < 1 || formData.numberOfDays > 7) {
+            newErrors.numberOfDays = "Number of days must be between 1 and 7.";
+            isValid = false;
+        }
+    
+        // Max Distance
+        if (formData.maxDistance < 20 || formData.maxDistance > 40) {
+            newErrors.maxDistance = "Maximum distance must be between 20 and 40 km.";
+            isValid = false;
+        }
+    
+        // Hotel Budget
+        if (formData.hotelBudget <= 5000) {
+            newErrors.hotelBudget = "Hotel budget must be more than 5000.";
+            isValid = false;
+        }
+    
+        setErrors(newErrors);
+        return isValid;
+    };
+
     
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -378,17 +429,13 @@ const TravelItineraryGenerator = () => {
                         </div>
                     </div>
                     <br></br>
-
                     <button type="submit" className="form-button">
                         Get Itinerary <FaPlaneDeparture className="inline ml-2" />
                     </button>
                 </form>
             </div>
             <Layout>
-      <div className="demo-content">
-      </div>
     </Layout>
-
             <Footer />
         </div>
     );

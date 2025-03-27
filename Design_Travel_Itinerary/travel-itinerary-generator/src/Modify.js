@@ -261,14 +261,13 @@ const Modify = () => {
     transportModesPerDay={itinerary.itinerary}
   />
 </div>
-<Layout>
-      <div className="demo-content">
-      </div>
-    </Layout>
+
 
       </div>
-      
-    <button className="save-button" onClick={handleSave}>Save Changes</button>
+      <button className="save-button" onClick={handleSave}>Save Changes</button>
+
+      <Layout>
+    </Layout>
       <Footer />
     </div>
   );

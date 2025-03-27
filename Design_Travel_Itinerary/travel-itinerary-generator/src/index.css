@@ -16,7 +16,7 @@
   background: rgba(255, 255, 255, 0.75);
   backdrop-filter: blur(15px);
   border-radius: 20px;
-  padding: 0.5rem 4rem 4rem 4rem;
+  padding: 0.5rem 4rem 2rem 4rem;
   max-width: 700px;
   max-height: fit-content;
   height: 100%;
@@ -32,7 +32,6 @@
   box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
 }
 
-/* Form Styles */
 /* Form Grid Styles */
 .form-grid {
   display: grid;
@@ -60,19 +59,19 @@
   gap: 0.5rem 1.5rem;
 }
 
-
 /* Consistent Styling for Labels */
 .checkbox-grid label, 
 .radio-grid label {
     display: flex;
     align-items: center;
     font-size: 1rem;
-    color: #134e4a;
+    color: #000000;
 }
 
 /* Label Styles */
 .form-label {
   font-weight: 600;
+  font-size: 1.2rem;
   color: #134e4a;
   margin-bottom: 0.5rem;
   display: block;
@@ -95,7 +94,7 @@ input[type="radio"] {
 input[type="text"],
 input[type="number"],
 select {
-  border: 2px solid #14b8a6;
+  border: 2px solid #15574f;
   padding: 12px;
   border-radius: 8px;
   width: 100%;
@@ -104,11 +103,19 @@ select {
   transition: border-color 0.3s, box-shadow 0.3s;
 }
 
+/* Make checkbox and radio buttons appear green when checked */
+input[type="checkbox"]:checked,
+input[type="radio"]:checked {
+  accent-color: #1e753e; 
+}
+
+
 /* Button Styles */
 .form-button {
   background-color: #0f766e;
   color: white;
   padding: 15px;
+  margin-top: 20px;
   border: none;
   border-radius: 12px;
   font-weight: bold;
@@ -148,7 +155,7 @@ select {
 
 /* Page Title */
 .page-title {
-  font-size: 3.5rem;
+  font-size: 3rem;
   font-weight: bold;
   color: #134e4a;
   margin-bottom: 0rem;
@@ -163,7 +170,6 @@ select {
   text-align: center;
   text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
 }
-
 
 /* Background Animation */
 body, html {
@@ -184,7 +190,7 @@ body, html {
 /* Input and Button Styles */
 input[type="text"],
 select {
-  border: 2px solid #14b8a6;
+  border: 2px solid #0f766e;
   padding: 12px;
   border-radius: 8px;
   width: 100%;
@@ -240,8 +246,6 @@ form {
 .mt-8 {
   margin-top: 2rem;
 }
-
-
 
 .header {
   position: fixed;
