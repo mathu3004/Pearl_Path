@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from 'react';
-import Layout from '../src/components/Layout';
+import Layout from './components/Layout';
 import { useParams, useNavigate } from 'react-router-dom';
 import { FaInstagram, FaFacebook } from "react-icons/fa";
 import { Link } from 'react-router-dom';
 import axios from 'axios';
-import MapComponent from './MapComponent'; 
+import MapComponent from './RadiusMapComponent'; 
 import './TravelItineraryRadius.css';
 
 const Header = () => {

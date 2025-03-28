@@ -1,6 +1,6 @@
 // TravelItineraryGenerator.js
 import React, { useState } from 'react';
-import Layout from '../src/components/Layout';
+import Layout from './components/Layout';
 import { useNavigate } from 'react-router-dom';
 import { Link } from 'react-router-dom';
 import { FaInstagram, FaFacebook } from "react-icons/fa";
@@ -59,8 +59,8 @@ const TravelItineraryGenerator = () => {
         }
     
         if (name === "numberOfDays") {
-            if (value < 1 || value > 7) {
-                error = "Number of days must be between 1 and 7.";
+            if (value < 1 || value > 10) {
+                error = "Number of days must be between 1 and 10.";
             }
         }
     
@@ -112,47 +112,88 @@ const TravelItineraryGenerator = () => {
         let isValid = true;
         let newErrors = {};
     
+        // Username
+        if (!formData.username.trim()) {
+            newErrors.username = "Username is required.";
+            isValid = false;
+        }
+    
         // Name Validation
         if (!/^[A-Za-z\s]+$/.test(formData.name) || formData.name.trim() === "") {
             newErrors.name = "Name must contain only alphabetical characters.";
             isValid = false;
         }
     
+        // Destinations
+        if (formData.destinations.length === 0) {
+            newErrors.destinations = "At least one destination must be selected.";
+            isValid = false;
+        }
+    
         // Starting destination check
-        if (!formData.destinations.includes(formData.startingDestination)) {
+        if (!formData.startingDestination || !formData.destinations.includes(formData.startingDestination)) {
             newErrors.startingDestination = "Starting destination must be one of the selected destinations.";
             isValid = false;
         }
     
+        // Hotel Budget
+        if (!formData.hotelBudget || formData.hotelBudget <= 5000) {
+            newErrors.hotelBudget = "Hotel budget must be more than 5000.";
+            isValid = false;
+        }
+    
         // Number of Days
-        if (formData.numberOfDays < 1 || formData.numberOfDays > 7) {
-            newErrors.numberOfDays = "Number of days must be between 1 and 7.";
+        if (!formData.numberOfDays || formData.numberOfDays < 1 || formData.numberOfDays > 10) {
+            newErrors.numberOfDays = "Number of days must be between 1 and 10.";
             isValid = false;
         }
     
         // Max Distance
-        if (formData.maxDistance < 20 || formData.maxDistance > 40) {
+        if (!formData.maxDistance || formData.maxDistance < 20 || formData.maxDistance > 40) {
             newErrors.maxDistance = "Maximum distance must be between 20 and 40 km.";
             isValid = false;
         }
     
-        // Hotel Budget
-        if (formData.hotelBudget <= 5000) {
-            newErrors.hotelBudget = "Hotel budget must be more than 5000.";
+        // People Count
+        if (!formData.peopleCount) {
+            newErrors.peopleCount = "Please select people count.";
+            isValid = false;
+        }
+    
+        // Food Preference
+        if (!formData.foodPreferences) {
+            newErrors.foodPreferences = "Please select your food preference.";
+            isValid = false;
+        }
+    
+        // Transportation Mode
+        if (!formData.transportationMode.length) {
+            newErrors.transportationMode = "At least one transportation mode must be selected.";
+            isValid = false;
+        }
+    
+        // Enforce activities and cuisines
+        if (!formData.activities.length) {
+            newErrors.activities = "Please select at least one activity.";
+            isValid = false;
+        }
+        
+        if (!formData.cuisines.length) {
+            newErrors.cuisines = "Please select at least one cuisine.";
             isValid = false;
         }
     
         setErrors(newErrors);
         return isValid;
     };
-
+    
     
     const handleSubmit = async (e) => {
         e.preventDefault();
         console.log("Form Data Before Sending:", formData);
     
         if (!validateForm()) {
-            alert("Please fix the errors in the form before submitting.");
+            alert("Please fix the errors or select atleast one for each in the form before submitting.");
             return;
         }
     
@@ -208,7 +249,7 @@ const TravelItineraryGenerator = () => {
     
 
     return (
-        <div className="page-container">
+        <div className="page-container" id="travel-itinerary-generator">
             <Header />
             <div className="glass-card">
                 <h2 className="page-title">Heal to Nature : Craft your Dream</h2> <h3 className="page-subtitle">Max Range Based Itinerary</h3>

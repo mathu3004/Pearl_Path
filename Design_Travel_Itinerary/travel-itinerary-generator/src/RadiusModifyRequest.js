@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom'; 
-import Layout from '../src/components/Layout';
+import Layout from './components/Layout';
 import { FaInstagram, FaFacebook } from "react-icons/fa";
 import axios from 'axios';
 import './TravelItineraryRadius.css';
