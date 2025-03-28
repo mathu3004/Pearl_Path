@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
+import Layout from './components/Layout';
 import L from 'leaflet';
 import { FaHotel, FaUtensils, FaMapMarkerAlt, FaInstagram, FaFacebook } from 'react-icons/fa';
 import './ItineraryApp.css';
@@ -360,7 +361,8 @@ const VisualizationItinerary = () => {
   </button>
 
 </div>
-
+<Layout>
+</Layout>
       <Footer />
     </div>
   );

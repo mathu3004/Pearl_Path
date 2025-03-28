@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { FaHotel, FaUtensils, FaMapMarkerAlt, FaInstagram, FaFacebook } from 'react-icons/fa';
 import './ItineraryApp.css';
+import Layout from './components/Layout';
 
 const Header = () => {
   const { username, itinerary_name } = useParams();
@@ -196,7 +197,8 @@ const ModifyItinerary = () => {
       <div className="save-button-wrapper">
         <button className="viz-button" onClick={handleSave}>Save Changes</button>
       </div>
-
+      <Layout>
+      </Layout>
       <Footer />
     </div>
   );

@@ -2,9 +2,9 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Link } from 'react-router-dom';
+import Layout from './components/Layout';
 import { FaInstagram, FaFacebook } from "react-icons/fa";
 import { FaPlaneDeparture, FaWalking, FaCar, FaBiking, FaBusAlt, FaTrain, FaShuttleVan,} from 'react-icons/fa';
-
 
 const Header = () => {
   return (
@@ -334,7 +334,8 @@ const TravelItineraryGenerator = () => {
                     </button>
                 </form>
             </div>
-
+            <Layout>
+            </Layout>
             <Footer />
         </div>
     );

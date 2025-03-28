@@ -132,7 +132,8 @@ const TravelItinerary = () => {
       }
   };  
         fetchItinerary();
-      }, [lowerUsername, lowerName]);
+      }, [lowerUsername, lowerName, mode]);
+
       useEffect(() => {
         const loadCoordinates = async () => {
           if (!itineraries?.itinerary) return;
@@ -184,12 +185,11 @@ if (!itineraries || !itineraries.itinerary) {
   return <p>No itinerary found.</p>;
 }
 
-  return (
+return (
     <div>
-      
-      <Header />
+      <Header />  
       <div
-  className="page-containers"
+  className="pagecontainers"
   ref={itineraryRef} style={{
     backgroundImage: 'url("https://i0.wp.com/www.tourbooking.lk/wp-content/uploads/2023/03/merlin_148552275_74c0d250-949c-46e0-b8a1-e6d499e992cf-superJumbo-edited.jpg?fit=2048%2C1151&ssl=1")',
     backgroundPosition: 'center',
@@ -197,11 +197,11 @@ if (!itineraries || !itineraries.itinerary) {
     minHeight: '200vh'
   }}
 >
-        <div className="main-layout">
-          <div className="itinerary-card">
-          <h2 className="itinerary-title">Itineraries for {username}</h2>
+        <div className="mainlayout">
+          <div className="itinerarycard">
+          <h2 className="itinerarytitle">Itineraries for {username}</h2>
           {itineraries?.name && (
-  <h2 className="itinerary-subtitle">{itineraries.name.toUpperCase()}'s Itinerary</h2>
+  <h2 className="itinerarysubtitle">{itineraries.name.toUpperCase()}'s Itinerary</h2>
 )}
 
           {Object.entries(itineraries.itinerary).map(([dayKey, details], index) => {
@@ -222,13 +222,13 @@ if (!itineraries || !itineraries.itinerary) {
 
               return (
                 <div key={dayKey}>
-                  <h3 className="itinerary-subtitle">Day {dayNumber}: {location}</h3>
-                  <ul className="itinerary-list">
+                  <h3 className="itinerarysubtitle">Day {dayNumber}: {location}</h3>
+                  <ul className="itinerarylist">
                     {orderedItems.map((item, i) => {
                       if (!item.data) return null;
-                      const icon = item.type === "Hotel" ? <FaHotel className="activity-icon" />
-                        : item.type === "Restaurant" ? <FaUtensils className="activity-icon" />
-                        : <FaMapMarkerAlt className="activity-icon" />;
+                      const icon = item.type === "Hotel" ? <FaHotel className="activityicon" />
+                        : item.type === "Restaurant" ? <FaUtensils className="activityicon" />
+                        : <FaMapMarkerAlt className="activityicon" />;
                                      
                       // Identify if this is the active one
                       const isActive =
@@ -242,7 +242,7 @@ if (!itineraries || !itineraries.itinerary) {
                         <li
                           key={i}
                           ef={scrollRefs.current[refIndex]}
-                          className="itinerary-item"
+                          className="itineraryitem"
                           style={{
                             backgroundColor: isActive ? "#c4f1eb" : "",
                             cursor: "pointer",
@@ -260,14 +260,14 @@ if (!itineraries || !itineraries.itinerary) {
                             }, 100);
                           }}
                         >
-                          <div className="activity-header">
+                          <div className="activityheader">
                             {icon}
-                            <span className="activity-type">{item.label || item.type}:</span> {item.data.name}
+                            <span className="activitytype">{item.label || item.type}:</span> {item.data.name}
                           </div>
-                          <div className="activity-second-row">
-                            <div className="activity-location"><FaMapMarkerAlt /> <span>{(item.data.city || 'Unknown').replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase())}</span>
+                          <div className="activitysecond-row">
+                            <div className="activitylocation"><FaMapMarkerAlt /> <span>{(item.data.city || 'Unknown').replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase())}</span>
                             </div>
-                            <div className="activity-rating"><FaStar /> <span>{item.data.rating}/5</span></div>
+                            <div className="activityrating"><FaStar /> <span>{item.data.rating}/5</span></div>
                           </div>
                         </li>
                       );
@@ -278,7 +278,7 @@ if (!itineraries || !itineraries.itinerary) {
             })}
           </div>
         {/* Ensure map loads dynamically after data */}
-        <div className="map-container">
+        <div className="mapcontainer">
         <MapComponent
   locations={locations}
   activeLocation={activeLocation}
@@ -288,8 +288,8 @@ if (!itineraries || !itineraries.itinerary) {
 
         </div>
       </div>
-      <div className="button-container hide-on-export">
-      <button className="button" onClick={() => navigate(`/modify/${lowerUsername}/${lowerName}`)}>Edit</button>
+      <div className="buttoncontainer hide-on-export">
+      <button className="button" onClick={() => navigate(`/modify-radius/${lowerUsername}/${lowerName}`)}>Edit</button>
   <button className="button" onClick={handleSaveItinerary}>Save Itinerary</button>
   <button className="button" onClick={handleExportPDF}>Export</button>
   <button className="button" onClick={() => navigate(`/modify-request/${lowerUsername}`)}>
@@ -300,7 +300,7 @@ if (!itineraries || !itineraries.itinerary) {
 
       <Layout>
     </Layout>
-    <p className="thank-you-message">Thank You! Enjoy Your Trip! <FaTrain /> </p>
+    <p className="thankyou-message">Thank You! Enjoy Your Trip! <FaTrain /> </p>
 
     </div> <Footer />
         </div>  

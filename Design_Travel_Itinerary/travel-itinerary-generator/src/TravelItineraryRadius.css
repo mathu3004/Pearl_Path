@@ -387,7 +387,7 @@ body, html {
 
 /*Visual Page*/
 /* Page Container */
-.page-containers {
+.pagecontainers {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -398,17 +398,17 @@ body, html {
 }
 
 /* Main Layout */
-.main-layout {
+.mainlayout {
   display: flex;
   justify-content: space-between;
   gap: 40px;
   width: 100%;
   max-width: 1400px;
-  margin-top: 40px;
+  margin-top: 110px;
 }
 
 /* Itinerary Card */
-.itinerary-card {
+.itinerarycard {
   background: rgba(255, 255, 255, 0.95);
   padding: 40px;
   border-radius: 25px;
@@ -418,7 +418,7 @@ body, html {
   backdrop-filter: blur(10px);
 }
 
-.itinerary-title {
+.itinerarytitle {
   font-size: 2.4rem;
   font-weight: bold;
   color: black;
@@ -429,7 +429,7 @@ body, html {
   padding-bottom: 10px;
 }
 
-.itinerary-subtitle {
+.itinerarysubtitle {
   font-size: 1.8rem;
   font-weight: bold;
   color: #064e3b;
@@ -439,13 +439,13 @@ body, html {
   text-transform: capitalize;
 }
 
-.itinerary-list {
+.itinerarylist {
   list-style: none;
   padding: 0;
   margin-top: 15px;
 }
 
-.itinerary-item {
+.itineraryitem {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -460,25 +460,25 @@ body, html {
   transition: transform 0.2s ease-in-out;
 }
 
-.itinerary-item:hover {
+.itineraryitem:hover {
   transform: scale(1.05);
   background: #d1f4f0;
 }
 
-.activity-icon {
+.activityicon {
   font-size: 1.8rem;
   color: #0f766e;
   margin-right: 15px;
 }
 
-.activity-type {
+.activitytype {
   font-weight: bold;
   margin-right: 5px;
   color: #064e3b;
   text-transform: capitalize;
 }
 
-.activity-header {
+.activityheader {
   display: flex;
   align-items: left;
   font-weight: bold;
@@ -486,7 +486,7 @@ body, html {
 }
 
 /* Second row - Location & Rating */
-.activity-second-row {
+.activitysecond-row {
   display: flex;
   justify-content: center; /* Location on left, Rating on right */
   margin-top: 5px;
@@ -496,28 +496,28 @@ body, html {
   width: 100%;
 }
 
-.activity-location,
-.activity-rating {
+.activitylocation,
+.activityrating {
   display: flex;
   align-items: center;
   gap: 5px;
   margin-right: 10px;
 }
 
-.activity-location svg,
-.activity-rating svg {
+.activitylocation svg,
+.activityrating svg {
   color: #555;
   font-size: 16px;
 }
 
-.activity-location span,
-.activity-rating span {
+.activitylocation span,
+.activityrating span {
   color: #333;
   font-weight: bold;
 }
 
 /* Google Map Section */
-.map-container {
+.mapcontainer {
   width: 50%;
   height: auto;
   background-color: #e0f2f1;
@@ -527,14 +527,14 @@ body, html {
 }
 
 /* Buttons */
-.button-container {
+.buttoncontainer {
   display: flex;
   justify-content: center;
   gap: 25px;
   margin-top: 30px;
 }
 
-.button {
+.buttoncontainer .button {
   background-color: black;
   color: white;
   padding: 14px 28px;
@@ -546,13 +546,13 @@ body, html {
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
 }
 
-.button:hover {
+.buttoncontainer .button:hover {
   background-color: #0c5d57;
   transform: translateY(-2px);
 }
 
 /* Wish Text */
-.thank-you-message {
+.thankyou-message {
   font-size: 1.5rem;
   color: black;
   font-weight: bold;
@@ -565,7 +565,7 @@ body, html {
    -webkit-text-stroke: 1px white; /* Black outline around each letter */
 }
 
-body {
+ body  {
   font-family: 'Times New Roman', Times, serif;
   display: flex;
   flex-direction: column;
@@ -577,7 +577,7 @@ body {
   background-attachment: fixed;
 }
 
-.header {
+ .header {
   position: fixed;
   top: 0;
   left: 0;
@@ -639,7 +639,7 @@ body {
   z-index: 1;
 }
 
-.footer-container {
+  .footer-container {
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -649,7 +649,7 @@ body {
   color: white;
 }
 
-.footer-left {
+ .footer-left {
   font-size: 16px;
   color: white;
   margin-left: 30px;
@@ -674,16 +674,16 @@ body {
   z-index: 2;
 }
 
-.footer a:hover {
+ .footer a:hover {
   text-decoration: underline;
 }
 
-.social-links {
+ .social-links {
   display: flex;
   gap: 20px;
 }
 
-.social-links i {
+ .social-links i {
   font-size: 20px;
 }
 
@@ -691,7 +691,7 @@ body {
   .header {
     padding: 10px 20px;
   }
-  .nav-links {
+   .nav-links {
     gap: 10px;
   }
   .footer {
@@ -706,7 +706,7 @@ body {
   }
 }
 
-h2 {
+ h2 {
     color: #065f46; 
 }
 
@@ -722,18 +722,19 @@ h2 {
   margin: 0 auto;
 }
 
-.edit-page-wrapper {
+.editpage-wrapper {
   display: flex;
   align-items: flex-start;
   padding-bottom: 1 rem;
   padding: 2rem;
+  margin-top: 110px;
   gap: 2rem;
   overflow: hidden;
   box-sizing: border-box;
 }
 
 /* Left scrollable content */
-.edit-left-scrollable {
+.editleft-scrollable {
   flex: 2;
   overflow-y: auto;
   height: 90vh;
@@ -746,17 +747,18 @@ h2 {
   scrollbar-color: #ccc transparent;
 }
 
-.edit-left-scrollable::-webkit-scrollbar {
+.editleft-scrollable::-webkit-scrollbar {
   width: 6px;
 }
 
-.edit-left-scrollable::-webkit-scrollbar-thumb {
+.editleft-scrollable::-webkit-scrollbar-thumb {
   background-color: #bbb;
   border-radius: 10px;
 }
+
 /* Sticky Map stays fixed on the right */
 /* Right sticky map */
-.edit-map {
+.editmap {
   flex: 1;
   position: sticky;
   height: 92vh;
@@ -772,12 +774,12 @@ h2 {
   box-sizing: border-box;
 }
 
-.edit-left-scrollable,
-.edit-map {
+.editleft-scrollable,
+.editmap {
   min-width: 0;
 }
 
-.placeholder-map {
+.placeholdermap {
   height: 90vh;
   border-radius: 15px;
   background-image: url('https://upload.wikimedia.org/wikipedia/commons/thumb/e/e1/OpenStreetMap_Mapnik_Example_Map.png/1200px-OpenStreetMap_Mapnik_Example_Map.png');
@@ -786,7 +788,7 @@ h2 {
   filter: grayscale(20%);
 }
 
-.edit-page h2 {
+.editpage h2 {
   font-size: 2.5rem;
   text-align: center;
   margin-bottom: 2rem;
@@ -794,7 +796,7 @@ h2 {
   font-weight: bold;
 }
 
-.edit-day {
+.editday {
   background: #f6f6f6; /* light solid */
   padding: 1.5rem;
   margin-bottom: 2rem;
@@ -802,7 +804,7 @@ h2 {
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
 }
 
-.edit-day h3 {
+.editday h3 {
   font-size: 1.6rem;
   color: #333;
   font-weight: bold;
@@ -811,7 +813,7 @@ h2 {
   margin-bottom: 1rem;
 }
 
-.edit-day h4 {
+.editday h4 {
   font-size: 1.4rem;
   font-size: 1.2rem;
   color: #2a6461;
@@ -820,7 +822,7 @@ h2 {
   margin-bottom: 0.5rem;
 }
 
-.edit-item {
+.edititem {
     background: #fefefe;
     border-radius: 10px;
     padding: 1rem 1.2rem;
@@ -831,14 +833,14 @@ h2 {
     flex-direction: column;  
 }
 
-.edit-item span {
+.edititem span {
   font-size: 1.1rem;
   color: #222; 
   font-weight: bold;
   margin-bottom: 0.5rem;
 }
 
-.edit-item .replace-btn {
+.edititem .replacebtn {
   font-size: 0.75rem;
   padding: 0.3rem 0.6rem;
   background-color: #30605d;
@@ -849,15 +851,15 @@ h2 {
   transition: 0.2s ease;
 }
 
-.edit-item .replace-btn:hover {
-  background-color: #009688;
+.edititem .replacebtn:hover {
+  background-color: #4b928b;
   transform: scale(1.03);
 }
 
-.edit-item .remove-btn {
+.edititem .removebtn {
   font-size: 0.8rem;
   padding: 0.4rem 0.4rem;
-  background-color: #269026;
+  background-color: #61ad61;
   color: white;
   border: none;
   border-radius: 6px;
@@ -867,12 +869,12 @@ h2 {
   transition: 0.2s ease;
 }
 
-.edit-item .remove-btn:hover {
-  background-color: #004d00;
+.edititem .removebtn:hover {
+  background-color: #1b5c1b;
   transform: scale(1.03);
 }
 
-.edit-day button {
+.editday button {
   font-size: 0.8rem;
   padding: 0.4rem 0.8rem;
   background-color: #30605d;
@@ -883,19 +885,19 @@ h2 {
   cursor: pointer;
 }
 
-.alt-row {
+.altrow {
   display: flex;
   flex-wrap: wrap;
   gap: 0.5rem;
   margin-top: 0.5rem;
 }
 
-.edit-item button:hover {
+.edititem button:hover {
   background-color: #009688;
   transform: scale(1.03);
 }
 
-.save-button {
+.savebutton {
   margin: 0px auto 20px auto;
   font-weight: bold;
   background-color: #2a5d4f;
@@ -909,24 +911,24 @@ h2 {
   text-align: center;
 }
 
-.save-button:hover {
+.savebutton:hover {
   background-color: #10ac84;
   transform: scale(1.05);
 }
 
 /* Responsive fix if map gets hidden */
 @media (max-width: 1000px) {
-  .edit-page-wrapper {
+  .editpage-wrapper {
     flex-direction: column;
     height: auto;
   }
 
-  .edit-left-scrollable {
+  .editleft-scrollable {
     max-height: unset;
     overflow-y: visible;
   }
 
-  .edit-map {
+  .editmap {
     position: static;
     height: 400px;
     margin-top: 1rem;
@@ -937,6 +939,7 @@ h2 {
 .editrequest-page-wrapper {
   padding-top: 50px;
   min-height: 100vh;
+  margin-top: 110px;
   display: flex;
   flex-direction: column;
   align-items: center;

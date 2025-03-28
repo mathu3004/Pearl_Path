@@ -59,8 +59,8 @@ const TravelItineraryGenerator = () => {
         }
     
         if (name === "numberOfDays") {
-            if (value < 1 || value > 10) {
-                error = "Number of days must be between 1 and 10.";
+            if (value < 1 || value > 7) {
+                error = "Number of days must be between 1 and 7.";
             }
         }
     
@@ -143,8 +143,8 @@ const TravelItineraryGenerator = () => {
         }
     
         // Number of Days
-        if (!formData.numberOfDays || formData.numberOfDays < 1 || formData.numberOfDays > 10) {
-            newErrors.numberOfDays = "Number of days must be between 1 and 10.";
+        if (!formData.numberOfDays || formData.numberOfDays < 1 || formData.numberOfDays > 7) {
+            newErrors.numberOfDays = "Number of days must be between 1 and 7.";
             isValid = false;
         }
     

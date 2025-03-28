@@ -43,7 +43,7 @@ const Footer = () => {
   );
 };
 
-const Modify = () => {
+const RadiusModify = () => {
   const { username, name } = useParams();
   const navigate = useNavigate();
   const [itinerary, setItinerary] = useState(null);
@@ -52,7 +52,11 @@ const Modify = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await axios.get(`http://localhost:5000/api/itineraries/${username}/${name}`);
+        const isRadiusMode = window.location.pathname.includes("/modify-radius");
+        const port = isRadiusMode ? 5000 : 5001;
+        const basePath = isRadiusMode ? "itineraries" : "itinerary";
+        const url = `http://localhost:${port}/api/${basePath}/${username}/${name}`;
+        const response = await axios.get(url);
         const data = response.data;
         setItinerary(data);
 
@@ -176,26 +180,26 @@ const Modify = () => {
   if (!itinerary) return <div>Loading...</div>;
 
   return (
-    <div className="full-page-container">
+    <div className="full-pagecontainer" id="radius-modify">
       <Header />
-      <div className="edit-page-wrapper">
-        <div className="edit-left-scrollable">
+      <div className="editpage-wrapper">
+        <div className="editleft-scrollable">
           <h2>Modify {username.toUpperCase()}'s {name.toUpperCase()} Itinerary</h2>
           {Object.entries(itinerary.itinerary).map(([dayKey, day]) => (
-            <div key={dayKey} className="edit-day">
+            <div key={dayKey} className="editday">
               <h3>{dayKey}</h3>
 
               {/* Hotel */}
               <div>
                 <h4>Hotel</h4>
                 {day.Hotel ? (
-                  <div className="edit-item">
+                  <div className="edititem">
                     <span>{day.Hotel.name}</span>
                   </div>
                 ) : <p>No hotel selected</p>}
-                <div className="alt-row">
+                <div className="altrow">
                 {alternatives[dayKey]?.Hotels?.slice(1, 4).map((alt, idx) => (
-                  <button key={idx} className="replace-btn" onClick={() => handleReplace(dayKey, 'Hotel', null, alt)}>
+                  <button key={idx} className="replacebtn" onClick={() => handleReplace(dayKey, 'Hotel', null, alt)}>
                     Replace with: {alt.name}
                   </button>
                   ))}
@@ -206,12 +210,12 @@ const Modify = () => {
               <div>
                 <h4>Restaurants</h4>
                 {Object.entries(day.Restaurants || {}).map(([meal, rest], idx) => (
-                  <div key={idx} className="edit-item">
+                  <div key={idx} className="edititem">
                     <span>{meal.toUpperCase()}: {rest.name}</span>
-                    <button className="remove-btn" onClick={() => handleRemove(dayKey, 'Restaurants', meal)}>Remove</button>
-                    <div className="alt-row">
+                    <button className="removebtn" onClick={() => handleRemove(dayKey, 'Restaurants', meal)}>Remove</button>
+                    <div className="altrow">
                     {(alternatives[dayKey]?.Restaurants?.[meal] || []).slice(0, 3).map((alt, aIdx) => (
-                      <button key={aIdx} className="replace-btn" onClick={() => handleReplace(dayKey, 'Restaurants', meal, alt)}>
+                      <button key={aIdx} className="replacebtn" onClick={() => handleReplace(dayKey, 'Restaurants', meal, alt)}>
                         Replace {meal} with: {alt.name}
                       </button>
                     ))}
@@ -224,12 +228,12 @@ const Modify = () => {
               <div>
                 <h4>Attractions</h4>
                 {day.Attractions?.map((att, idx) => (
-  <div key={idx} className="edit-item">
+  <div key={idx} className="edititem">
     <span>{att.name}</span>
-    <button className="remove-btn" onClick={() => handleRemove(dayKey, 'Attractions', idx)}>Remove</button>
-    <div className="alt-row">
+    <button className="removebtn" onClick={() => handleRemove(dayKey, 'Attractions', idx)}>Remove</button>
+    <div className="altrow">
       {(alternatives[dayKey]?.Attractions?.[att.name] || []).map((alt, aIdx) => (
-        <button key={aIdx} className="replace-btn" onClick={() => handleReplace(dayKey, 'Attractions', idx, alt)}>
+        <button key={aIdx} className="replacebtn" onClick={() => handleReplace(dayKey, 'Attractions', idx, alt)}>
           Replace with: {alt.name}
         </button>
       ))}
@@ -242,7 +246,7 @@ const Modify = () => {
           ))}
         </div>
   
-        <div className="edit-map">
+        <div className="editmap">
   <MapComponent
     locations={
       Object.values(itinerary.itinerary).flatMap((day) => {
@@ -269,7 +273,7 @@ const Modify = () => {
 
 
       </div>
-      <button className="save-button" onClick={handleSave}>Save Changes</button>
+      <button className="savebutton" onClick={handleSave}>Save Changes</button>
 
       <Layout>
     </Layout>
@@ -278,4 +282,4 @@ const Modify = () => {
   );
 };
 
-export default Modify;
+export default RadiusModify;

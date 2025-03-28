@@ -2,6 +2,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import './ItineararySelectionMode.css';
+import Layout from './components/Layout';
 
 const Header = () => (
   <header className="header">
@@ -48,6 +49,8 @@ const ChooseMode = () => {
           </Link>
         </div>
       </div>
+      <Layout>
+      </Layout>
       <Footer />
     </div>
   );
