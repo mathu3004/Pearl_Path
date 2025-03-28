@@ -11,6 +11,7 @@ import "./TravelItineraryRadius.css";
 import html2canvas from "html2canvas";
 import jsPDF from "jspdf";
 import { useNavigate } from "react-router-dom";
+import { useLocation } from "react-router-dom";
 
 const Header = () => {
   return (
@@ -38,6 +39,8 @@ const TravelItinerary = () => {
   const itineraryRef = useRef();
 
   const { username, name } = useParams();
+  const location = useLocation();
+  const mode = location.pathname.includes("/visual-radius") ? "radius" : "normal";
   const lowerUsername = username ? username.toLowerCase() : null;
   const lowerName = name ? name.toLowerCase() : null;
 
@@ -98,8 +101,14 @@ const TravelItinerary = () => {
     const fetchItinerary = async (retries = 5) => {
       try {
           console.log("Fetching itinerary for:", lowerUsername, lowerName);
-          console.log(`Fetching from URL: http://localhost:5000/api/itineraries/${lowerUsername}/${lowerName}`);
-          const response = await axios.get(`http://localhost:5000/api/itineraries/${lowerUsername}/${lowerName}`);
+          const isRadiusMode = mode === "radius";
+          const port = isRadiusMode ? 5000 : 5001;
+          const route = isRadiusMode ? "itineraries" : "itinerary";
+          const url = `http://localhost:${port}/api/${route}/${lowerUsername}/${lowerName}`;
+
+          console.log("Fetching from URL:", url);
+          const response = await axios.get(url);
+
           console.log("API Response:", response.data);  // Debugging log
   
           if (!response.data || !response.data.itinerary) {

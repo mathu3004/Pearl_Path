@@ -167,7 +167,7 @@ const Modify = () => {
       });
       
       alert('Itinerary updated!');
-      navigate(`/visual/${username}/${name}`);
+      navigate(`/visual-radius/${username}/${name}`);
     } catch (error) {
       console.error('Error saving edited itinerary:', error);
     }

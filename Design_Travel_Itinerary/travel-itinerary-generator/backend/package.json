@@ -4,8 +4,12 @@
   "type": "module",
   "main": "Radiusserver.js",
   "scripts": {
-    "start": "node Radiusserver.js",
-    "dev": "nodemon Radiusserver.js"
+    "start:radius": "node Radiusserver.js",
+    "start:itinerary": "node Itineraryserver.js",
+    "dev:radius": "nodemon Radiusserver.js",
+    "dev:itinerary": "nodemon Itineraryserver.js",
+    "start:all": "concurrently \"npm run start:radius\" \"npm run start:itinerary\"",
+    "dev:all": "concurrently \"npm run dev:radius\" \"npm run dev:itinerary\""
   },
   "dependencies": {
     "body-parser": "^1.20.3",
@@ -14,5 +18,8 @@
     "express": "^4.21.2",
     "mongoose": "^8.12.0",
     "node-fetch": "^3.3.1"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2"
   }
 }
