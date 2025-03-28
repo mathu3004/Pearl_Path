@@ -1,9 +1,9 @@
 //Visual.js
 import React, { useState, useEffect, useRef } from "react";
 import { useParams } from "react-router-dom";
-import Layout from '../src/components/Layout';
+import Layout from './components/Layout';
 import axios from "axios";
-import MapComponent from "./MapComponent";
+import MapComponent from "./RadiusMapComponent";
 import { FaHotel, FaUtensils, FaMapMarkerAlt, FaTrain, FaStar} from "react-icons/fa";
 import { FaInstagram, FaFacebook } from "react-icons/fa";
 import { Link } from "react-router-dom";

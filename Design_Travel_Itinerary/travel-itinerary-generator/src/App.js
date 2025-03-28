@@ -1,10 +1,10 @@
 // src/App.js
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import TravelItineraryGenerator from './TravelItineraryGenerator';
-import TravelItinerary from './Visual';
-import Modify from './Modify';
-import ModifyRequest from './ModifyRequest';
+import TravelItineraryGenerator from './RadiusTravelItineraryGenerator';
+import TravelItinerary from './RadiusVisual';
+import Modify from './RadiusModify';
+import ModifyRequest from './RadiusModifyRequest';
 
 const App = () => {
     return (

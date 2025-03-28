@@ -126,7 +126,7 @@ runPythonScript("RadiusBasedGenerator.py", [username, name], (error) => {
 
     console.log("SUCCESS: Preprocessing done!");
 
-    runPythonScript("app.py", [username, name], (appError) => {
+    runPythonScript("Radiusapp.py", [username, name], (appError) => {
         if (appError) {
             console.error("ERROR: Itinerary generation failed.");
             return res.status(500).json({ error: "Itinerary generation failed." });

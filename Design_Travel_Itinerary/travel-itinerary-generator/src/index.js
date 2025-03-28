@@ -1,7 +1,6 @@
 // src/index.js
 import React from 'react';
 import ReactDOM from 'react-dom/client';
-import './index.css'; // This is sufficient for styling
 import App from './App';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
