@@ -8,14 +8,18 @@
     "start:itinerary": "node Itineraryserver.js",
     "dev:radius": "nodemon Radiusserver.js",
     "dev:itinerary": "nodemon Itineraryserver.js",
-    "start:all": "concurrently \"npm run start:radius\" \"npm run start:itinerary\"",
-    "dev:all": "concurrently \"npm run dev:radius\" \"npm run dev:itinerary\""
+    "start:start": "node Startserver.cjs",
+    "dev:start": "nodemon Startserver.cjs",
+    "start:all": "concurrently \"npm run start:radius\" \"npm run start:itinerary\" \"npm run start:start\"",
+    "dev:all": "concurrently \"npm run dev:radius\" \"npm run dev:itinerary\" \"npm run dev:start\""
   },
   "dependencies": {
+    "bcrypt": "^5.1.1",
     "body-parser": "^1.20.3",
     "cors": "^2.8.5",
     "dotenv": "^16.4.7",
     "express": "^4.21.2",
+    "jsonwebtoken": "^9.0.2",
     "mongoose": "^8.12.0",
     "node-fetch": "^3.3.1"
   },
