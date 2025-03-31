@@ -1,8 +1,6 @@
 import React, { useContext, useEffect } from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { AuthProvider, AuthContext } from "./context/auth.context";
-import Header from "./components/Header";
-import Footer from "./components/Footer";
 import LandingPage from "./pages/LandingPage";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
@@ -16,7 +14,7 @@ import TravelItineraryGenerator from "./pages/TravelItineraryGenerator";
 import UserDashboard from "./pages/UserDashboard";
 import VendorDashboard from "./pages/VendorDashboard";
 import ProtectedRoute from "./router/ProtectedRoute";
-import AboutUs from "./pages/AboutUs"; // Added AboutUs import
+import AboutUs from "./pages/AboutUs";
 
 const AppContent = () => {
     const { auth, fetchProfile } = useContext(AuthContext);
@@ -29,7 +27,6 @@ const AppContent = () => {
 
     return (
         <div className="flex flex-col min-h-screen">
-            <Header />
             <main className="flex-grow">
                 <Routes>
                     <Route path="/" element={<LandingPage />} />
@@ -48,7 +45,7 @@ const AppContent = () => {
                         path="/create-new-itinerary"
                         element={<TravelItineraryGenerator />}
                     />
-                    <Route path="/about-us" element={<AboutUs />} /> {/* Added AboutUs route */}
+                    <Route path="/about-us" element={<AboutUs />} />
                     <Route
                         path="/user-dashboard"
                         element={
@@ -68,7 +65,6 @@ const AppContent = () => {
                     <Route path="*" element={<LandingPage />} />
                 </Routes>
             </main>
-            <Footer />
         </div>
     );
 };
