@@ -1,0 +1,7 @@
+Flask
+Flask-CORS
+pymongo
+langchain_google_genai
+langchain
+http.client
+bson
