@@ -20,6 +20,10 @@ const ChatWidget = () => {
     });
   };
 
+  const handleMouseUp = () => {
+    setIsDragging(false);
+  };
+
   useEffect(() => {
     const handleMouseMove = (e) => {
       if (!isDragging || isChatOpen) return;
@@ -28,20 +32,15 @@ const ChatWidget = () => {
         y: e.clientY - offset.y,
       });
     };
-  
-    const handleMouseUp = () => {
-      setIsDragging(false);
-    };
-  
+
     document.addEventListener('mousemove', handleMouseMove);
     document.addEventListener('mouseup', handleMouseUp);
-  
+
     return () => {
       document.removeEventListener('mousemove', handleMouseMove);
       document.removeEventListener('mouseup', handleMouseUp);
     };
   }, [isDragging, isChatOpen, offset]);
-  
 
   return (
     <>

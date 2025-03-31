@@ -245,16 +245,16 @@ const VisualizationItinerary = () => {
 
               {/* Attraction 1 */}
               {day.attractions?.[0]?.name && (
-                <a href={day.attractions[0].weburl || "#"} target="_blank" rel="noreferrer" className="itinerary-item">
-                  <div className="activity-header"><FaMapMarkerAlt className="activity-icon" />Attraction: {day.attractions[0].name}</div>
-                  <div className="activity-second-row">
-                    <div className="activity-location"><FaMapMarkerAlt /> {day.attractions[0].address || day.attractions[0].city}</div>
-                    <div className="activity-rating">
-                      ⭐ {day.attractions[0].rating}
-                      {day.attractions[0].price && <> | Rs. {day.attractions[0].price}</>}
-                    </div>
+                <div className="itinerary-item">
+                <div className="activity-header"><FaMapMarkerAlt className="activity-icon" />Attraction: {day.attractions[0].name}</div>
+                <div className="activity-second-row">
+                  <div className="activity-location"><FaMapMarkerAlt /> {day.attractions[0].address || day.attractions[0].city}</div>
+                  <div className="activity-rating">
+                    ⭐ {day.attractions[0].rating}
+                    {day.attractions[0].price && <> | Rs. {day.attractions[0].price}</>}
                   </div>
-                </a>
+                </div>
+              </div>
               )}
 
               {/* Lunch */}
@@ -274,16 +274,20 @@ const VisualizationItinerary = () => {
 
               {/* Attraction 2 */}
               {day.attractions?.[1]?.name && (
-                <a href={day.attractions[1].weburl || "#"} target="_blank" rel="noreferrer" className="itinerary-item">
-                  <div className="activity-header"><FaMapMarkerAlt className="activity-icon" />Attraction: {day.attractions[1].name}</div>
-                  <div className="activity-second-row">
-                    <div className="activity-location"><FaMapMarkerAlt /> {day.attractions[1].address || day.attractions[1].city}</div>
-                    <div className="activity-rating">
-                      ⭐ {day.attractions[1].rating}
-                      {day.attractions[1].price && <> | Rs. {day.attractions[1].price}</>}
-                    </div>
+                <div className="itinerary-item">
+                <div className="activity-header">
+                  <FaMapMarkerAlt className="activity-icon" />Attraction: {day.attractions[1].name}
+                </div>
+                <div className="activity-second-row">
+                  <div className="activity-location">
+                    <FaMapMarkerAlt /> {day.attractions[1].address || day.attractions[1].city}
                   </div>
-                </a>
+                  <div className="activity-rating">
+                    ⭐ {day.attractions[1].rating}
+                    {day.attractions[1].price && <> | Rs. {day.attractions[1].price}</>}
+                  </div>
+                </div>
+              </div>
               )}
 
               {/* Dinner */}

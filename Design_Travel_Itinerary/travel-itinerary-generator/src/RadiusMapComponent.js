@@ -4,7 +4,6 @@ import {
   TileLayer,
   Marker,
   Popup,
-  Polyline,
   useMap
 } from "react-leaflet";
 import L from "leaflet";
@@ -162,19 +161,6 @@ const MapComponent = ({ locations, activeLocation, transportModesPerDay }) => {
           </Marker>
         );
       })}
-
-      {/* Show routes per day */}
-      {dayPolylines.map((line, i) => (
-        <Polyline
-          key={i}
-          positions={line.positions}
-          pathOptions={{
-            color: line.color,
-            weight: 4,
-            opacity: 0.7
-          }}
-        />
-      ))}
 
       <FlyToLocation activeLocation={activeLocation} />
     </MapContainer>

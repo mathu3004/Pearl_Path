@@ -1,4 +1,3 @@
-// ChatBox.js
 import React, { useState } from 'react';
 import Message from './Message';
 
@@ -8,13 +7,21 @@ const ChatBox = ({ toggleChat, position }) => {
   ]);
   const [input, setInput] = useState('');
 
-  const sendMessage = () => {
+  const sendMessage = async () => {
     if (input.trim() === '') return;
     setMessages([...messages, { text: input, sender: 'user' }]);
     setInput('');
-    setTimeout(() => {
-      setMessages([...messages, { text: input, sender: 'user' }, { text: "I'm still learning! 😊", sender: 'bot' }]);
-    }, 1000);
+
+    const response = await fetch('http://localhost:5000/chat', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ message: input }),
+    });    
+
+    const data = await response.json();
+    setMessages([...messages, { text: input, sender: 'user' }, { text: data.response, sender: 'bot' }]);
   };
 
   const handleKeyDown = (e) => {

@@ -76,7 +76,7 @@ const TravelItinerary = () => {
 
   const handleSaveItinerary = async () => {
     try {
-      const response = await axios.post("http://localhost:5000/api/save-itinerary", {
+      const response = await axios.post("http://localhost:5003/api/save-itinerary", {
         username: lowerUsername,
         name: lowerName
       });
@@ -102,7 +102,7 @@ const TravelItinerary = () => {
       try {
           console.log("Fetching itinerary for:", lowerUsername, lowerName);
           const isRadiusMode = mode === "radius";
-          const port = isRadiusMode ? 5000 : 5001;
+          const port = isRadiusMode ? 5003 : 5001;
           const route = isRadiusMode ? "itineraries" : "itinerary";
           const url = `http://localhost:${port}/api/${route}/${lowerUsername}/${lowerName}`;
 

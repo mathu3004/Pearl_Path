@@ -199,7 +199,7 @@ const TravelItineraryGenerator = () => {
     
         try {
             // Send form data to the backend
-            const response = await fetch('http://localhost:5000/api/itinerary', {
+            const response = await fetch('http://localhost:5003/api/itinerary', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(formData),
@@ -215,13 +215,13 @@ const TravelItineraryGenerator = () => {
                 const itineraryName = formData.name.toLowerCase();
     
                 for (let i = 0; i < 8; i++) {
-                    const checkResponse = await fetch(`http://localhost:5000/api/itinerary/${itineraryName}`);
+                    const checkResponse = await fetch(`http://localhost:5003/api/itinerary/${itineraryName}`);
                     if (checkResponse.ok) {
                         success = true;
                         break;
                     }
                     console.log(`Attempt ${i + 1}: Itinerary not ready yet...`);
-                    await new Promise(resolve => setTimeout(resolve, 5000));
+                    await new Promise(resolve => setTimeout(resolve, 5003));
                 }
     
                 if (success) {
@@ -243,7 +243,7 @@ const TravelItineraryGenerator = () => {
     
         } catch (error) {
             console.error("Network or Fetch Error:", error);
-            alert("Failed to connect to the server. Is it running on port 5000?");
+            alert("Failed to connect to the server. Is it running on port 5003?");
         }
     };
     

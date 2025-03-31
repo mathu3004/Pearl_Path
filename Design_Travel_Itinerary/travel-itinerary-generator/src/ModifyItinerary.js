@@ -100,6 +100,25 @@ const ModifyItinerary = () => {
       alert("Something went wrong while changing.");
     }
   };
+
+  const handleRemove = (type, dayIndex, mealType = null, attractionIndex = null) => {
+    if (!itinerary) return;
+  
+    const updatedItinerary = { ...itinerary };
+    const day = updatedItinerary.days[dayIndex];
+  
+    if (type === 'restaurant') {
+      if (mealType && day.meals?.[mealType]) {
+        delete day.meals[mealType];
+      }
+    } else if (type === 'attraction') {
+      if (typeof attractionIndex === 'number' && day.attractions?.[attractionIndex]) {
+        day.attractions.splice(attractionIndex, 1);
+      }
+    }
+  
+    setItinerary(updatedItinerary); 
+  };
   
 
   const handleSave = async () => {
@@ -167,8 +186,11 @@ const ModifyItinerary = () => {
                       </div>
                     </div>
                     <button className="change-button" onClick={() => handleChange('restaurant', idx, mealType)}>
-                      Change {mealType.charAt(0).toUpperCase() + mealType.slice(1)} Restaurant
-                    </button>
+  Change {mealType.charAt(0).toUpperCase() + mealType.slice(1)} Restaurant
+</button>
+<button className="remove-button ml-2" onClick={() => handleRemove('restaurant', idx, mealType)}>
+  Remove {mealType.charAt(0).toUpperCase() + mealType.slice(1)}
+</button>
                   </div>
                 );
               })}
@@ -184,8 +206,11 @@ const ModifyItinerary = () => {
                     <div className="activity-rating">⭐ {attr.rating} {attr.price && `| Rs. ${attr.price}`}</div>
                   </div>
                   <button className="change-button" onClick={() => handleChange('attraction', idx, null, i)}>
-                    Change Attraction
-                  </button>
+  Change Attraction
+</button>
+<button className="remove-button ml-2" onClick={() => handleRemove('attraction', idx, null, i)}>
+  Remove Attraction
+</button>
                 </div>
               ))}
             </div>

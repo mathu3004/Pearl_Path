@@ -523,7 +523,7 @@ def generate_itinerary():
                 "username": username,
                 "name": itinerary_name,
                 "itinerary": itinerary,
-                "transport_modes": transport_modes,  # ✅ save user-selected transport modes
+                "transport_modes": transport_modes,  #  save user-selected transport modes
                 "last_updated": datetime.now(timezone.utc)
             }},
             upsert=True
