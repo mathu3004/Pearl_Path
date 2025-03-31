@@ -1,16 +1,26 @@
 import React from "react";
 import { Link } from "react-router-dom";
+import Header from "../components/Header";
+import Footer from "../components/Footer";
 
 const fadeInKeyframes = `
 @keyframes fadeIn {
-  from { opacity: 0; transform: translateY(20px); }
-  to { opacity: 1; transform: translateY(0); }
+  from { 
+    opacity: 0; 
+    transform: translateY(20px); 
+  }
+  to { 
+    opacity: 1; 
+    transform: translateY(0); 
+  }
 }
 `;
 
 const RadiusItineraryGenerator = () => {
     return (
         <>
+            <Header />
+            {/* Inject fade-in keyframes */}
             <style>{fadeInKeyframes}</style>
             <div
                 style={{
@@ -117,6 +127,7 @@ const RadiusItineraryGenerator = () => {
                     </div>
                 </div>
             </div>
+            <Footer />
         </>
     );
 };
