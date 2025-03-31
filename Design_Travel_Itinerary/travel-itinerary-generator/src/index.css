@@ -1,0 +1,9 @@
+@import "tailwindcss";
+
+.glass-container {
+  @apply bg-white/75 backdrop-blur-md rounded-xl shadow-lg;
+}
+
+.glass-hover:hover {
+  @apply scale-105 shadow-2xl transition-all;
+}

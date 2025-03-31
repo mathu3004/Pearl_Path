@@ -873,6 +873,8 @@ html, body, #root {
   font-size: 24px;
   user-select: none;
   z-index: 1000;
+  margin-left: 1400px;
+  margin-top: 500px;
 }
 
 /* Chat Box */
@@ -888,6 +890,8 @@ html, body, #root {
   overflow: hidden; /* Prevent the entire chatbox from scrolling */
   display: flex;
   flex-direction: column;
+  margin-left: 1400px;
+  margin-top: 500px;
 }
 
 /* Chat Header */

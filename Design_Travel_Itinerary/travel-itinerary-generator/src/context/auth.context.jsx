@@ -8,7 +8,7 @@ export const AuthProvider = ({ children }) => {
 
   const login = async ({ username, password }) => {
     try {
-      const res = await fetch("http://localhost:5001/api/auth/login", {
+      const res = await fetch("http://localhost:5002/api/auth/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ username, password }),
@@ -30,7 +30,7 @@ export const AuthProvider = ({ children }) => {
 
   const register = async (userData) => {
     try {
-      const res = await fetch("http://localhost:5001/api/auth/register", {
+      const res = await fetch("http://localhost:5002/api/auth/register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(userData),
@@ -63,7 +63,7 @@ export const AuthProvider = ({ children }) => {
       return null;
     }
     try {
-      const res = await fetch(`http://localhost:5001/api/profile/${userId}`, {
+      const res = await fetch(`http://localhost:5002/api/profile/${userId}`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
