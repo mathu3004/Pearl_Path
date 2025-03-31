@@ -1,15 +1,25 @@
 import React from "react";
+import Header from "../components/Header";
+import Footer from "../components/Footer";
 
 const fadeInKeyframes = `
 @keyframes fadeIn {
-  from { opacity: 0; transform: translateY(10px); }
-  to { opacity: 1; transform: translateY(0); }
+  from { 
+    opacity: 0; 
+    transform: translateY(10px); 
+  }
+  to { 
+    opacity: 1; 
+    transform: translateY(0); 
+  }
 }
 `;
 
 const VendorDashboard = () => {
   return (
     <>
+      <Header />
+      {/* Inject fade-in keyframes */}
       <style>{fadeInKeyframes}</style>
       <div
         style={{
@@ -25,6 +35,7 @@ const VendorDashboard = () => {
           overflow: "hidden",
         }}
       >
+        {/* Dark Overlay */}
         <div
           style={{
             position: "absolute",
@@ -36,6 +47,7 @@ const VendorDashboard = () => {
             zIndex: 1,
           }}
         />
+        {/* Main Content */}
         <div
           style={{
             position: "relative",
@@ -61,12 +73,17 @@ const VendorDashboard = () => {
             Vendor Dashboard
           </h2>
           <p
-            style={{ fontSize: "1.2rem", color: "#555", marginBottom: "20px" }}
+            style={{
+              fontSize: "1.2rem",
+              color: "#555",
+              marginBottom: "20px",
+            }}
           >
             Manage your property listings, bookings, and analytics with ease.
           </p>
         </div>
       </div>
+      <Footer />
     </>
   );
 };
