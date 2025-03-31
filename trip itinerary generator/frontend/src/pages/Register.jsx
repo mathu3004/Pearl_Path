@@ -2,6 +2,8 @@ import React, { useState, useContext } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { AuthContext } from "../context/auth.context";
 import Select from "react-select";
+import Header from "../components/Header";
+import Footer from "../components/Footer";
 
 const fadeInKeyframes = `
 @keyframes fadeIn {
@@ -182,6 +184,7 @@ const Register = () => {
 
   return (
       <>
+        <Header />
         <style>{fadeInKeyframes}</style>
         <div
             style={{
@@ -780,6 +783,7 @@ const Register = () => {
             </div>
           </div>
         </div>
+        <Footer />
       </>
   );
 };
