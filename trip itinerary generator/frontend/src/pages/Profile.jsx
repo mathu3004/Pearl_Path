@@ -1,6 +1,8 @@
 import React, { useContext, useEffect, useState } from "react";
-import { AuthContext } from "../context/auth.context";
+import { AuthContext } from "../context/auth.context.jsx";
 import { FaPencilAlt } from "react-icons/fa";
+import Header from "../components/Header";
+import Footer from "../components/Footer";
 
 const Profile = () => {
   const { auth, fetchProfile } = useContext(AuthContext);
@@ -106,199 +108,211 @@ const Profile = () => {
   const isVendor = userData.role === "vendor";
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100 pt-24 p-4">
-      <div className="w-full max-w-3xl bg-white rounded-lg shadow p-6">
-        <div className="flex justify-between items-center mb-6">
-          <h2 className="text-3xl font-bold">Profile</h2>
-          <button
-            type="button"
-            onClick={toggleEdit}
-            className="flex items-center text-blue-600 hover:text-blue-800"
-          >
-            <FaPencilAlt className="mr-2" />
-            {editing ? "Cancel" : "Edit"}
-          </button>
-        </div>
-        {message && (
-          <p className="text-green-600 text-center mb-4">{message}</p>
-        )}
-        {error && <p className="text-red-500 text-center mb-4">{error}</p>}
-        <form onSubmit={handleSubmit} className="space-y-6">
-          <div>
-            <h3 className="text-xl font-semibold mb-2">User Information</h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <label className="block font-semibold mb-1">Username:</label>
-                {editing ? (
-                  <input
-                    type="text"
-                    name="username"
-                    value={userData.username || ""}
-                    onChange={handleChangeUser}
-                    className="w-full p-2 border rounded"
-                  />
-                ) : (
-                  <p>{userData.username}</p>
-                )}
-              </div>
-              <div>
-                <label className="block font-semibold mb-1">Email:</label>
-                {editing ? (
-                  <input
-                    type="email"
-                    name="email"
-                    value={userData.email || ""}
-                    onChange={handleChangeUser}
-                    className="w-full p-2 border rounded"
-                  />
-                ) : (
-                  <p>{userData.email || "Not provided"}</p>
-                )}
-              </div>
-              <div>
-                <label className="block font-semibold mb-1">First Name:</label>
-                {editing ? (
-                  <input
-                    type="text"
-                    name="firstName"
-                    value={userData.firstName || ""}
-                    onChange={handleChangeUser}
-                    className="w-full p-2 border rounded"
-                  />
-                ) : (
-                  <p>{userData.firstName || "Not provided"}</p>
-                )}
-              </div>
-              <div>
-                <label className="block font-semibold mb-1">Last Name:</label>
-                {editing ? (
-                  <input
-                    type="text"
-                    name="lastName"
-                    value={userData.lastName || ""}
-                    onChange={handleChangeUser}
-                    className="w-full p-2 border rounded"
-                  />
-                ) : (
-                  <p>{userData.lastName || "Not provided"}</p>
-                )}
-              </div>
-            </div>
+    <>
+      <Header />
+      <div className="min-h-screen flex items-center justify-center bg-gray-100 pt-24 p-4">
+        <div className="w-full max-w-3xl bg-white rounded-lg shadow p-6">
+          <div className="flex justify-between items-center mb-6">
+            <h2 className="text-3xl font-bold">Profile</h2>
+            <button
+              type="button"
+              onClick={toggleEdit}
+              className="flex items-center text-blue-600 hover:text-blue-800"
+            >
+              <FaPencilAlt className="mr-2" />
+              {editing ? "Cancel" : "Edit"}
+            </button>
           </div>
-          {isVendor && (
+          {message && (
+            <p className="text-green-600 text-center mb-4">{message}</p>
+          )}
+          {error && <p className="text-red-500 text-center mb-4">{error}</p>}
+          <form onSubmit={handleSubmit} className="space-y-6">
             <div>
-              <h3 className="text-xl font-semibold mb-2">Vendor Information</h3>
+              <h3 className="text-xl font-semibold mb-2">User Information</h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <label className="block font-semibold mb-1">
-                    Property Name:
+                    Username:
                   </label>
                   {editing ? (
                     <input
                       type="text"
-                      name="propertyName"
-                      value={vendorData.propertyName || ""}
-                      onChange={handleChangeVendor}
+                      name="username"
+                      value={userData.username || ""}
+                      onChange={handleChangeUser}
                       className="w-full p-2 border rounded"
                     />
                   ) : (
-                    <p>{vendorData.propertyName || "Not provided"}</p>
+                    <p>{userData.username}</p>
                   )}
                 </div>
                 <div>
                   <label className="block font-semibold mb-1">
-                    Property Type:
+                    Email:
                   </label>
                   {editing ? (
                     <input
-                      type="text"
-                      name="propertyType"
-                      value={vendorData.propertyType || ""}
-                      onChange={handleChangeVendor}
+                      type="email"
+                      name="email"
+                      value={userData.email || ""}
+                      onChange={handleChangeUser}
                       className="w-full p-2 border rounded"
                     />
                   ) : (
-                    <p>{vendorData.propertyType || "Not provided"}</p>
+                    <p>{userData.email || "Not provided"}</p>
                   )}
                 </div>
                 <div>
                   <label className="block font-semibold mb-1">
-                    Property City:
+                    First Name:
                   </label>
                   {editing ? (
                     <input
                       type="text"
-                      name="propertyCity"
-                      value={vendorData.propertyCity || ""}
-                      onChange={handleChangeVendor}
+                      name="firstName"
+                      value={userData.firstName || ""}
+                      onChange={handleChangeUser}
                       className="w-full p-2 border rounded"
                     />
                   ) : (
-                    <p>{vendorData.propertyCity || "Not provided"}</p>
+                    <p>{userData.firstName || "Not provided"}</p>
                   )}
                 </div>
                 <div>
                   <label className="block font-semibold mb-1">
-                    Property Address:
+                    Last Name:
                   </label>
                   {editing ? (
                     <input
                       type="text"
-                      name="propertyAddress"
-                      value={vendorData.propertyAddress || ""}
-                      onChange={handleChangeVendor}
+                      name="lastName"
+                      value={userData.lastName || ""}
+                      onChange={handleChangeUser}
                       className="w-full p-2 border rounded"
                     />
                   ) : (
-                    <p>{vendorData.propertyAddress || "Not provided"}</p>
-                  )}
-                </div>
-                <div>
-                  <label className="block font-semibold mb-1">
-                    Phone Number:
-                  </label>
-                  {editing ? (
-                    <input
-                      type="text"
-                      name="phoneNumber"
-                      value={vendorData.phoneNumber || ""}
-                      onChange={handleChangeVendor}
-                      className="w-full p-2 border rounded"
-                    />
-                  ) : (
-                    <p>{vendorData.phoneNumber || "Not provided"}</p>
-                  )}
-                </div>
-                <div className="md:col-span-2">
-                  <label className="block font-semibold mb-1">
-                    Property Description:
-                  </label>
-                  {editing ? (
-                    <textarea
-                      name="propertyDescription"
-                      value={vendorData.propertyDescription || ""}
-                      onChange={handleChangeVendor}
-                      className="w-full p-2 border rounded"
-                      rows="3"
-                    />
-                  ) : (
-                    <p>{vendorData.propertyDescription || "Not provided"}</p>
+                    <p>{userData.lastName || "Not provided"}</p>
                   )}
                 </div>
               </div>
             </div>
-          )}
-          {editing && (
-            <button
-              type="submit"
-              className="bg-blue-600 text-white px-6 py-3 rounded hover:bg-blue-700 transition"
-            >
-              Update Profile
-            </button>
-          )}
-        </form>
+            {isVendor && (
+              <div>
+                <h3 className="text-xl font-semibold mb-2">Vendor Information</h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block font-semibold mb-1">
+                      Property Name:
+                    </label>
+                    {editing ? (
+                      <input
+                        type="text"
+                        name="propertyName"
+                        value={vendorData.propertyName || ""}
+                        onChange={handleChangeVendor}
+                        className="w-full p-2 border rounded"
+                      />
+                    ) : (
+                      <p>{vendorData.propertyName || "Not provided"}</p>
+                    )}
+                  </div>
+                  <div>
+                    <label className="block font-semibold mb-1">
+                      Property Type:
+                    </label>
+                    {editing ? (
+                      <input
+                        type="text"
+                        name="propertyType"
+                        value={vendorData.propertyType || ""}
+                        onChange={handleChangeVendor}
+                        className="w-full p-2 border rounded"
+                      />
+                    ) : (
+                      <p>{vendorData.propertyType || "Not provided"}</p>
+                    )}
+                  </div>
+                  <div>
+                    <label className="block font-semibold mb-1">
+                      Property City:
+                    </label>
+                    {editing ? (
+                      <input
+                        type="text"
+                        name="propertyCity"
+                        value={vendorData.propertyCity || ""}
+                        onChange={handleChangeVendor}
+                        className="w-full p-2 border rounded"
+                      />
+                    ) : (
+                      <p>{vendorData.propertyCity || "Not provided"}</p>
+                    )}
+                  </div>
+                  <div>
+                    <label className="block font-semibold mb-1">
+                      Property Address:
+                    </label>
+                    {editing ? (
+                      <input
+                        type="text"
+                        name="propertyAddress"
+                        value={vendorData.propertyAddress || ""}
+                        onChange={handleChangeVendor}
+                        className="w-full p-2 border rounded"
+                      />
+                    ) : (
+                      <p>{vendorData.propertyAddress || "Not provided"}</p>
+                    )}
+                  </div>
+                  <div>
+                    <label className="block font-semibold mb-1">
+                      Phone Number:
+                    </label>
+                    {editing ? (
+                      <input
+                        type="text"
+                        name="phoneNumber"
+                        value={vendorData.phoneNumber || ""}
+                        onChange={handleChangeVendor}
+                        className="w-full p-2 border rounded"
+                      />
+                    ) : (
+                      <p>{vendorData.phoneNumber || "Not provided"}</p>
+                    )}
+                  </div>
+                  <div className="md:col-span-2">
+                    <label className="block font-semibold mb-1">
+                      Property Description:
+                    </label>
+                    {editing ? (
+                      <textarea
+                        name="propertyDescription"
+                        value={vendorData.propertyDescription || ""}
+                        onChange={handleChangeVendor}
+                        className="w-full p-2 border rounded"
+                        rows="3"
+                      />
+                    ) : (
+                      <p>{vendorData.propertyDescription || "Not provided"}</p>
+                    )}
+                  </div>
+                </div>
+              </div>
+            )}
+            {editing && (
+              <button
+                type="submit"
+                className="bg-blue-600 text-white px-6 py-3 rounded hover:bg-blue-700 transition"
+              >
+                Update Profile
+              </button>
+            )}
+          </form>
+        </div>
       </div>
-    </div>
+      <Footer />
+    </>
   );
 };
 
