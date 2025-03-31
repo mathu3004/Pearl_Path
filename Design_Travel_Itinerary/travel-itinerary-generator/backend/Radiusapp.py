@@ -252,7 +252,8 @@ def assign_hotel_for_destination(user, destination):
         "longitude": float(best["longitude"]),
         "rating": float(best["rating"]),
         "pricelevel": int(best["pricelevel"]),
-        "city": destination.title()
+        "city": destination.title(),
+        "weburl": str(best["weburl"])
     }
 
     alt_hotels = [{
@@ -261,6 +262,7 @@ def assign_hotel_for_destination(user, destination):
         "longitude": float(row["longitude"]),
         "rating": float(row["rating"]),
         "pricelevel": int(row["pricelevel"]),
+        "weburl": str(row["weburl"]),
         "city": destination.title()
     } for _, row in alternatives.iterrows()]
 
@@ -425,7 +427,8 @@ def recommend_restaurants_for_destination(user, destination, hotel_lat, hotel_lo
                 "latitude": float(best_restaurant['latitude']),
                 "longitude": float(best_restaurant['longitude']),
                 "city": destination.replace('_', ' ').title(),
-                "rating": float(best_restaurant['rating'])
+                "rating": float(best_restaurant['rating']),
+                "weburl": str(best_restaurant['weburl'])
             }
 
             alt_group = group.iloc[1:4]
@@ -434,6 +437,7 @@ def recommend_restaurants_for_destination(user, destination, hotel_lat, hotel_lo
                 "latitude": float(row["latitude"]),
                 "longitude": float(row["longitude"]),
                 "rating": float(row["rating"]),
+                "weburl": str(row['weburl']),
                 "city": destination.replace('_', ' ').title()
             } for _, row in alt_group.iterrows()]
         else:

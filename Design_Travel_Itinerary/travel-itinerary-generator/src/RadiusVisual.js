@@ -248,6 +248,9 @@ return (
                             cursor: "pointer",
                           }}
                           onClick={() => {
+                            if (item.data.weburl) {
+                              window.open(item.data.weburl, "_blank");
+                            }
                             const newLocation = {
                               lat: item.data.latitude,
                               lng: item.data.longitude,

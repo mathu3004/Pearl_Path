@@ -10,18 +10,18 @@ import sys
 import traceback
 import json
 
-# ✅ Fix Unicode printing on Windows
+# Fix Unicode printing on Windows
 if sys.platform.startswith('win'):
     sys.stdout.reconfigure(encoding='utf-8')
 
-# ✅ MongoDB Connection
+# MongoDB Connection
 mongo_uri = "mongodb+srv://Pearlpath:DMEN2425@pearlpath.lq9jq.mongodb.net/?retryWrites=true&w=majority&appName=PearlPath"
 client = MongoClient(mongo_uri)
 db = client["itinerary_recommendations"]
 
-# ✅ Step 1: Get CLI arguments
+# Step 1: Get CLI arguments
 if len(sys.argv) < 3:
-    print("❌ Error: Username and itinerary name required")
+    print("Error: Username and itinerary name required")
     sys.exit(1)
 
 username = sys.argv[1].strip().lower()

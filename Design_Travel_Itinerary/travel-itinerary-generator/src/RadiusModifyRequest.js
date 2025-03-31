@@ -66,7 +66,7 @@ const ModifyRequest = () => {
   };
 
   const handleNavigate = (itineraryName) => {
-    navigate(`/modify/${username.toLowerCase()}/${itineraryName.toLowerCase()}`);
+    navigate(`/modify-radius/${username.toLowerCase()}/${itineraryName.toLowerCase()}`);
   };
 
   return (
