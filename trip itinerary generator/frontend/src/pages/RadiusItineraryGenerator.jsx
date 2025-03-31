@@ -85,7 +85,7 @@ const RadiusItineraryGenerator = () => {
                     </p>
                     <div style={{ display: "flex", gap: "30px", justifyContent: "center" }}>
                         <Link
-                            to="/create-new-itinerary"
+                            to="/RadiusTravelItineraryGenerator"
                             style={{
                                 padding: "15px 30px",
                                 backgroundColor: "#128C7E",
@@ -116,10 +116,10 @@ const RadiusItineraryGenerator = () => {
                                 transition: "background-color 0.3s",
                             }}
                             onMouseOver={(e) =>
-                                (e.currentTarget.style.backgroundColor = "#333")
+                                (e.currentTarget.style.backgroundColor = "#555")
                             }
                             onMouseOut={(e) =>
-                                (e.currentTarget.style.backgroundColor = "#555")
+                                (e.currentTarget.style.backgroundColor = "#333")
                             }
                         >
                             Modify Itinerary
