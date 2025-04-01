@@ -9,12 +9,16 @@ import TravelItineraryGenerator from './TravelItineraryGenerator';
 import VisualizationItinerary from './VisualizationItinerary';
 import ModifyItinerary from './ModifyItinerary'; 
 import ItinerarySelection from './ItinerarySelection'; 
+import SignUp from './BasicSignup';   
+import Signin from './BasicLogin' 
 
 const App = () => {
     return (
         <Router>
             <Routes>
-                <Route path="/" element={<ItinerarySelection />} />
+                <Route path="/" element={<SignUp />} /> 
+                <Route path="/signin" element={<Signin />} />
+                <Route path="/itinerarySelection" element={<ItinerarySelection />} />
                 <Route path="/radius-mode" element={<RadiusTravelItineraryGenerator />} />
                 <Route path="/no-radius-mode" element={<TravelItineraryGenerator />} />
                 <Route path="/visual-radius/:username/:name" element={<RadiusTravelItinerary />} />

@@ -42,7 +42,11 @@ const Footer = () => {
 };
 
 const ModifyRequest = () => {
-  const [username, setUsername] = useState('');
+  const [username, setUsername] = useState(() => {
+    const storedUser = JSON.parse(localStorage.getItem("user"));
+    return storedUser?.username || '';
+  });
+  
   const [itineraries, setItineraries] = useState([]);
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
@@ -80,7 +84,7 @@ const ModifyRequest = () => {
       type="text"
       value={username}
       placeholder="Enter your username"
-      onChange={(e) => setUsername(e.target.value)}
+      readOnly
       className="input"
     /> <br />
     <button className="button" onClick={handleSearch}>Search Itineraries</button>

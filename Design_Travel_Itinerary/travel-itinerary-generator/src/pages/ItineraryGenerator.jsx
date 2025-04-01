@@ -1,5 +1,7 @@
 import React from "react";
 import { Link } from "react-router-dom";
+import Header from "../components/Header";
+import Footer from "../components/Footer";
 
 const fadeInKeyframes = `
 @keyframes fadeIn {
@@ -11,6 +13,8 @@ const fadeInKeyframes = `
 const ItineraryGenerator = () => {
     return (
         <>
+            <Header />
+            {/* Inject fade-in keyframes */}
             <style>{fadeInKeyframes}</style>
             <div
                 style={{
@@ -28,6 +32,7 @@ const ItineraryGenerator = () => {
                     flexDirection: "column",
                     alignItems: "center",
                     padding: "250px 20px",
+                    overflow: "hidden",
                 }}
             >
                 {/* Dark Overlay */}
@@ -54,7 +59,7 @@ const ItineraryGenerator = () => {
                         style={{
                             fontSize: "3rem",
                             fontWeight: "bold",
-                            color: "#fff", // White for contrast over the overlay
+                            color: "#fff",
                             marginBottom: "20px",
                         }}
                     >
@@ -64,17 +69,16 @@ const ItineraryGenerator = () => {
                         style={{
                             fontWeight: "bold",
                             fontSize: "1.2rem",
-                            color: "#fff", // White for contrast
+                            color: "#fff",
                             marginBottom: "40px",
                             maxWidth: "800px",
                         }}
                     >
-                        Select an option below to either create a new itinerary or modify an
-                        existing one.
+                        Select an option below to either create a new itinerary or modify an existing one.
                     </p>
                     <div style={{ display: "flex", gap: "30px", justifyContent: "center" }}>
                         <Link
-                            to="/create-new-itinerary"
+                            to="/TravelItineraryGenerator"
                             style={{
                                 padding: "15px 30px",
                                 backgroundColor: "#128C7E",
@@ -116,6 +120,7 @@ const ItineraryGenerator = () => {
                     </div>
                 </div>
             </div>
+            <Footer />
         </>
     );
 };

@@ -1,16 +1,26 @@
 import React from "react";
 import { Link } from "react-router-dom";
+import Header from "../components/Header";
+import Footer from "../components/Footer";
 
 const fadeInKeyframes = `
 @keyframes fadeIn {
-  from { opacity: 0; transform: translateY(20px); }
-  to { opacity: 1; transform: translateY(0); }
+  from { 
+    opacity: 0; 
+    transform: translateY(20px); 
+  }
+  to { 
+    opacity: 1; 
+    transform: translateY(0); 
+  }
 }
 `;
 
 const RadiusItineraryGenerator = () => {
     return (
         <>
+            <Header />
+            {/* Inject fade-in keyframes */}
             <style>{fadeInKeyframes}</style>
             <div
                 style={{
@@ -75,7 +85,7 @@ const RadiusItineraryGenerator = () => {
                     </p>
                     <div style={{ display: "flex", gap: "30px", justifyContent: "center" }}>
                         <Link
-                            to="/create-new-itinerary"
+                            to="/RadiusTravelItineraryGenerator"
                             style={{
                                 padding: "15px 30px",
                                 backgroundColor: "#128C7E",
@@ -106,10 +116,10 @@ const RadiusItineraryGenerator = () => {
                                 transition: "background-color 0.3s",
                             }}
                             onMouseOver={(e) =>
-                                (e.currentTarget.style.backgroundColor = "#333")
+                                (e.currentTarget.style.backgroundColor = "#555")
                             }
                             onMouseOut={(e) =>
-                                (e.currentTarget.style.backgroundColor = "#555")
+                                (e.currentTarget.style.backgroundColor = "#333")
                             }
                         >
                             Modify Itinerary
@@ -117,6 +127,7 @@ const RadiusItineraryGenerator = () => {
                     </div>
                 </div>
             </div>
+            <Footer />
         </>
     );
 };

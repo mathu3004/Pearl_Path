@@ -25,7 +25,7 @@ const Header = () => {
 
 const TravelItineraryGenerator = () => {
     const [formData, setFormData] = useState({
-        username: '',
+        username: JSON.parse(localStorage.getItem("user"))?.username || '',
         itineraryName: '',
         startingDestination: '',
         destinations: [],
@@ -135,7 +135,7 @@ const TravelItineraryGenerator = () => {
                             name="username"
                             placeholder="Enter your username"
                             value={formData.username}
-                            onChange={handleChange}
+                            readOnly
                             className="w-full p-3 border-2 border-green-500 rounded-md focus:border-green-700 focus:outline-none shadow-sm"
                             required
                         />

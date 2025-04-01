@@ -2,14 +2,16 @@ import React, { useContext, useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { AuthContext } from "../context/auth.context";
 import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
+import Header from "../components/Header";
+import Footer from "../components/Footer";
 
 const fadeInKeyframes = `
 @keyframes fadeIn {
-  0% {
+  from {
     opacity: 0;
-    transform: translateY(10px);
+    transform: translateY(20px);
   }
-  100% {
+  to {
     opacity: 1;
     transform: translateY(0);
   }
@@ -44,9 +46,10 @@ const slides = [
 ];
 
 const TripHome = () => {
-    const { auth } = useContext(AuthContext);
+    const { auth, fetchProfile } = useContext(AuthContext);
     const navigate = useNavigate();
     const [currentSlide, setCurrentSlide] = useState(0);
+    const [userName, setUserName] = useState("");
 
     // Redirect if not authenticated
     useEffect(() => {
@@ -54,6 +57,17 @@ const TripHome = () => {
             navigate("/login");
         }
     }, [auth, navigate]);
+
+    // Retrieve current user's profile to extract the username
+    useEffect(() => {
+        async function loadProfile() {
+            const profile = await fetchProfile();
+            if (profile && profile.user) {
+                setUserName(profile.user.username);
+            }
+        }
+        loadProfile();
+    }, [fetchProfile]);
 
     // Auto-slide every 5 seconds
     useEffect(() => {
@@ -77,6 +91,7 @@ const TripHome = () => {
 
     return (
         <>
+            <Header />
             {/* Inject fade-in keyframes */}
             <style>{fadeInKeyframes}</style>
             <div
@@ -104,7 +119,6 @@ const TripHome = () => {
                         zIndex: 1,
                     }}
                 />
-
                 {/* Main Content */}
                 <div
                     style={{
@@ -120,7 +134,7 @@ const TripHome = () => {
                         color: "#fff",
                     }}
                 >
-                    {/* Header Section */}
+                    {/* Inner Header Section with Greeting */}
                     <header style={{ marginTop: "60px" }}>
                         <h1
                             style={{
@@ -133,7 +147,7 @@ const TripHome = () => {
                             PEARL PATH
                         </h1>
                         <p style={{ marginTop: "10px", fontSize: "1.2rem", opacity: 0.9 }}>
-                            Your Next Adventure Awaits
+                            Hi {userName || "Guest"}, Your Next Adventure Awaits!
                         </p>
                     </header>
 
@@ -306,6 +320,7 @@ const TripHome = () => {
                     </div>
                 </div>
             </div>
+            <Footer />
         </>
     );
 };

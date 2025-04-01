@@ -1,5 +1,7 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
+import Header from "../components/Header";
+import Footer from "../components/Footer";
 
 const fadeInKeyframes = `
 @keyframes fadeIn {
@@ -46,9 +48,7 @@ const ResetPassword = () => {
       });
       const data = await res.json();
       if (res.ok) {
-        setMessage(
-            "Password reset successfully. Please login with your new password."
-        );
+        setMessage("Password reset successfully. Please login with your new password.");
       } else {
         setError(data.message || "Reset password failed");
       }
@@ -59,99 +59,93 @@ const ResetPassword = () => {
   };
 
   return (
-      <>
-        {/* Inject fade-in keyframes */}
-        <style>{fadeInKeyframes}</style>
+    <>
+      <Header />
+      {/* Inject fade-in keyframes */}
+      <style>{fadeInKeyframes}</style>
+      <div
+        style={{
+          paddingTop: "10%",
+          position: "relative",
+          width: "100%",
+          minHeight: "100vh",
+          backgroundImage: 'url("/ResetPasswordBackground.jpg")',
+          backgroundSize: "cover",
+          backgroundPosition: "center",
+          filter: "brightness(0.9) contrast(1.1)",
+          fontFamily: "'Poppins', sans-serif",
+          animation: "fadeIn 1s ease forwards",
+        }}
+      >
+        {/* Dark Overlay */}
         <div
-            style={{
-              paddingTop: "10%",
-              position: "relative",
-              width: "100%",
-              minHeight: "100vh",
-              backgroundImage: 'url("/ResetPasswordBackground.jpg")',
-              backgroundSize: "cover",
-              backgroundPosition: "center",
-              filter: "brightness(0.9) contrast(1.1)",
-              fontFamily: "'Poppins', sans-serif",
-              animation: "fadeIn 1s ease forwards",
-            }}
+          style={{
+            position: "absolute",
+            top: 0,
+            left: 0,
+            width: "100%",
+            height: "100%",
+            backgroundColor: "rgba(0, 0, 0, 0.2)",
+            zIndex: 1,
+          }}
+        />
+        <div
+          className="glass-container p-8 w-full max-w-md bg-white bg-opacity-80 rounded-lg shadow-lg"
+          style={{ position: "relative", zIndex: 2, margin: "0 auto" }}
         >
-          {/* Dark Overlay */}
-          <div
-              style={{
-                position: "absolute",
-                top: 0,
-                left: 0,
-                width: "100%",
-                height: "100%",
-                backgroundColor: "rgba(0, 0, 0, 0.2)",
-                zIndex: 1,
-              }}
-          />
-          <div
-              className="glass-container p-8 w-full max-w-md bg-white bg-opacity-80 rounded-lg shadow-lg"
-              style={{ position: "relative", zIndex: 2, margin: "0 auto" }}
-          >
-            <h2 className="text-2xl font-bold mb-6 text-center">Reset Password</h2>
-            {error && (
-                <p className="text-red-500 text-center mb-4">{error}</p>
-            )}
-            {message && (
-                <p className="text-green-600 text-center mb-4">{message}</p>
-            )}
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <div>
-                <label className="block mb-1 font-semibold">Username</label>
-                <input
-                    type="text"
-                    name="username"
-                    value={formData.username}
-                    onChange={handleChange}
-                    className="w-full p-3 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    required
-                />
-              </div>
-              <div>
-                <label className="block mb-1 font-semibold">
-                  New Password
-                </label>
-                <input
-                    type="password"
-                    name="newPassword"
-                    value={formData.newPassword}
-                    onChange={handleChange}
-                    className="w-full p-3 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    required
-                />
-              </div>
-              <div>
-                <label className="block mb-1 font-semibold">
-                  Confirm New Password
-                </label>
-                <input
-                    type="password"
-                    name="confirmNewPassword"
-                    value={formData.confirmNewPassword}
-                    onChange={handleChange}
-                    className="w-full p-3 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    required
-                />
-              </div>
-              <button
-                  type="submit"
-                  className="w-full py-3 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition"
-              >
-                Reset Password
-              </button>
-            </form>
-            <div className="mt-4 text-center">
-              <Link to="/login" className="text-blue-600 hover:underline">
-                Back to Login
-              </Link>
+          <h2 className="text-2xl font-bold mb-6 text-center">Reset Password</h2>
+          {error && <p className="text-red-500 text-center mb-4">{error}</p>}
+          {message && <p className="text-green-600 text-center mb-4">{message}</p>}
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div>
+              <label className="block mb-1 font-semibold">Username</label>
+              <input
+                type="text"
+                name="username"
+                value={formData.username}
+                onChange={handleChange}
+                className="w-full p-3 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                required
+              />
             </div>
+            <div>
+              <label className="block mb-1 font-semibold">New Password</label>
+              <input
+                type="password"
+                name="newPassword"
+                value={formData.newPassword}
+                onChange={handleChange}
+                className="w-full p-3 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                required
+              />
+            </div>
+            <div>
+              <label className="block mb-1 font-semibold">Confirm New Password</label>
+              <input
+                type="password"
+                name="confirmNewPassword"
+                value={formData.confirmNewPassword}
+                onChange={handleChange}
+                className="w-full p-3 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                required
+              />
+            </div>
+            <button
+              type="submit"
+              className="w-full py-3 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition"
+            >
+              Reset Password
+            </button>
+          </form>
+          <div className="mt-4 text-center">
+            <Link to="/login" className="text-blue-600 hover:underline">
+              Back to Login
+            </Link>
           </div>
         </div>
-      </>
+      </div>
+      <Footer />
+    </>
   );
 };
 

@@ -1,4 +1,5 @@
-// Top of server.js
+// Top of Radiusserver.js
+import User from './models/User.js';
 import dotenv from 'dotenv';
 dotenv.config();
 
@@ -74,6 +75,44 @@ const runPythonScript = (scriptPath, args, callback) => {
         callback(null, stdout);
     });
     };
+
+    // **User Signup**
+    app.post("/signup", async (req, res) => {
+      try {
+        const { username, email, password } = req.body;
+    
+        const existingUser = await User.findOne({ $or: [{ email }, { username }] });
+        if (existingUser) {
+          return res.status(400).json({ message: "User already exists" });
+        }
+    
+        const newUser = new User({ username, email, password });
+        await newUser.save();
+    
+        res.status(201).json({ message: "User registered successfully" });
+      } catch (error) {
+        console.error("Signup error:", error);
+        res.status(500).json({ message: "Server error" });
+      }
+    });    
+    
+// **User Signin**
+app.post("/signin", async (req, res) => {
+  try {
+    const { username, password } = req.body;
+
+    const user = await User.findOne({ username });
+
+    if (!user || user.password !== password) {
+      return res.status(400).json({ message: "Invalid credentials" });
+    }
+
+    res.json({ message: "Login successful", userId: user._id, username: user.username });
+  } catch (error) {
+    console.error("Signin error:", error);
+    res.status(500).json({ message: "Server error" });
+  }
+});
 
 // API Endpoint to Save Itinerary Data
 app.post('/api/itinerary', async (req, res) => {

@@ -10,9 +10,9 @@ const Header = () => (
     <ul className="nav-links">
       <Link to="/home">Home</Link>
       <Link to="/visual/testuser/sample-itinerary">Itinerary</Link>
-      <Link to="/chatbot">Help!</Link>
       <Link to="/about-us">AboutUs</Link>
       <Link to="/features">Features</Link>
+      <Link to="/signin">Logout</Link>
     </ul>
   </header>
 );
