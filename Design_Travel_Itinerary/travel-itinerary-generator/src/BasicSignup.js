@@ -62,12 +62,13 @@ const CustomSignUp = () => {
   };
 
   return (
+    <div className="main">
     <div className="custom-signup-container">
       <div className="custom-signup-card">
         <div className="custom-signup-header">
           <h2 className="custom-signup-title">Create Account</h2>
           <p className="custom-signup-subtitle">
-            Join Shrimple for better aquaculture insights
+            Road to Travel... Pearl Path for you
           </p>
         </div>
 
@@ -154,6 +155,7 @@ const CustomSignUp = () => {
           </Link>
         </div>
       </div>
+    </div>
     </div>
   );
 };

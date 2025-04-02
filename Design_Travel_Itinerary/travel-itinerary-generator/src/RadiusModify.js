@@ -3,45 +3,9 @@ import Layout from './components/Layout';
 import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import MapComponent from './RadiusMapComponent';
-import { FaInstagram, FaFacebook } from "react-icons/fa";
-import { Link } from "react-router-dom"; 
 import './TravelItineraryRadius.css';
-
-const Header = () => {
-  return (
-    <header className="header">
-      <img src="/assests/IconPearl.png" alt="Logo" />
-      <ul className="nav-links">
-        <Link to="/home">Home</Link>
-        <Link to="/Pearl.js">Itinerary</Link>
-        <Link to="/chatbot">Help!</Link>
-        <Link to="/about-us">AboutUs</Link>
-        <Link to="/features">Features</Link>
-      </ul>
-    </header>
-  );
-};
-
-const Footer = () => {
-  return (
-    <footer className="footer">
-      <div className="footer-container">
-        <div className="footer-left">&copy; 2025 Pearl Path. All rights reserved.</div>
-        <div className="footer-right">
-          <div className="social-links">
-            <a href="https://www.instagram.com/yourpage" target="_blank" rel="noopener noreferrer">
-              <FaInstagram /> Instagram
-            </a>
-            <a href="https://www.facebook.com/yourpage" target="_blank" rel="noopener noreferrer">
-              <FaFacebook /> Facebook
-            </a>
-          </div>
-          <a href="/contact">Contact</a>
-        </div>
-      </div>
-    </footer>
-  );
-};
+import Header from './components/Header';
+import Footer from './components/Footer';
 
 const RadiusModify = () => {
   const { username, name } = useParams();
@@ -180,6 +144,7 @@ const RadiusModify = () => {
   if (!itinerary) return <div>Loading...</div>;
 
   return (
+    <div className='main'>
     <div className="full-pagecontainer" id="radius-modify">
       <Header />
       <div className="editpage-wrapper">
@@ -278,6 +243,7 @@ const RadiusModify = () => {
       <Layout>
     </Layout>
       <Footer />
+    </div>
     </div>
   );
 };

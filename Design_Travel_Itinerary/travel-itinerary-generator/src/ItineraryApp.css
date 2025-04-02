@@ -185,8 +185,12 @@ html, body, #root {
      /* Add black stroke */
      -webkit-text-stroke: 1px white; /* Black outline around each letter */
   }
-  
+
   body {
+    margin: 0px;
+  }
+  
+  .main {
     font-family: 'Times New Roman', Times, serif;
     display: flex;
     flex-direction: column;
@@ -579,7 +583,7 @@ html, body, #root {
   input[type="text"],
   input[type="number"],
   select {
-    border: 2px solid #14b8a6;
+    border: 2px solid #37a057;
     padding: 12px;
     border-radius: 8px;
     width: 100%;
@@ -642,7 +646,7 @@ html, body, #root {
   
   
   /* Background Animation */
-  body, html {
+  .main{
     min-height: 100%;
     background-color: #f0f4f8;
     margin: 0;
@@ -873,8 +877,8 @@ html, body, #root {
   font-size: 24px;
   user-select: none;
   z-index: 1000;
-  margin-left: 1400px;
-  margin-top: 500px;
+  margin-left: 70px;
+  margin-top: 660px;
 }
 
 /* Chat Box */
@@ -890,8 +894,20 @@ html, body, #root {
   overflow: hidden; /* Prevent the entire chatbox from scrolling */
   display: flex;
   flex-direction: column;
-  margin-left: 1400px;
-  margin-top: 500px;
+  margin-left: 100px;
+  margin-top: 640px;
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.greeting {
+  font-size: 2rem;
+  font-weight: 600;
+  color: white;
 }
 
 /* Chat Header */

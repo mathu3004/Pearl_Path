@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import {
   FaPlaneDeparture,
   FaCar,
@@ -43,7 +43,7 @@ const TravelItineraryGenerator = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await fetch("http://localhost:5001/api/itinerary", {
+      const response = await fetch("http://localhost:5002/api/itinerary", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

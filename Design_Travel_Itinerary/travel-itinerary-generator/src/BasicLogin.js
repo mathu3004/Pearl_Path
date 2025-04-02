@@ -56,7 +56,7 @@ const SignIn = () => {
 
 
   return (
-
+    <div className="main">
     <div className="custom-signup-container">
       <div className="custom-signup-card">
         <div className="custom-signup-header">
@@ -135,7 +135,7 @@ const SignIn = () => {
         </div>
       </div>
     </div>
-    
+    </div>
   );
 };
 

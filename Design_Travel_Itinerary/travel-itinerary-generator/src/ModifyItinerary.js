@@ -1,43 +1,10 @@
 import React, { useEffect, useState } from 'react';
-import { useParams, Link, useNavigate } from 'react-router-dom';
-import { FaHotel, FaUtensils, FaMapMarkerAlt, FaInstagram, FaFacebook } from 'react-icons/fa';
+import { useParams, useNavigate } from 'react-router-dom';
+import { FaHotel, FaUtensils, FaMapMarkerAlt } from 'react-icons/fa';
 import './ItineraryApp.css';
 import Layout from './components/Layout';
-
-const Header = () => {
-  const { username, itinerary_name } = useParams();
-  return (
-    <header className="header">
-      <img src="/assests/IconPearl.png" alt="Logo" />
-      <ul className="nav-links">
-        <Link to="/home">Home</Link>
-        <Link to={`/visual/${username}/${itinerary_name}`}>Itinerary</Link>
-        <Link to="/chatbot">Help!</Link>
-        <Link to="/about-us">About Us</Link>
-        <Link to="/features">Features</Link>
-      </ul>
-    </header>
-  );
-};
-
-const Footer = () => (
-  <footer className="footer mt-8">
-    <div className="footer-container">
-      <div className="footer-left">&copy; 2025 Pearl Path. All rights reserved.</div>
-      <div className="footer-right">
-        <div className="social-links">
-          <a href="https://www.instagram.com/yourpage" target="_blank" rel="noopener noreferrer">
-            <FaInstagram /> Instagram
-          </a>
-          <a href="https://www.facebook.com/yourpage" target="_blank" rel="noopener noreferrer">
-            <FaFacebook /> Facebook
-          </a>
-        </div>
-        <a href="/contact">Contact</a>
-      </div>
-    </div>
-  </footer>
-);
+import Header from './components/Header';
+import Footer from './components/Footer';
 
 const ModifyItinerary = () => {
   const { username, itinerary_name } = useParams();
@@ -76,13 +43,13 @@ const ModifyItinerary = () => {
       const newRec = await res.json();
       if (!itinerary) return;
   
-      // ❌ If backend responds with an error, show alert and skip
+      // If backend responds with an error, show alert and skip
       if (newRec.error) {
         alert(`⚠️ ${newRec.error}`);
         return;
       }
   
-      // ✅ Update frontend itinerary only if response is valid
+      // Update frontend itinerary only if response is valid
       const updatedItinerary = { ...itinerary };
       const day = updatedItinerary.days[dayIndex];
   
@@ -130,20 +97,21 @@ const ModifyItinerary = () => {
       });
 
       if (res.ok) {
-        alert("✅ Itinerary updated successfully!");
+        alert("Itinerary updated successfully!");
         navigate(`/visual/${username}/${itinerary_name}`);
       } else {
-        alert("❌ Failed to save itinerary.");
+        alert("Failed to save itinerary.");
       }
     } catch (err) {
       console.error("Error saving updated itinerary:", err);
-      alert("❌ Failed to save changes.");
+      alert("Failed to save changes.");
     }
   };
 
   if (!itinerary) return <p className="text-center mt-20 text-lg">Loading itinerary...</p>;
 
   return (
+    <div className='main'>
     <div className="page-containers">
       <Header />
 
@@ -224,7 +192,9 @@ const ModifyItinerary = () => {
       </div>
       <Layout>
       </Layout>
+      </div>
       <Footer />
+
     </div>
   );
 };

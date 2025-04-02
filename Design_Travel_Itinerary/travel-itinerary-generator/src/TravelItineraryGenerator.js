@@ -1,27 +1,10 @@
 // src/TravelItineraryGenerator.js
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Link } from 'react-router-dom';
+import Header from './components/Header';
+import Footer from './components/Footer';
 import Layout from './components/Layout';
-import { FaInstagram, FaFacebook } from "react-icons/fa";
 import { FaPlaneDeparture, FaWalking, FaCar, FaBiking, FaBusAlt, FaTrain, FaShuttleVan,} from 'react-icons/fa';
-
-const Header = () => {
-  return (
-    <header className="header">
-      <img src="/assests/IconPearl.png" alt="Logo" />
-      <ul className="nav-links">
-        <Link to="/home">Home</Link>
-        <Link to="/visual/testuser/sample-itinerary">Itinerary</Link>
-        <Link to="/chatbot">Help!</Link>
-        <Link to="/about-us">AboutUs</Link>
-        <Link to="/features">Features</Link>
-      </ul>
-
-    </header>
-  );
-};
-
 
 const TravelItineraryGenerator = () => {
     const [formData, setFormData] = useState({
@@ -122,6 +105,7 @@ const TravelItineraryGenerator = () => {
     };
 
     return (
+        <div className='main'>
         <div className="page-container">
             <Header />
             <div className="glass-card">
@@ -338,29 +322,8 @@ const TravelItineraryGenerator = () => {
             </Layout>
             <Footer />
         </div>
-    );
-};
-
-const Footer = () => {
-  return (
-    <footer className="footer">
-      <div className="footer-container">
-        <div className="footer-left">&copy; 2025 Pearl Path. All rights reserved.</div>
-        <div className="footer-right">
-          <div className="social-links">
-          <a href="https://www.instagram.com/yourpage" target="_blank" rel="noopener noreferrer">
-  <FaInstagram /> Instagram
-</a>
-<a href="https://www.facebook.com/yourpage" target="_blank" rel="noopener noreferrer">
-  <FaFacebook /> Facebook
-</a>
-
-          </div>
-          <a href="/contact">Contact</a>
         </div>
-      </div>
-    </footer>
-  );
+    );
 };
 
 export default TravelItineraryGenerator;

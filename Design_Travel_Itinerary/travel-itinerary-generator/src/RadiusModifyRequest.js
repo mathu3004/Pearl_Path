@@ -74,6 +74,7 @@ const ModifyRequest = () => {
   };
 
   return (
+    <div className='main'>
     <div className="editrequest-page-wrapper">
   <Header />
   
@@ -111,6 +112,7 @@ const ModifyRequest = () => {
   )}
   <Layout />
   <Footer />
+</div>
 </div>
 
   );

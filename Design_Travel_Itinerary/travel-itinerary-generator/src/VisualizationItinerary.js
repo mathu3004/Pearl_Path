@@ -1,10 +1,12 @@
 import React, { useEffect, useState } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import Layout from './components/Layout';
 import L from 'leaflet';
-import { FaHotel, FaUtensils, FaMapMarkerAlt, FaInstagram, FaFacebook } from 'react-icons/fa';
+import Header from './components/Header';
+import Footer from './components/Footer';
+import { FaHotel, FaUtensils, FaMapMarkerAlt} from 'react-icons/fa';
 import './ItineraryApp.css';
 import html2canvas from 'html2canvas';
 import { useNavigate } from 'react-router-dom'; 
@@ -21,41 +23,7 @@ L.Icon.Default.mergeOptions({
   shadowUrl: iconShadow,
 });
 
-const Header = () => {
-  return (
-    <header className="header">
-      <img src="/assests/IconPearl.png" alt="Logo" />
-      <ul className="nav-links">
-        <Link to="/home">Home</Link>
-        <Link to="/visual/testuser/sample-itinerary">Itinerary</Link>
-        <Link to="/chatbot">Help!</Link>
-        <Link to="/about-us">AboutUs</Link>
-        <Link to="/features">Features</Link>
-      </ul>
-    </header>
-  );
-};
 
-const Footer = () => {
-  return (
-    <footer className="footer mt-8">
-      <div className="footer-container">
-        <div className="footer-left">&copy; 2025 Pearl Path. All rights reserved.</div>
-        <div className="footer-right">
-          <div className="social-links">
-            <a href="https://www.instagram.com/yourpage" target="_blank" rel="noopener noreferrer">
-              <FaInstagram /> Instagram
-            </a>
-            <a href="https://www.facebook.com/yourpage" target="_blank" rel="noopener noreferrer">
-              <FaFacebook /> Facebook
-            </a>
-          </div>
-          <a href="/contact">Contact</a>
-        </div>
-      </div>
-    </footer>
-  );
-};
 
 const VisualizationItinerary = () => {
   const { username, itinerary_name } = useParams();
@@ -201,6 +169,7 @@ const VisualizationItinerary = () => {
   
   
   return (
+    <div className='main'>
     <div className="page-containers">
       <Header />
 
@@ -368,6 +337,7 @@ const VisualizationItinerary = () => {
 <Layout>
 </Layout>
       <Footer />
+    </div>
     </div>
   );
 };

@@ -56,7 +56,7 @@ const Profile = () => {
     e.preventDefault();
     try {
       const response = await fetch(
-        `http://localhost:5001/api/profile/${auth.user.id}`,
+        `http://localhost:5002/api/profile/${auth.user.id}`,
         {
           method: "PATCH",
           headers: {
