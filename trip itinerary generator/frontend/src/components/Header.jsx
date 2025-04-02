@@ -17,10 +17,13 @@ const Header = () => {
   };
 
   return (
-      <header className="fixed top-0 left-0 w-full h-[70px] bg-[rgba(39,47,45,0.7)] flex items-center justify-between px-8 shadow-md z-50">
+      <header
+          id="app-header"
+          className="fixed top-0 left-0 w-full h-[70px] bg-[rgba(39,47,45,0.7)] flex items-center justify-between px-8 shadow-md z-50"
+      >
         <div className="flex items-center h-full">
           <img
-              src="IconPearl.png"
+              src="/IconPearl.png"
               alt="Logo"
               className="h-auto max-h-[50px] object-contain mr-5"
           />
