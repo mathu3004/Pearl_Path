@@ -1,9 +1,10 @@
 import React, { useState, useContext } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import { AuthContext } from "../context/auth.context";
 import Select from "react-select";
+import { AuthContext } from "../context/auth.context";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
+import "../index.css";
 
 const fadeInKeyframes = `
 @keyframes fadeIn {
@@ -61,7 +62,6 @@ const Register = () => {
     restaurant_rankingposition: "",
     restaurant_rankingdenom: "",
   });
-
   const [error, setError] = useState("");
   const [msg, setMsg] = useState("");
 
@@ -111,9 +111,7 @@ const Register = () => {
   const handleMultiSelectChange = (fieldName, selectedOptions) => {
     setFormData((prev) => ({
       ...prev,
-      [fieldName]: selectedOptions
-          ? selectedOptions.map((opt) => opt.value)
-          : [],
+      [fieldName]: selectedOptions ? selectedOptions.map((opt) => opt.value) : [],
     }));
   };
 
@@ -186,32 +184,11 @@ const Register = () => {
       <>
         <Header />
         <style>{fadeInKeyframes}</style>
-        <div
-            style={{
-              position: "relative",
-              width: "100%",
-              minHeight: "100vh",
-              animation: "fadeIn 1s ease forwards",
-            }}
-        >
+        <div id="register-container">
+          <div id="register-overlay"></div>
           <div
-              style={{
-                position: "absolute",
-                top: 0,
-                left: 0,
-                width: "100%",
-                height: "100%",
-                backgroundColor: "rgba(0, 0, 0, 0.3)",
-                zIndex: 1,
-              }}
-          />
-          <div
+              id="register-bg-container"
               className="min-h-screen flex items-center justify-center bg-cover bg-center pt-20 p-4"
-              style={{
-                backgroundImage: 'url("/CreateAccount1.jpg")',
-                position: "relative",
-                zIndex: 2,
-              }}
           >
             <div className="glass-container p-8 w-full max-w-3xl bg-white bg-opacity-80 rounded-lg shadow-lg">
               <h2 className="text-3xl font-bold mb-6 text-center">Register</h2>
@@ -287,7 +264,9 @@ const Register = () => {
                               Basic Hotel Information
                             </h3>
                             <div>
-                              <label className="block font-semibold mb-1">Name *</label>
+                              <label className="block font-semibold mb-1">
+                                Name *
+                              </label>
                               <input
                                   type="text"
                                   name="hotel_name"
@@ -373,7 +352,9 @@ const Register = () => {
                               />
                             </div>
                             <div>
-                              <label className="block font-semibold mb-1">City *</label>
+                              <label className="block font-semibold mb-1">
+                                City *
+                              </label>
                               <select
                                   name="hotel_city"
                                   value={formData.hotel_city}
@@ -392,7 +373,9 @@ const Register = () => {
                               Contact Information
                             </h3>
                             <div>
-                              <label className="block font-semibold mb-1">Email *</label>
+                              <label className="block font-semibold mb-1">
+                                Email *
+                              </label>
                               <input
                                   type="email"
                                   name="hotel_email"
@@ -403,7 +386,9 @@ const Register = () => {
                               />
                             </div>
                             <div>
-                              <label className="block font-semibold mb-1">Phone *</label>
+                              <label className="block font-semibold mb-1">
+                                Phone *
+                              </label>
                               <input
                                   type="tel"
                                   name="hotel_phone"
@@ -536,7 +521,9 @@ const Register = () => {
                               Basic Restaurant Information
                             </h3>
                             <div>
-                              <label className="block font-semibold mb-1">Name *</label>
+                              <label className="block font-semibold mb-1">
+                                Name *
+                              </label>
                               <input
                                   type="text"
                                   name="restaurant_name"
@@ -563,7 +550,9 @@ const Register = () => {
                               />
                             </div>
                             <div>
-                              <label className="block font-semibold mb-1">City *</label>
+                              <label className="block font-semibold mb-1">
+                                City *
+                              </label>
                               <select
                                   name="restaurant_addressobj_city"
                                   value={formData.restaurant_addressobj_city}
@@ -610,7 +599,9 @@ const Register = () => {
                               Contact Information
                             </h3>
                             <div>
-                              <label className="block font-semibold mb-1">Email *</label>
+                              <label className="block font-semibold mb-1">
+                                Email *
+                              </label>
                               <input
                                   type="email"
                                   name="restaurant_email"
@@ -621,7 +612,9 @@ const Register = () => {
                               />
                             </div>
                             <div>
-                              <label className="block font-semibold mb-1">Phone *</label>
+                              <label className="block font-semibold mb-1">
+                                Phone *
+                              </label>
                               <input
                                   type="tel"
                                   name="restaurant_phone"
@@ -674,10 +667,7 @@ const Register = () => {
                                   className="basic-multi-select"
                                   classNamePrefix="select"
                                   onChange={(selected) =>
-                                      handleMultiSelectChange(
-                                          "restaurant_dietaryrestrictions",
-                                          selected
-                                      )
+                                      handleMultiSelectChange("restaurant_dietaryrestrictions", selected)
                                   }
                               />
                             </div>
@@ -766,23 +756,24 @@ const Register = () => {
                             </div>
                           </div>
                       )}
+                      <button
+                          type="submit"
+                          className="w-full py-3 bg-green-600 text-white rounded-md hover:bg-green-700 transition"
+                      >
+                        Register
+                      </button>
                     </>
                 )}
-                <button
-                    type="submit"
-                    className="w-full py-3 bg-green-600 text-white rounded-md hover:bg-green-700 transition"
-                >
-                  Register
-                </button>
+                <div className="mt-4 text-center">
+                  <Link to="/login" className="text-blue-600 hover:underline">
+                    Already have an account? Login
+                  </Link>
+                </div>
               </form>
-              <div className="mt-4 text-center">
-                <Link to="/login" className="text-blue-600 hover:underline">
-                  Already have an account? Login
-                </Link>
-              </div>
             </div>
           </div>
         </div>
+        <Footer />
       </>
   );
 };
