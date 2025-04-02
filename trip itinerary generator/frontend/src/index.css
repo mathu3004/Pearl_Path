@@ -1,9 +1,1086 @@
 @import "tailwindcss";
 
+/* Tailwind directives */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Keyframes */
+@keyframes fadeIn {
+  0% {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Glass Effects */
 .glass-container {
   @apply bg-white/75 backdrop-blur-md rounded-xl shadow-lg;
 }
 
 .glass-hover:hover {
-  @apply scale-105 shadow-2xl transition-all;
+  @apply scale-105 shadow-2xl transition-all duration-300;
+}
+
+/* AboutUs Component */
+#about-us-container {
+  padding: 80px;
+  font-family: 'Poppins', sans-serif;
+  background-color: #f9f9f9;
+  min-height: 100vh;
+}
+
+#about-us-title {
+  text-align: center;
+  margin-bottom: 40px;
+  color: #333;
+  font-weight: bold;
+}
+
+#about-us-content {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.team-member-card {
+  background: #fff;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  opacity: 0;
+  animation: fadeIn 1s ease forwards;
+}
+
+.team-member-name {
+  margin-top: 0;
+  color: #128C7E;
+}
+
+.team-member-bio {
+  color: #555;
+  line-height: 1.6;
+}
+
+/* Itineraries Component */
+#itineraries-container {
+  position: relative;
+  width: 100%;
+  min-height: 100vh;
+  font-family: 'Poppins', sans-serif;
+  animation: fadeIn 1s ease forwards;
+  overflow: hidden;
+}
+
+#itineraries-bg {
+  background-image: url("/Caravan.jpg");
+  background-size: cover;
+  background-position: center;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+}
+
+#itineraries-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.3);
+  z-index: 2;
+}
+
+#itineraries-content {
+  position: relative;
+  z-index: 3;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 190px 20px;
+  min-height: 100vh;
+  text-align: center;
+}
+
+#itineraries-title {
+  font-size: 3rem;
+  font-weight: bold;
+  color: #fff;
+  margin-bottom: 20px;
+}
+
+#itineraries-subtitle {
+  font-weight: bold;
+  font-size: 1.2rem;
+  color: #eee;
+  margin-bottom: 40px;
+  max-width: 800px;
+  padding: 20px;
+}
+
+.itineraries-button {
+  padding: 15px 30px;
+  color: #fff;
+  border-radius: 5px;
+  text-decoration: none;
+  font-weight: bold;
+  transition: background-color 0.3s;
+}
+
+.itineraries-button-primary {
+  background-color: #128C7E;
+}
+
+.itineraries-button-primary:hover {
+  background-color: #25D366;
+}
+
+.itineraries-button-secondary {
+  background-color: #333;
+}
+
+.itineraries-button-secondary:hover {
+  background-color: #555;
+}
+
+/* ItineraryGenerator Component */
+#itinerary-generator-container {
+  position: relative;
+  width: 100%;
+  min-height: 100vh;
+  font-family: 'Poppins', sans-serif;
+  background-image: url("/Beach.jpg");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-color: #f0f0f0;
+  animation: fadeIn 1s ease forwards;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 250px 20px;
+  overflow: hidden;
+}
+
+#itinerary-generator-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.4);
+  z-index: 1;
+}
+
+#itinerary-generator-content {
+  position: relative;
+  z-index: 2;
+  text-align: center;
+}
+
+/* Login Component */
+/* Keyframes for fadeIn animation */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Login Component Styles */
+#login-container {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-image: url("/LoginOption6.jpg");  /* Ensure this image is in your public folder */
+  background-size: cover;
+  background-position: center;
+  filter: brightness(0.9) contrast(1.1);
+  animation: fadeIn 1s ease forwards;
+  position: relative;
+}
+
+#login-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.2);
+  z-index: 1;
+}
+
+#login-form-container {
+  position: relative;
+  z-index: 2;
+  padding: 2rem;
+  width: 100%;
+  max-width: 28rem;
+  background-color: rgba(255, 255, 255, 0.8);
+  border-radius: 0.5rem;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
+  0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+
+/* Keyframes for fadeIn animation */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ResetPassword Component Styles */
+#reset-password-container {
+  padding-top: 10%;
+  position: relative;
+  width: 100%;
+  min-height: 100vh;
+  background-image: url("/ResetPasswordBackground.jpg");
+  background-size: cover;
+  background-position: center;
+  filter: brightness(0.9) contrast(1.1);
+  font-family: 'Poppins', sans-serif;
+  animation: fadeIn 1s ease forwards;
+}
+
+#reset-password-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.2);
+  z-index: 1;
+}
+
+#reset-password-form-container {
+  position: relative;
+  z-index: 2;
+  margin: 0 auto;
+  /* Glass effect styling (if not overridden by Tailwind) */
+  background-color: rgba(255, 255, 255, 0.8);
+  padding: 2rem;
+  max-width: 28rem;
+  border-radius: 0.5rem;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
+  0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+
+/* Profile Component */
+#profile-container {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #f3f4f6;
+  padding: 6rem 1rem 2rem;
+}
+
+#profile-card {
+  width: 100%;
+  max-width: 56rem;
+  background-color: white;
+  border-radius: 0.5rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1),
+  0 1px 2px rgba(0, 0, 0, 0.06);
+  padding: 1.5rem;
+}
+
+/* TripHome Component */
+/* Keyframes for fadeIn animation */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Outer container */
+#trip-home-container {
+  position: relative;
+  width: 100%;
+  min-height: 100vh;
+  font-family: 'Poppins', sans-serif;
+  overflow: hidden;
+  background-image: url("/Lighthouse.jpeg");
+  background-size: cover;
+  background-position: center;
+  animation: fadeIn 1s ease forwards;
+}
+
+/* Dark overlay */
+#trip-home-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 1;
+}
+
+/* Main content container */
+#trip-home-content {
+  position: relative;
+  z-index: 3;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+  min-height: 100vh;
+  padding: 50px 20px;
+  text-align: center;
+  color: #fff;
+}
+
+/* Header section */
+#trip-home-header {
+  margin-top: 60px;
+}
+
+#trip-home-header-title {
+  font-size: 3rem;
+  font-weight: bold;
+  margin: 0;
+  letter-spacing: 2px;
+}
+
+#trip-home-header-greeting {
+  margin-top: 10px;
+  font-size: 1.2rem;
+  opacity: 0.9;
+}
+
+/* Slideshow container */
+#trip-home-slideshow {
+  position: relative;
+  width: 80%;
+  max-width: 1000px;
+  height: 400px;
+  margin: 40px 0;
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+/* Each slide (static properties) */
+.trip-home-slide {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  transition: opacity 0.8s ease-in-out;
+}
+
+/* Slide overlay (for text) */
+.trip-home-slide-overlay {
+  position: absolute;
+  bottom: 20px;
+  left: 20px;
+  right: 20px;
+  background-color: rgba(0, 0, 0, 0.5);
+  padding: 20px;
+  border-radius: 5px;
+}
+
+.trip-home-slide-title {
+  font-size: 1.8rem;
+  font-weight: bold;
+  margin: 0;
+  color: #fff;
+}
+
+.trip-home-slide-content {
+  font-size: 1rem;
+  margin-top: 10px;
+  color: #fff;
+}
+
+/* Chevron buttons */
+#trip-home-prev,
+#trip-home-next {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  cursor: pointer;
+  background-color: rgba(0, 0, 0, 0.5);
+  padding: 10px;
+  border-radius: 50%;
+  z-index: 4;
+}
+
+#trip-home-prev {
+  left: 10px;
+}
+
+#trip-home-next {
+  right: 10px;
+}
+
+/* Dot indicators container */
+#trip-home-dots-container {
+  position: absolute;
+  bottom: 20px;
+  width: 100%;
+  text-align: center;
+  z-index: 4;
+}
+
+/* Individual dot */
+.trip-home-dot {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  margin: 0 5px;
+  border-radius: 50%;
+  background-color: rgba(255, 255, 255, 0.5);
+  cursor: pointer;
+}
+
+.trip-home-dot.active {
+  background-color: #fff;
+}
+
+/* Bottom buttons container */
+#trip-home-buttons-container {
+  margin-bottom: 60px;
+}
+
+/* "Plan New Trip" button */
+#trip-home-plan-trip {
+  display: inline-block;
+  margin-right: 20px;
+  padding: 15px 30px;
+  background-color: #128C7E;
+  color: #fff;
+  border-radius: 5px;
+  text-decoration: none;
+  font-weight: bold;
+  transition: background-color 0.3s;
+}
+
+#trip-home-plan-trip:hover {
+  background-color: #25D366;
+}
+
+/* "View Saved Itineraries" button */
+#trip-home-saved-itineraries {
+  display: inline-block;
+  padding: 15px 30px;
+  background-color: #333;
+  color: #fff;
+  border-radius: 5px;
+  text-decoration: none;
+  font-weight: bold;
+  transition: background-color 0.3s;
+}
+
+#trip-home-saved-itineraries:hover {
+  background-color: #555;
+}
+
+/* VendorDashboard Component */
+#vendor-dashboard-container {
+  position: relative;
+  min-height: 100vh;
+  background-color: #0F4D4E;
+  font-family: 'Poppins', sans-serif;
+  animation: fadeIn 1s ease forwards;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  overflow: hidden;
+}
+
+#vendor-dashboard-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 1;
+}
+
+#vendor-dashboard-content {
+  position: relative;
+  z-index: 2;
+  padding: 40px;
+  max-width: 800px;
+  width: 100%;
+  background-color: rgba(255, 255, 255, 0.85);
+  border-radius: 10px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  text-align: center;
+  backdrop-filter: blur(5px);
+}
+
+/* Form Elements */
+.form-input {
+  @apply w-full p-3 border rounded-md focus:outline-none focus:ring-2 focus:ring-green-500;
+}
+
+.form-button {
+  @apply w-full py-3 bg-green-600 text-white rounded-md hover:bg-green-700 transition;
+}
+
+/* Utility Classes */
+.text-primary {
+  color: #128C7E;
+}
+
+.bg-primary {
+  background-color: #128C7E;
+}
+
+.hover\:bg-primary:hover {
+  background-color: #25D366;
+}
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+  #about-us-container {
+    padding: 40px 20px;
+  }
+
+  #itineraries-content,
+  #itinerary-generator-container {
+    padding: 100px 20px;
+  }
+
+  .team-member-card {
+    padding: 15px;
+  }
+}
+
+/* Header Styles */
+#app-header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 70px;
+  background-color: rgba(39, 47, 45, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 2rem;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  z-index: 50;
+}
+
+#app-header .logo-container {
+  display: flex;
+  align-items: center;
+  height: 100%;
+}
+
+#app-header .logo-container img {
+  height: auto;
+  max-height: 50px;
+  object-fit: contain;
+  margin-right: 1.25rem;
+}
+
+#app-header nav {
+  display: none;
+}
+
+@media (min-width: 768px) {
+  #app-header nav {
+    display: flex;
+    gap: 2rem;
+    align-items: center;
+  }
+
+  #app-header nav li {
+    list-style: none;
+  }
+
+  #app-header nav li a {
+    color: white;
+    font-size: 1.125rem;
+    padding: 0.25rem 0.5rem;
+    border-radius: 0.25rem;
+    transition: all 0.3s;
+    text-decoration: none;
+  }
+
+  #app-header nav li a:hover {
+    background-color: rgba(255,255,255,0.2);
+    transform: translateY(-0.25rem);
+    color: black;
+  }
+}
+
+/* Footer Styles */
+#app-footer {
+  width: 100%;
+  background-color: rgb(42, 42, 42);
+  color: white;
+  text-align: center;
+  padding: 1rem 2rem;
+  position: relative;
+}
+
+#app-footer .footer-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+  max-width: 72rem;
+  margin: 0 auto;
+}
+
+@media (min-width: 768px) {
+  #app-footer .footer-container {
+    flex-direction: row;
+  }
+}
+
+#app-footer .footer-left {
+  font-size: 0.875rem;
+  margin-left: 2rem;
+}
+
+#app-footer .footer-right {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  font-size: 0.875rem;
+  gap: 1rem;
+  margin-right: 2rem;
+}
+
+#app-footer .footer-right .social-links {
+  display: flex;
+  gap: 1rem;
+}
+
+#app-footer .footer-right a {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  text-decoration: none;
+  color: inherit;
+  transition: text-decoration 0.3s;
+}
+
+#app-footer .footer-right a:hover {
+  text-decoration: underline;
+}
+
+/* Main container styles */
+#itinerary-generator-container {
+  position: relative;
+  width: 100%;
+  min-height: 100vh;
+  font-family: 'Poppins', sans-serif;
+  background-image: url("/Beach.jpg");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-color: #f0f0f0;
+  animation: fadeIn 1s ease forwards;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 250px 20px;
+  overflow: hidden;
+}
+
+/* Dark Overlay */
+#itinerary-generator-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.4);
+  z-index: 1;
+}
+
+/* Main Content */
+#itinerary-generator-content {
+  position: relative;
+  z-index: 2;
+  text-align: center;
+}
+
+/* Heading */
+#itinerary-generator-heading {
+  font-size: 3rem;
+  font-weight: bold;
+  color: #fff;
+  margin-bottom: 20px;
+}
+
+/* Paragraph */
+#itinerary-generator-paragraph {
+  font-weight: bold;
+  font-size: 1.2rem;
+  color: #fff;
+  margin-bottom: 40px;
+  max-width: 800px;
+}
+
+/* Button Container */
+#itinerary-generator-button-container {
+  display: flex;
+  gap: 30px;
+  justify-content: center;
+}
+
+/* "Create New Itinerary" Button */
+#create-itinerary-link {
+  padding: 15px 30px;
+  background-color: #128C7E;
+  color: #fff;
+  border-radius: 5px;
+  text-decoration: none;
+  font-weight: bold;
+  transition: background-color 0.3s;
+}
+#create-itinerary-link:hover {
+  background-color: #25D366;
+}
+
+/* "Modify Itinerary" Button */
+#modify-itinerary-link {
+  padding: 15px 30px;
+  background-color: #333;
+  color: #fff;
+  border-radius: 5px;
+  text-decoration: none;
+  font-weight: bold;
+  transition: background-color 0.3s;
+}
+#modify-itinerary-link:hover {
+  background-color: #555;
+}
+
+/* Keyframes for fadeIn animation */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ResetPassword Component Styles */
+#reset-password-container {
+  padding-top: 10%;
+  position: relative;
+  width: 100%;
+  min-height: 100vh;
+  background-image: url("/LoginOption6.jpg");
+  background-size: cover;
+  background-position: center;
+  filter: brightness(0.9) contrast(1.1);
+  font-family: 'Poppins', sans-serif;
+  animation: fadeIn 1s ease forwards;
+}
+
+#reset-password-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.2);
+  z-index: 1;
+}
+
+#reset-password-form-container {
+  position: relative;
+  z-index: 2;
+  margin: 0 auto;
+  /* Glass effect styling (if not overridden by Tailwind) */
+  background-color: rgba(255, 255, 255, 0.8);
+  padding: 2rem;
+  max-width: 28rem;
+  border-radius: 0.5rem;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
+  0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+/* Custom Keyframes */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Radius Itinerary Generator Component Styles */
+#radius-itinerary-container {
+  position: relative;
+  width: 100%;
+  min-height: 100vh;
+  font-family: 'Poppins', sans-serif;
+  animation: fadeIn 1s ease forwards;
+  background-image: url("/Mirissa.jpg");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-color: #f0f0f0;
+  overflow: hidden;
+  padding: 270px 20px;
+}
+
+#radius-itinerary-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.3);
+  z-index: 1;
+}
+
+#radius-itinerary-content {
+  position: relative;
+  z-index: 2;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+#radius-itinerary-heading {
+  font-size: 3rem;
+  font-weight: bold;
+  color: #fff;
+  margin-bottom: 20px;
+}
+
+#radius-itinerary-paragraph {
+  font-size: 1.2rem;
+  color: #eee;
+  margin-bottom: 40px;
+  max-width: 800px;
+  text-align: center;
+  font-weight: bold;
+}
+
+#radius-itinerary-button-container {
+  display: flex;
+  gap: 30px;
+  justify-content: center;
+}
+
+#radius-create-itinerary-link {
+  padding: 15px 30px;
+  background-color: #128C7E;
+  color: #fff;
+  border-radius: 5px;
+  text-decoration: none;
+  font-weight: bold;
+  transition: background-color 0.3s;
+}
+
+#radius-create-itinerary-link:hover {
+  background-color: #25D366;
+}
+
+#radius-modify-itinerary-link {
+  padding: 15px 30px;
+  background-color: #333;
+  color: #fff;
+  border-radius: 5px;
+  text-decoration: none;
+  font-weight: bold;
+  transition: background-color 0.3s;
+}
+
+#radius-modify-itinerary-link:hover {
+  background-color: #555;
+}
+
+/* Keyframes for fadeIn animation */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Outer container for Register page */
+#register-container {
+  position: relative;
+  width: 100%;
+  min-height: 100vh;
+  animation: fadeIn 1s ease forwards;
+}
+
+/* Dark overlay behind the form */
+#register-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.3);
+  z-index: 1;
+}
+
+/* Background image container for the registration form */
+#register-bg-container {
+  background-image: url("/CreateAccount1.jpg");
+  position: relative;
+  z-index: 2;
+}
+
+/* Fade-in Keyframes */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Landing Page Container */
+#landing-page-container {
+  position: relative;
+  width: 100%;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Poppins', sans-serif;
+  background-color: #f0f0f0;
+  animation: fadeIn 1s ease forwards;
+  overflow: hidden;
+}
+
+/* Dark Overlay */
+#landing-page-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.1);
+  z-index: 1;
+}
+
+/* Main Content Area */
+#landing-page-content {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex: 1;
+}
+
+/* Left Section (Headline & CTAs) */
+#landing-left {
+  flex: 1;
+  padding: 60px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+#landing-headline {
+  font-size: 3rem;
+  font-weight: bold;
+  margin-bottom: 20px;
+  color: #333;
+}
+
+#landing-description {
+  font-size: 1.2rem;
+  margin-bottom: 30px;
+  color: #555;
+  line-height: 1.5;
+  max-width: 600px;
+}
+
+/* CTA Container */
+#landing-cta-container {
+  display: flex;
+  gap: 15px;
+}
+
+.landing-cta {
+  padding: 14px 28px;
+  background-color: #128C7E;
+  color: #fff;
+  border-radius: 5px;
+  text-decoration: none;
+  font-weight: bold;
+  transition: background-color 0.3s;
+}
+
+.landing-cta:hover {
+  background-color: #25D366;
+}
+
+/* Right Section (Hero Image) */
+#landing-hero-container {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 60px;
+}
+
+.landing-hero-image {
+  max-width: 100%;
+  height: auto;
+  border-radius: 10px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  transition: transform 0.3s ease;
+}
+
+.landing-hero-image:hover {
+  transform: scale(1.05);
 }
