@@ -1,9 +1,10 @@
 import React, { useContext, useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { AuthContext } from "../context/auth.context";
 import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
+import { AuthContext } from "../context/auth.context";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
+import "../index.css"; // Import the external CSS file
 
 const fadeInKeyframes = `
 @keyframes fadeIn {
@@ -44,13 +45,6 @@ const slides = [
         image: "/Fishermen.jpeg",
     },
 ];
-
-const center = { lat: 6.9271, lng: 79.8612 };
-const mapContainerStyle = {
-    width: "100%",
-    height: "700px",
-    borderRadius: "20px",
-};
 
 const TripHome = () => {
     const { auth, fetchProfile } = useContext(AuthContext);
@@ -98,235 +92,73 @@ const TripHome = () => {
 
     return (
         <>
-            <Header />
             {/* Inject fade-in keyframes */}
             <style>{fadeInKeyframes}</style>
-            <div
-                style={{
-                    position: "relative",
-                    width: "100%",
-                    minHeight: "100vh",
-                    fontFamily: "'Poppins', sans-serif",
-                    overflow: "hidden",
-                    backgroundImage: 'url("/Lighthouse.jpeg")',
-                    backgroundSize: "cover",
-                    backgroundPosition: "center",
-                    animation: "fadeIn 1s ease forwards",
-                }}
-            >
+            <div id="trip-home-container">
                 {/* Dark Overlay */}
-                <div
-                    style={{
-                        position: "absolute",
-                        top: 0,
-                        left: 0,
-                        width: "100%",
-                        height: "100%",
-                        backgroundColor: "rgba(0,0,0,0.5)",
-                        zIndex: 1,
-                    }}
-                />
+                <div id="trip-home-overlay" />
                 {/* Main Content */}
-                <div
-                    style={{
-                        position: "relative",
-                        zIndex: 3,
-                        display: "flex",
-                        flexDirection: "column",
-                        justifyContent: "space-between",
-                        alignItems: "center",
-                        minHeight: "100vh",
-                        padding: "50px 20px",
-                        textAlign: "center",
-                        color: "#fff",
-                    }}
-                >
-                    {/* Inner Header Section with Greeting */}
-                    <header style={{ marginTop: "60px" }}>
-                        <h1
-                            style={{
-                                fontSize: "3rem",
-                                fontWeight: "bold",
-                                margin: 0,
-                                letterSpacing: "2px",
-                            }}
-                        >
-                            PEARL PATH
-                        </h1>
-                        <p style={{ marginTop: "10px", fontSize: "1.2rem", opacity: 0.9 }}>
+                <div id="trip-home-content">
+                    {/* Header Section */}
+                    <header id="trip-home-header">
+                        <h1 id="trip-home-header-title">PEARL PATH</h1>
+                        <p id="trip-home-header-greeting">
                             Hi {userName || "Guest"}, Your Next Adventure Awaits!
                         </p>
                     </header>
 
                     {/* Slideshow Container */}
-                    <div
-                        style={{
-                            position: "relative",
-                            width: "80%",
-                            maxWidth: "1000px",
-                            height: "400px",
-                            margin: "40px 0",
-                            borderRadius: "10px",
-                            overflow: "hidden",
-                            boxShadow: "0 4px 12px rgba(0, 0, 0, 0.2)",
-                        }}
-                    >
+                    <div id="trip-home-slideshow">
                         {slides.map((slide, index) => (
                             <div
                                 key={index}
+                                className="trip-home-slide"
                                 style={{
-                                    position: "absolute",
-                                    top: 0,
-                                    left: 0,
-                                    width: "100%",
-                                    height: "100%",
                                     backgroundImage: `url("${slide.image}")`,
-                                    backgroundSize: "cover",
-                                    backgroundPosition: "center",
-                                    backgroundRepeat: "no-repeat",
                                     opacity: currentSlide === index ? 1 : 0,
-                                    transition: "opacity 0.8s ease-in-out",
                                 }}
                             >
-                                <div
-                                    style={{
-                                        position: "absolute",
-                                        bottom: "20px",
-                                        left: "20px",
-                                        right: "20px",
-                                        backgroundColor: "rgba(0, 0, 0, 0.5)",
-                                        padding: "20px",
-                                        borderRadius: "5px",
-                                    }}
-                                >
-                                    <h2
-                                        style={{
-                                            fontSize: "1.8rem",
-                                            fontWeight: "bold",
-                                            margin: 0,
-                                            color: "#fff",
-                                        }}
-                                    >
-                                        {slide.title}
-                                    </h2>
-                                    <p style={{ fontSize: "1rem", marginTop: "10px", color: "#fff" }}>
-                                        {slide.content}
-                                    </p>
+                                <div className="trip-home-slide-overlay">
+                                    <h2 className="trip-home-slide-title">{slide.title}</h2>
+                                    <p className="trip-home-slide-content">{slide.content}</p>
                                 </div>
                             </div>
                         ))}
                         {/* Left Chevron */}
-                        <div
-                            onClick={prevSlide}
-                            style={{
-                                position: "absolute",
-                                top: "50%",
-                                left: "10px",
-                                transform: "translateY(-50%)",
-                                cursor: "pointer",
-                                backgroundColor: "rgba(0,0,0,0.5)",
-                                padding: "10px",
-                                borderRadius: "50%",
-                                zIndex: 4,
-                            }}
-                        >
+                        <div id="trip-home-prev" onClick={prevSlide}>
                             <FaChevronLeft size={20} color="#fff" />
                         </div>
                         {/* Right Chevron */}
-                        <div
-                            onClick={nextSlide}
-                            style={{
-                                position: "absolute",
-                                top: "50%",
-                                right: "10px",
-                                transform: "translateY(-50%)",
-                                cursor: "pointer",
-                                backgroundColor: "rgba(0,0,0,0.5)",
-                                padding: "10px",
-                                borderRadius: "50%",
-                                zIndex: 4,
-                            }}
-                        >
+                        <div id="trip-home-next" onClick={nextSlide}>
                             <FaChevronRight size={20} color="#fff" />
                         </div>
                     </div>
 
                     {/* Dot Indicators */}
-                    <div
-                        style={{
-                            position: "absolute",
-                            bottom: "20px",
-                            width: "100%",
-                            textAlign: "center",
-                            zIndex: 4,
-                        }}
-                    >
+                    <div id="trip-home-dots-container">
                         {slides.map((_, index) => (
                             <span
                                 key={index}
+                                className={`trip-home-dot ${
+                                    currentSlide === index ? "active" : ""
+                                }`}
                                 onClick={() => goToSlide(index)}
-                                style={{
-                                    display: "inline-block",
-                                    width: "10px",
-                                    height: "10px",
-                                    margin: "0 5px",
-                                    borderRadius: "50%",
-                                    backgroundColor:
-                                        currentSlide === index ? "#fff" : "rgba(255, 255, 255, 0.5)",
-                                    cursor: "pointer",
-                                }}
                             />
                         ))}
                     </div>
 
-                    {/* Buttons near the bottom */}
-                    <div style={{ marginBottom: "60px" }}>
-                        <Link
-                            to="/itineraries"
-                            style={{
-                                display: "inline-block",
-                                marginRight: "20px",
-                                padding: "15px 30px",
-                                backgroundColor: "#128C7E",
-                                color: "#fff",
-                                borderRadius: "5px",
-                                textDecoration: "none",
-                                fontWeight: "bold",
-                                transition: "background-color 0.3s",
-                            }}
-                            onMouseOver={(e) =>
-                                (e.currentTarget.style.backgroundColor = "#25D366")
-                            }
-                            onMouseOut={(e) =>
-                                (e.currentTarget.style.backgroundColor = "#128C7E")
-                            }
-                        >
+                    {/* Bottom Buttons */}
+                    <div id="trip-home-buttons-container">
+                        <Link id="trip-home-plan-trip" to="/itineraries">
                             Plan New Trip
                         </Link>
-                        <Link
-                            to="/saved-itineraries"
-                            style={{
-                                display: "inline-block",
-                                padding: "15px 30px",
-                                backgroundColor: "#333",
-                                color: "#fff",
-                                borderRadius: "5px",
-                                textDecoration: "none",
-                                fontWeight: "bold",
-                                transition: "background-color 0.3s",
-                            }}
-                            onMouseOver={(e) =>
-                                (e.currentTarget.style.backgroundColor = "#555")
-                            }
-                            onMouseOut={(e) =>
-                                (e.currentTarget.style.backgroundColor = "#333")
-                            }
-                        >
+                        <Link id="trip-home-saved-itineraries" to="/saved-itineraries">
                             View Saved Itineraries
                         </Link>
                     </div>
                 </div>
             </div>
+            <Header />
             <Footer />
         </>
     );
