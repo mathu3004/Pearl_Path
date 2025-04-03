@@ -1,31 +1,52 @@
 // src/TravelItineraryGenerator.js
-import React, { useState } from 'react';
+import React, { useState, useContext, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Header from './components/Header';
 import Footer from './components/Footer';
 import Layout from './components/Layout';
-import { FaPlaneDeparture, FaWalking, FaCar, FaBiking, FaBusAlt, FaTrain, FaShuttleVan,} from 'react-icons/fa';
+import { FaPlaneDeparture, FaWalking, FaCar, FaBiking, FaBusAlt, FaTrain, FaShuttleVan } from 'react-icons/fa';
+import { AuthContext } from './context/auth.context';
+import './TravelItineraryRadius.css';
 
 const TravelItineraryGenerator = () => {
-    const [formData, setFormData] = useState({
-        username: JSON.parse(localStorage.getItem("user"))?.username || '',
-        itineraryName: '',
-        startingDestination: '',
-        destinations: [],
-        activities: [],
-        cuisines: [],
-        foodPreferences: '',
-        transportationMode: [],
-        maxDistance: '',
-        numberOfDays: '',
-        budgetRangePerDay: '',
-        peopleCount: '',
-    });
-
-    const [budgetError, setBudgetError] = useState('');
-    const [startingDestinationError, setStartingDestinationError] = useState('');
-    const navigate = useNavigate(); 
-    
+        const { fetchProfile } = useContext(AuthContext);
+        const navigate = useNavigate();
+      
+        const [formData, setFormData] = useState({
+          username: '',
+          itineraryName: '',
+          startingDestination: '',
+          destinations: [],
+          activities: [],
+          cuisines: [],
+          foodPreferences: '',
+          transportationMode: [],
+          maxDistance: '',
+          numberOfDays: '',
+          budgetRangePerDay: '',
+          peopleCount: '',
+        });
+      
+        const [budgetError, setBudgetError] = useState('');
+        const [startingDestinationError, setStartingDestinationError] = useState('');
+      
+        // Fetch the current user's username on mount using fetchProfile
+        useEffect(() => {
+          async function loadProfile() {
+            try {
+              const profile = await fetchProfile();
+              if (profile && profile.user) {
+                setFormData((prevData) => ({
+                  ...prevData,
+                  username: profile.user.username,
+                }));
+              }
+            } catch (error) {
+              console.error('Error fetching profile:', error);
+            }
+          }
+          loadProfile();
+        }, [fetchProfile]);
 
     const handleChange = (e) => {
         const { name, value, type, checked } = e.target;
@@ -62,7 +83,6 @@ const TravelItineraryGenerator = () => {
         }
 
     };
-    
     
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -106,10 +126,11 @@ const TravelItineraryGenerator = () => {
 
     return (
         <div className='main'>
-        <div className="page-container">
+        <div className="pagecontainer" id="travel-itinerary-generator">
             <Header />
             <div className="glass-card">
-                <h2 className="page-title">Heal to Nature : Craft your Dream</h2>
+            <h2 className="page-title">Heal to Nature</h2>
+            <h2 className="page-title">Craft your Dream</h2>
                 <form onSubmit={handleSubmit} className="form-grid">
 
                 <div className="col-span-2">
@@ -144,7 +165,7 @@ const TravelItineraryGenerator = () => {
                         <label className="form-label">Destinations:</label>
                         <div className="form-grid">
                             {['Ella', 'Kandy', 'Nuwara Eliya', 'Colombo'].map((destination) => (
-                                <label key={destination} className="flex items-center">
+                                <label key={destination} className="option-tile">
                                     <input
                                         type="checkbox"
                                         name="destinations"
@@ -214,7 +235,7 @@ const TravelItineraryGenerator = () => {
                         <label className="form-label">Activities:</label>
                         <div className="checkbox-grid">
                             {['Historical Sites', 'Nature Trails', 'Cultural', 'Adventurous', 'Shopping', 'Wildlife', 'Religious', 'Spa and Wellness'].map((activity) => (
-                                <label key={activity} className="flex items-center">
+                                <label key={activity} className="option-tile">
                                     <input
                                         type="checkbox"
                                         name="activities"
@@ -233,7 +254,7 @@ const TravelItineraryGenerator = () => {
                         <label className="form-label">Cuisines:</label>
                         <div className="checkbox-grid">
                             {['Italian', 'Chinese', 'Indian', 'Mexican', 'Sri-Lankan', 'Western', 'Thai'].map((cuisine) => (
-                                <label key={cuisine} className="flex items-center">
+                                <label key={cuisine} className="option-tile">
                                     <input
                                         type="checkbox"
                                         name="cuisines"
@@ -252,7 +273,7 @@ const TravelItineraryGenerator = () => {
                         <label className="form-label">People Count:</label>
                         <div className="radio-grid">
                             {['1', '2', '3-5', '6+'].map((count) => (
-                                <label key={count} className="flex items-center">
+                                <label key={count} className="option-tile">
                                     <input
                                         type="radio"
                                         name="peopleCount"
@@ -271,7 +292,7 @@ const TravelItineraryGenerator = () => {
                         <label className="form-label">Food Preference:</label>
                         <div className="radio-grid">
                             {['Veg', 'Non-Veg'].map((preference) => (
-                                <label key={preference} className="flex items-center p-2 bg-green-50 border-2 border-green-300 rounded-lg shadow-sm hover:bg-green-100 transition">
+                                <label key={preference} className="option-tile">
                                     <input
                                         type="radio"
                                         name="foodPreferences"
@@ -298,7 +319,7 @@ const TravelItineraryGenerator = () => {
                                 {mode: 'Tuk-Tuk', icon: <FaShuttleVan />},
 
                             ].map(({mode, icon}) => (
-                                <label key={mode} className="flex items-center p-2 bg-green-50 border-2 border-green-300 rounded-lg shadow-sm hover:bg-green-100 transition">
+                                <label key={mode} className="option-tile">
                                     <input
                                         type="checkbox"
                                         name="transportationMode"

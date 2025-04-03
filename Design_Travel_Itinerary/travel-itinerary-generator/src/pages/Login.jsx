@@ -1,14 +1,27 @@
 import React, { useState, useContext, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { AuthContext } from "../context/auth.context";
+import Header from "../components/Header";
+import Footer from "../components/Footer";
+import "../index.css"; // Import external CSS
+
+const fadeInKeyframes = `
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+`;
 
 const Login = () => {
     const { auth, login } = useContext(AuthContext);
     const navigate = useNavigate();
-    const [credentials, setCredentials] = useState({
-        username: "",
-        password: "",
-    });
+    const [credentials, setCredentials] = useState({ username: "", password: "" });
     const [error, setError] = useState("");
 
     useEffect(() => {
@@ -33,48 +46,54 @@ const Login = () => {
 
     return (
         <>
+            <Header />
+            {/* Inject fade-in keyframes */}
+            <style>{fadeInKeyframes}</style>
             <div id="login-container">
                 <div id="login-overlay"></div>
                 <div id="login-form-container">
-                    <h2 className="text-2xl font-bold mb-6 text-center">Login</h2>
-                    {error && <p className="text-red-500 text-center mb-4">{error}</p>}
-                    <form onSubmit={handleSubmit} className="space-y-4">
+                    <h2 id="login-title">Login</h2>
+                    {error && <p id="login-error">{error}</p>}
+                    <form id="login-form" onSubmit={handleSubmit}>
                         <div>
-                            <label className="block mb-1 font-semibold">Username</label>
+                            <label htmlFor="username-input">Username</label>
                             <input
+                                id="username-input"
                                 type="text"
                                 name="username"
                                 value={credentials.username}
                                 onChange={handleChange}
-                                className="form-input"
                                 required
                             />
                         </div>
                         <div>
-                            <label className="block mb-1 font-semibold">Password</label>
+                            <label htmlFor="password-input">Password</label>
                             <input
+                                id="password-input"
                                 type="password"
                                 name="password"
                                 value={credentials.password}
                                 onChange={handleChange}
-                                className="form-input"
                                 required
                             />
                         </div>
-                        <button type="submit" className="form-button">
+                        <button id="login-button" type="submit">
                             Login
                         </button>
                     </form>
-                    <div className="mt-4 flex flex-col items-center gap-2">
-                        <Link to="/register" className="text-blue-600 hover:underline">
-                            Don't have an account? Register
-                        </Link>
-                        <Link to="/reset-password" className="text-blue-600 hover:underline">
-                            Forgot Password?
-                        </Link>
+
+                    {/* Links in separate lines */}
+                    <div id="login-links">
+                        <p>
+                            Don’t have an account? <Link to="/register">Register</Link>
+                        </p>
+                        <p>
+                            <Link to="/reset-password">Forgot Password?</Link>
+                        </p>
                     </div>
                 </div>
             </div>
+            <Footer />
         </>
     );
 };

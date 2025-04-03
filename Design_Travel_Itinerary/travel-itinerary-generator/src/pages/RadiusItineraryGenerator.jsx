@@ -36,12 +36,12 @@ const RadiusItineraryGenerator = () => {
                     </p>
                     <div id="radius-itinerary-button-container">
                         <Link
-                            to="/RadiusTravelItineraryGenerator"
+                            to="/radius-mode"
                             id="radius-create-itinerary-link"
                         >
                             Create New Itinerary
                         </Link>
-                        <Link to="/modify-itinerary" id="radius-modify-itinerary-link">
+                        <Link to="/modify-request/:username" id="radius-modify-itinerary-link">
                             Modify Itinerary
                         </Link>
                     </div>

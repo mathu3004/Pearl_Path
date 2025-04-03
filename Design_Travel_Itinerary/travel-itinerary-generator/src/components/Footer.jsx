@@ -10,7 +10,6 @@ const Footer = () => (
           <a href="https://www.instagram.com/tripadvisor" target="_blank" rel="noopener noreferrer">Instagram</a>
           <a href="https://web.facebook.com/Tripadvisor" target="_blank" rel="noopener noreferrer">Facebook</a>
         </div>
-        <a href="/contact">Contact</a>
       </div>
     </div>
   </footer>

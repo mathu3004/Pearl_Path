@@ -18,10 +18,10 @@ const ItineraryGenerator = () => {
                         Select an option below to either create a new itinerary or modify an existing one.
                     </p>
                     <div id="itinerary-generator-button-container">
-                        <Link to="/TravelItineraryGenerator" id="create-itinerary-link">
+                        <Link to="/no-radius-mode" id="create-itinerary-link">
                             Create New Itinerary
                         </Link>
-                        <Link to="/modify-itinerary" id="modify-itinerary-link">
+                        <Link to="/modify-request/:username" id="modify-itinerary-link">
                             Modify Itinerary
                         </Link>
                     </div>

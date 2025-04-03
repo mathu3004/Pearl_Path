@@ -5,12 +5,6 @@
 @import "tailwindcss/preflight";
 @import "tailwindcss/utilities";
 
-/* Keyframes */
-@keyframes fadeIn {
-  0% {
-    opacity: 0;
-  }
-}
 
 /* Keyframes */
 @keyframes fadeIn {
@@ -196,7 +190,7 @@
 }
 
 /* Login Component */
-/* Keyframes for fadeIn animation */
+/* Keyframes for fade-in (keep only one definition) */
 @keyframes fadeIn {
   from {
     opacity: 0;
@@ -208,13 +202,13 @@
   }
 }
 
-/* Login Component Styles */
+/* Outer container */
 #login-container {
   min-height: 100vh;
   display: flex;
   align-items: center;
   justify-content: center;
-  background-image: url("/public/LoginOption6.jpg");  /* Ensure this image is in your public folder */
+  background-image: url("/public/LoginOption6.jpg"); /* Ensure image is in your public folder */
   background-size: cover;
   background-position: center;
   filter: brightness(0.9) contrast(1.1);
@@ -222,6 +216,7 @@
   position: relative;
 }
 
+/* Dark overlay */
 #login-overlay {
   position: absolute;
   top: 0;
@@ -232,6 +227,7 @@
   z-index: 1;
 }
 
+/* Form container */
 #login-form-container {
   position: relative;
   z-index: 2;
@@ -244,31 +240,92 @@
   0 2px 4px -1px rgba(0, 0, 0, 0.06);
 }
 
-
-/* Keyframes for fadeIn animation */
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(10px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+/* Title */
+#login-title {
+  text-align: center;
+  color: black;
+  font-size: 2rem; /* Adjust as needed */
+  font-weight: bold;
+  margin-bottom: 1.5rem;
 }
 
-/* ResetPassword Component Styles */
-#reset-password-container {
-  padding-top: 10%;
-  position: relative;
+/* Error message */
+#login-error {
+  text-align: center;
+  color: red;
+  margin-bottom: 1rem;
+}
+
+/* Form styling */
+#login-form div {
+  margin-bottom: 1rem;
+}
+
+#login-form label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-size: 22px;
+  font-weight: 600; /* Semi-bold */
+}
+
+#login-form input {
   width: 100%;
+  padding: 0.75rem;
+  border: 1px solid #ccc;
+  border-radius: 0.375rem;
+}
+
+/* Green Login Button */
+#login-button {
+  width: 100%;
+  padding: 0.75rem;
+  background-color: #128C7E; /* Tailwind "green-500" shade */
+  color: white;
+  border: none;
+  border-radius: 0.375rem;
+  cursor: pointer;
+  font-weight: 600;
+  transition: background-color 0.3s;
+  margin-top: 0.5rem;
+}
+
+#login-button:hover {
+  background-color: #25D366; /* A darker green on hover */
+}
+
+/* Links container */
+#login-links {
+  text-align: center;
+  margin-top: 1rem;
+}
+
+/* Separate lines for each link group */
+#login-links p {
+  margin: 0.5rem 0;
+}
+
+/* Link styling */
+#login-links a {
+  color: #2563eb; /* Example link color (blue-600) */
+  text-decoration: none;
+}
+
+#login-links a:hover {
+  text-decoration: underline;
+}
+/* ResetPassword Component Styles */
+
+#reset-password-container {
   min-height: 100vh;
-  background-image: url("/public/ResetPasswordBackground.jpg");
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-image: url("/public/LoginOption6.jpg");  /* Ensure this image is in your public folder */
   background-size: cover;
   background-position: center;
   filter: brightness(0.9) contrast(1.1);
-  font-family: 'Poppins', sans-serif;
   animation: fadeIn 1s ease forwards;
+  position: relative;
 }
 
 #reset-password-overlay {
@@ -284,49 +341,239 @@
 #reset-password-form-container {
   position: relative;
   z-index: 2;
-  margin: 0 auto;
-  /* Glass effect styling (if not overridden by Tailwind) */
-  background-color: rgba(255, 255, 255, 0.8);
   padding: 2rem;
+  width: 100%;
   max-width: 28rem;
+  background-color: rgba(255, 255, 255, 0.8);
   border-radius: 0.5rem;
   box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
   0 2px 4px -1px rgba(0, 0, 0, 0.06);
 }
 
-
-/* Profile Component */
-#profile-container {
-  min-height: 100vh;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background-color: #f3f4f6;
-  padding: 6rem 1rem 2rem;
+/* Additional element styles can be added as needed */
+#reset-password-title {
+  text-align: center;
+  font-size: 2rem;
+  color: black;
+  font-weight: bold;
+  margin-bottom: 1.5rem;
 }
 
-#profile-card {
+#reset-password-error,
+#reset-password-message {
+  text-align: center;
+  margin-bottom: 1rem;
+}
+
+#reset-password-form div {
+  margin-bottom: 1rem;
+}
+
+#reset-password-form label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: bold;
+  font-size: 20px;
+}
+
+#reset-password-form input {
   width: 100%;
-  max-width: 56rem;
-  background-color: white;
-  border-radius: 0.5rem;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1),
-  0 1px 2px rgba(0, 0, 0, 0.06);
-  padding: 1.5rem;
+  padding: 0.75rem;
+  border: 1px solid #ccc;
+  border-radius: 0.375rem;
 }
 
-/* TripHome Component */
-/* Keyframes for fadeIn animation */
+#reset-password-button {
+  width: 100%;
+  padding: 0.75rem;
+  background-color: #128C7E;  /* Set button green */
+  color: white;
+  border: none;
+  border-radius: 0.375rem;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+#reset-password-button:hover {
+  background-color: #25D366;
+}
+
+#reset-password-links {
+  text-align: center;
+  margin-top: 1rem;
+}
+
+#reset-password-links a {
+  display: block; /* Each link on its own line */
+  color: blue;
+  text-decoration: none;
+  margin-bottom: 0.5rem;
+}
+
+#reset-password-links a:hover {
+  text-decoration: underline;
+}
+
 @keyframes fadeIn {
   from {
     opacity: 0;
-    transform: translateY(20px);
+    transform: translateY(10px);
   }
   to {
     opacity: 1;
     transform: translateY(0);
   }
 }
+
+/* Profile Component */
+/* Profile Container */
+#profile-container {
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  background-color: #f3f4f6; /* Light gray background */
+  padding-top: 8rem;        /* Increased top padding for spacing */
+  padding-bottom: 2rem;
+  padding-left: 1rem;
+  padding-right: 1rem;
+  font-family: "Poppins", sans-serif; /* Ensure a consistent font */
+}
+
+/* Profile Card */
+#profile-card {
+  width: 100%;
+  max-width: 56rem; /* ~896px */
+  background-color: #fff;
+  border-radius: 0.5rem;  /* Slightly rounded corners */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Soft shadow */
+  padding: 2rem;       /* More padding for comfortable spacing */
+  margin: 0 auto;
+}
+
+/* Header Section (Title + Edit Button) */
+#profile-header {
+  display: flex;
+
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem; /* Some spacing below the header */
+}
+
+/* Title */
+#profile-title {
+  font-size: 3rem;
+  color: black;
+  font-weight: bold;
+  margin: 0; /* Remove default margins */
+}
+
+/* Edit Button */
+#profile-edit-button {
+  display: flex;
+  align-items: center;
+  background-color: #1d4ed8; /* A nice blue color */
+  color: #fff;
+  padding: 0.5rem 1rem;
+  border-radius: 0.375rem;
+  border: none;
+  cursor: pointer;
+  font-weight: 500;
+  transition: background-color 0.3s ease;
+}
+
+/* Pencil Icon Spacing */
+#profile-edit-icon {
+  margin-right: 0.5rem;
+}
+
+/* Edit Button Hover */
+#profile-edit-button:hover {
+  background-color: #2563eb; /* Slightly lighter/darker variant */
+}
+
+/* Message & Error Display */
+#profile-message,
+#profile-error {
+  text-align: center;
+  margin-bottom: 1rem;
+  font-weight: 500;
+  line-height: 1.4;
+  font-size: 30px;
+}
+
+#profile-message {
+  color: #10b981; /* Tailwind "emerald-500" green for success */
+}
+
+#profile-error {
+  color: #ef4444; /* Tailwind "red-500" for errors */
+}
+
+/* Profile Form */
+#profile-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem; /* Spacing between form sections */
+}
+
+/* User & Vendor Sections */
+#user-information,
+#vendor-information {
+  margin-bottom: 1rem;
+}
+
+#user-information h3,
+#vendor-information h3 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin-bottom: 1rem;
+}
+
+/* Spacing for sub-sections */
+#user-information > div,
+#vendor-information > div {
+  margin-bottom: 1rem;
+}
+
+/* Labels & Inputs */
+#user-information label,
+#vendor-information label {
+  display: block;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  font-size: 30px;
+}
+
+#user-information input,
+#vendor-information input,
+#vendor-information textarea {
+  width: 100%;
+  padding: 0.65rem;
+  border: 1px solid #ccc;
+  border-radius: 0.375rem;
+  font-size: 2rem;
+  font-family: inherit; /* Use the same font as the container */
+}
+
+/* Update Button */
+#profile-update-button {
+  background-color: #059669; /* A green color */
+  color: #fff;
+  padding: 0.75rem 1.25rem;
+  border: none;
+  border-radius: 0.375rem;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  margin-top: 1rem; /* Add space above the button if needed */
+}
+
+/* Update Button Hover */
+#profile-update-button:hover {
+  background-color: #047857; /* Darker green on hover */
+}
+
 
 /* Outer container */
 #trip-home-container {
@@ -380,7 +627,7 @@
 
 #trip-home-header-greeting {
   margin-top: 10px;
-  font-size: 1.2rem;
+  font-size: 1.5rem;
   opacity: 0.9;
 }
 
@@ -670,12 +917,6 @@
   margin: 0 auto;
 }
 
-@media (min-width: 768px) {
-  #app-footer .footer-container {
-    flex-direction: row;
-  }
-}
-
 #app-footer .footer-left {
   font-size: 0.875rem;
   margin-left: 2rem;
@@ -796,67 +1037,8 @@
 #modify-itinerary-link:hover {
   background-color: #555;
 }
-
-/* Keyframes for fadeIn animation */
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(10px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
 /* ResetPassword Component Styles */
-#reset-password-container {
-  padding-top: 10%;
-  position: relative;
-  width: 100%;
-  min-height: 100vh;
-  background-image: url("/public/LoginOption6.jpg");
-  background-size: cover;
-  background-position: center;
-  filter: brightness(0.9) contrast(1.1);
-  font-family: 'Poppins', sans-serif;
-  animation: fadeIn 1s ease forwards;
-}
 
-#reset-password-overlay {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(0, 0, 0, 0.2);
-  z-index: 1;
-}
-
-#reset-password-form-container {
-  position: relative;
-  z-index: 2;
-  margin: 0 auto;
-  /* Glass effect styling (if not overridden by Tailwind) */
-  background-color: rgba(255, 255, 255, 0.8);
-  padding: 2rem;
-  max-width: 28rem;
-  border-radius: 0.5rem;
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
-  0 2px 4px -1px rgba(0, 0, 0, 0.06);
-}
-
-/* Custom Keyframes */
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
 
 /* Radius Itinerary Generator Component Styles */
 #radius-itinerary-container {
@@ -943,24 +1125,16 @@
   background-color: #555;
 }
 
-/* Keyframes for fadeIn animation */
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(10px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
 
 /* Outer container for Register page */
+
 #register-container {
   position: relative;
   width: 100%;
-  min-height: 100vh;
+  /* min-height: 100vh;  <-- Remove or comment out */
   animation: fadeIn 1s ease forwards;
+  font-family: 'Poppins', sans-serif;
+  background: transparent; /* Ensure no gray background color */
 }
 
 /* Dark overlay behind the form */
@@ -970,27 +1144,100 @@
   left: 0;
   width: 100%;
   height: 100%;
-  background-color: rgba(0, 0, 0, 0.3);
+  background-color: rgba(0, 0, 0, 0.4);
   z-index: 1;
 }
 
 /* Background image container for the registration form */
 #register-bg-container {
   background-image: url("/public/CreateAccount1.jpg");
+  background-size: cover;
+  background-position: center;
   position: relative;
   z-index: 2;
+  padding-top: 80px;  /* Increased top padding for breathing room */
+  padding-bottom: 20px;
 }
 
-/* Fade-in Keyframes */
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(10px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+/* Form container (inner) */
+#register-form-content {
+  margin: 0 auto;
+  max-width: 48rem;
+  background-color: rgba(255, 255, 255, 0.7);
+  border-radius: 0.5rem;
+  padding: 2rem;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
+  0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+/* Title */
+#register-title {
+  text-align: center;
+  font-size: 2.5rem;
+  font-weight: bold;
+  color: black;
+  margin-bottom: 1.5rem;
+}
+
+/* Error & Message */
+#register-error {
+  text-align: center;
+  color: red;
+  margin-bottom: 1rem;
+}
+#register-message {
+  text-align: center;
+  color: green;
+  margin-bottom: 1rem;
+}
+
+/* Form styling */
+#register-form div {
+  margin-bottom: 1rem;
+}
+#register-form label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: bold;
+  font-size: 20px;
+}
+#register-form input,
+#register-form select,
+#register-form textarea {
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid black;
+  border-radius: 0.375rem;
+}
+
+/* Register button styling */
+#register-button {
+  width: 100%;
+  padding: 0.75rem;
+  background-color: #128C7E; /* Make the button green */
+  color: white;
+  border: none;
+  border-radius: 0.375rem;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+#register-button:hover {
+  background-color: #25D366;
+}
+
+/* Link styling container */
+#register-links {
+  margin-top: 1rem;
+  text-align: center;
+}
+#register-links a {
+  display: block; /* Each link on its own line */
+  color: blue;
+  text-decoration: none;
+  margin-bottom: 0.5rem;
+}
+#register-links a:hover {
+  text-decoration: underline;
 }
 
 /* Landing Page Container */

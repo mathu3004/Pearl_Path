@@ -3,6 +3,7 @@ import { AuthContext } from "../context/auth.context.jsx";
 import { FaPencilAlt } from "react-icons/fa";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
+import "../index.css"; // Import the external CSS file
 
 const Profile = () => {
   const { auth, fetchProfile } = useContext(AuthContext);
@@ -56,15 +57,15 @@ const Profile = () => {
     e.preventDefault();
     try {
       const response = await fetch(
-        `http://localhost:5002/api/profile/${auth.user.id}`,
-        {
-          method: "PATCH",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${auth.token}`,
-          },
-          body: JSON.stringify({ user: userData, vendor: vendorData }),
-        }
+          `http://localhost:5001/api/profile/${auth.user.id}`,
+          {
+            method: "PATCH",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${auth.token}`,
+            },
+            body: JSON.stringify({ user: userData, vendor: vendorData }),
+          }
       );
       const data = await response.json();
       if (response.ok) {
@@ -83,236 +84,203 @@ const Profile = () => {
 
   if (!auth.token) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <p>Please log in to view your profile.</p>
-      </div>
+        <div id="profile-container">
+          <p>Please log in to view your profile.</p>
+        </div>
     );
   }
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <p>Loading profile...</p>
-      </div>
+        <div id="profile-container">
+          <p>Loading profile...</p>
+        </div>
     );
   }
 
   if (!userData) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <p>{error || "No profile data available."}</p>
-      </div>
+        <div id="profile-container">
+          <p>{error || "No profile data available."}</p>
+        </div>
     );
   }
 
   const isVendor = userData.role === "vendor";
 
   return (
-    <>
-      <Header />
-      <div className="min-h-screen flex items-center justify-center bg-gray-100 pt-24 p-4">
-        <div className="w-full max-w-3xl bg-white rounded-lg shadow p-6">
-          <div className="flex justify-between items-center mb-6">
-            <h2 className="text-3xl font-bold">Profile</h2>
-            <button
-              type="button"
-              onClick={toggleEdit}
-              className="flex items-center text-blue-600 hover:text-blue-800"
-            >
-              <FaPencilAlt className="mr-2" />
-              {editing ? "Cancel" : "Edit"}
-            </button>
-          </div>
-          {message && (
-            <p className="text-green-600 text-center mb-4">{message}</p>
-          )}
-          {error && <p className="text-red-500 text-center mb-4">{error}</p>}
-          <form onSubmit={handleSubmit} className="space-y-6">
-            <div>
-              <h3 className="text-xl font-semibold mb-2">User Information</h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <label className="block font-semibold mb-1">
-                    Username:
-                  </label>
-                  {editing ? (
-                    <input
-                      type="text"
-                      name="username"
-                      value={userData.username || ""}
-                      onChange={handleChangeUser}
-                      className="w-full p-2 border rounded"
-                    />
-                  ) : (
-                    <p>{userData.username}</p>
-                  )}
-                </div>
-                <div>
-                  <label className="block font-semibold mb-1">
-                    Email:
-                  </label>
-                  {editing ? (
-                    <input
-                      type="email"
-                      name="email"
-                      value={userData.email || ""}
-                      onChange={handleChangeUser}
-                      className="w-full p-2 border rounded"
-                    />
-                  ) : (
-                    <p>{userData.email || "Not provided"}</p>
-                  )}
-                </div>
-                <div>
-                  <label className="block font-semibold mb-1">
-                    First Name:
-                  </label>
-                  {editing ? (
-                    <input
-                      type="text"
-                      name="firstName"
-                      value={userData.firstName || ""}
-                      onChange={handleChangeUser}
-                      className="w-full p-2 border rounded"
-                    />
-                  ) : (
-                    <p>{userData.firstName || "Not provided"}</p>
-                  )}
-                </div>
-                <div>
-                  <label className="block font-semibold mb-1">
-                    Last Name:
-                  </label>
-                  {editing ? (
-                    <input
-                      type="text"
-                      name="lastName"
-                      value={userData.lastName || ""}
-                      onChange={handleChangeUser}
-                      className="w-full p-2 border rounded"
-                    />
-                  ) : (
-                    <p>{userData.lastName || "Not provided"}</p>
-                  )}
-                </div>
-              </div>
-            </div>
-            {isVendor && (
-              <div>
-                <h3 className="text-xl font-semibold mb-2">Vendor Information</h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <label className="block font-semibold mb-1">
-                      Property Name:
-                    </label>
-                    {editing ? (
-                      <input
-                        type="text"
-                        name="propertyName"
-                        value={vendorData.propertyName || ""}
-                        onChange={handleChangeVendor}
-                        className="w-full p-2 border rounded"
-                      />
-                    ) : (
-                      <p>{vendorData.propertyName || "Not provided"}</p>
-                    )}
-                  </div>
-                  <div>
-                    <label className="block font-semibold mb-1">
-                      Property Type:
-                    </label>
-                    {editing ? (
-                      <input
-                        type="text"
-                        name="propertyType"
-                        value={vendorData.propertyType || ""}
-                        onChange={handleChangeVendor}
-                        className="w-full p-2 border rounded"
-                      />
-                    ) : (
-                      <p>{vendorData.propertyType || "Not provided"}</p>
-                    )}
-                  </div>
-                  <div>
-                    <label className="block font-semibold mb-1">
-                      Property City:
-                    </label>
-                    {editing ? (
-                      <input
-                        type="text"
-                        name="propertyCity"
-                        value={vendorData.propertyCity || ""}
-                        onChange={handleChangeVendor}
-                        className="w-full p-2 border rounded"
-                      />
-                    ) : (
-                      <p>{vendorData.propertyCity || "Not provided"}</p>
-                    )}
-                  </div>
-                  <div>
-                    <label className="block font-semibold mb-1">
-                      Property Address:
-                    </label>
-                    {editing ? (
-                      <input
-                        type="text"
-                        name="propertyAddress"
-                        value={vendorData.propertyAddress || ""}
-                        onChange={handleChangeVendor}
-                        className="w-full p-2 border rounded"
-                      />
-                    ) : (
-                      <p>{vendorData.propertyAddress || "Not provided"}</p>
-                    )}
-                  </div>
-                  <div>
-                    <label className="block font-semibold mb-1">
-                      Phone Number:
-                    </label>
-                    {editing ? (
-                      <input
-                        type="text"
-                        name="phoneNumber"
-                        value={vendorData.phoneNumber || ""}
-                        onChange={handleChangeVendor}
-                        className="w-full p-2 border rounded"
-                      />
-                    ) : (
-                      <p>{vendorData.phoneNumber || "Not provided"}</p>
-                    )}
-                  </div>
-                  <div className="md:col-span-2">
-                    <label className="block font-semibold mb-1">
-                      Property Description:
-                    </label>
-                    {editing ? (
-                      <textarea
-                        name="propertyDescription"
-                        value={vendorData.propertyDescription || ""}
-                        onChange={handleChangeVendor}
-                        className="w-full p-2 border rounded"
-                        rows="3"
-                      />
-                    ) : (
-                      <p>{vendorData.propertyDescription || "Not provided"}</p>
-                    )}
-                  </div>
-                </div>
-              </div>
-            )}
-            {editing && (
-              <button
-                type="submit"
-                className="bg-blue-600 text-white px-6 py-3 rounded hover:bg-blue-700 transition"
-              >
-                Update Profile
+      <>
+        <Header />
+        <div id="profile-container">
+          <div id="profile-card">
+            <div id="profile-header">
+              <h2 id="profile-title">Profile</h2>
+              <button id="profile-edit-button" type="button" onClick={toggleEdit}>
+                <FaPencilAlt id="profile-edit-icon" />
+                {editing ? "Cancel" : "Edit"}
               </button>
-            )}
-          </form>
+            </div>
+            {message && <p id="profile-message">{message}</p>}
+            {error && <p id="profile-error">{error}</p>}
+            <form id="profile-form" onSubmit={handleSubmit}>
+              <div id="user-information">
+                <h3>User Information</h3>
+                <div>
+                  <label htmlFor="profile-username">Username:</label>
+                  {editing ? (
+                      <input
+                          id="profile-username"
+                          type="text"
+                          name="username"
+                          value={userData.username || ""}
+                          onChange={handleChangeUser}
+                      />
+                  ) : (
+                      <p>{userData.username}</p>
+                  )}
+                </div>
+                <div>
+                  <label htmlFor="profile-email">Email:</label>
+                  {editing ? (
+                      <input
+                          id="profile-email"
+                          type="email"
+                          name="email"
+                          value={userData.email || ""}
+                          onChange={handleChangeUser}
+                      />
+                  ) : (
+                      <p>{userData.email || "Not provided"}</p>
+                  )}
+                </div>
+                <div>
+                  <label htmlFor="profile-firstName">First Name:</label>
+                  {editing ? (
+                      <input
+                          id="profile-firstName"
+                          type="text"
+                          name="firstName"
+                          value={userData.firstName || ""}
+                          onChange={handleChangeUser}
+                      />
+                  ) : (
+                      <p>{userData.firstName || "Not provided"}</p>
+                  )}
+                </div>
+                <div>
+                  <label htmlFor="profile-lastName">Last Name:</label>
+                  {editing ? (
+                      <input
+                          id="profile-lastName"
+                          type="text"
+                          name="lastName"
+                          value={userData.lastName || ""}
+                          onChange={handleChangeUser}
+                      />
+                  ) : (
+                      <p>{userData.lastName || "Not provided"}</p>
+                  )}
+                </div>
+              </div>
+              {isVendor && (
+                  <div id="vendor-information">
+                    <h3>Vendor Information</h3>
+                    <div>
+                      <label htmlFor="vendor-propertyName">Property Name:</label>
+                      {editing ? (
+                          <input
+                              id="vendor-propertyName"
+                              type="text"
+                              name="propertyName"
+                              value={vendorData.propertyName || ""}
+                              onChange={handleChangeVendor}
+                          />
+                      ) : (
+                          <p>{vendorData.propertyName || "Not provided"}</p>
+                      )}
+                    </div>
+                    <div>
+                      <label htmlFor="vendor-propertyType">Property Type:</label>
+                      {editing ? (
+                          <input
+                              id="vendor-propertyType"
+                              type="text"
+                              name="propertyType"
+                              value={vendorData.propertyType || ""}
+                              onChange={handleChangeVendor}
+                          />
+                      ) : (
+                          <p>{vendorData.propertyType || "Not provided"}</p>
+                      )}
+                    </div>
+                    <div>
+                      <label htmlFor="vendor-propertyCity">Property City:</label>
+                      {editing ? (
+                          <input
+                              id="vendor-propertyCity"
+                              type="text"
+                              name="propertyCity"
+                              value={vendorData.propertyCity || ""}
+                              onChange={handleChangeVendor}
+                          />
+                      ) : (
+                          <p>{vendorData.propertyCity || "Not provided"}</p>
+                      )}
+                    </div>
+                    <div>
+                      <label htmlFor="vendor-propertyAddress">Property Address:</label>
+                      {editing ? (
+                          <input
+                              id="vendor-propertyAddress"
+                              type="text"
+                              name="propertyAddress"
+                              value={vendorData.propertyAddress || ""}
+                              onChange={handleChangeVendor}
+                          />
+                      ) : (
+                          <p>{vendorData.propertyAddress || "Not provided"}</p>
+                      )}
+                    </div>
+                    <div>
+                      <label htmlFor="vendor-phoneNumber">Phone Number:</label>
+                      {editing ? (
+                          <input
+                              id="vendor-phoneNumber"
+                              type="text"
+                              name="phoneNumber"
+                              value={vendorData.phoneNumber || ""}
+                              onChange={handleChangeVendor}
+                          />
+                      ) : (
+                          <p>{vendorData.phoneNumber || "Not provided"}</p>
+                      )}
+                    </div>
+                    <div>
+                      <label htmlFor="vendor-propertyDescription">Property Description:</label>
+                      {editing ? (
+                          <textarea
+                              id="vendor-propertyDescription"
+                              name="propertyDescription"
+                              value={vendorData.propertyDescription || ""}
+                              onChange={handleChangeVendor}
+                              rows="3"
+                          />
+                      ) : (
+                          <p>{vendorData.propertyDescription || "Not provided"}</p>
+                      )}
+                    </div>
+                  </div>
+              )}
+              {editing && (
+                  <button id="profile-update-button" type="submit">
+                    Update Profile
+                  </button>
+              )}
+            </form>
+          </div>
         </div>
-      </div>
-      <Footer />
-    </>
+        <Footer />
+      </>
   );
 };
 
