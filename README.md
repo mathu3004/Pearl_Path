@@ -17,4 +17,9 @@ Pearl Path Chatbot is a web application that provides a chatbot interface for us
 - **Model**: Google's Gemini LLM (LangChain)
 - **Web Search**: Serper API
 
-
+## How It Works
+-**Emergency Assistance**: The chatbot identifies emergency-related queries and provides relevant information using web search results.
+-**Information Hub**: The chatbot fetches detailed information about attractions using web search results.
+-**User-Provider Connection**: The chatbot retrieves specific details about hotels and restaurants from MongoDB and provides structured responses.
+-**Recommendations**: The chatbot suggests hotels, restaurants, and attractions based on user preferences using web search results.
+-**Chatbot Information**: The chatbot provides information about itself and the trip itinerary application.
