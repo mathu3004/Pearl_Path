@@ -3,6 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
 import { AuthContext } from "../context/auth.context";
 import Header from "../components/Header";
+import Layout from '../components/Layout';
 import Footer from "../components/Footer";
 import "../index.css"; // Import the external CSS file
 
@@ -160,6 +161,7 @@ const TripHome = () => {
             </div>
             <Header />
             <Footer />
+             <Layout />
         </>
     );
 };

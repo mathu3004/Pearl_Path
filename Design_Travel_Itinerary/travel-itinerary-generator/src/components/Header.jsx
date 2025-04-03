@@ -17,7 +17,7 @@ const Header = () => {
   // Logout handler: call logout and then redirect to login page
   const handleLogout = () => {
     logout();
-    navigate('/login');
+    navigate('/');
   };
 
   // Retrieve current user's profile to extract the username
@@ -51,7 +51,7 @@ const Header = () => {
 
         {!auth.token ? (
           <>
-            <li><Link to="/login">Login</Link></li>
+            <li><Link to="/">Login</Link></li>
             <li><Link to="/register">Sign Up</Link></li>
           </>
         ) : (

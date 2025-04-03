@@ -59,7 +59,7 @@ const RadiusModify = () => {
     const dayData = updated.itinerary[dayKey];
     const altData = updatedAlts[dayKey];
   
-    // 🏨 Swap Hotels
+    //  Swap Hotels
     if (type === 'Hotel') {
       const currentHotel = dayData.Hotel;
   
@@ -75,7 +75,7 @@ const RadiusModify = () => {
       altData.Hotels = [dayData.Hotel, ...(dayData['Alternative Hotels'] || [])];
     }
   
-    // 🍽 Swap Restaurants
+    // Swap Restaurants
     else if (type === 'Restaurants') {
       const currentRest = dayData.Restaurants[indexOrKey];
       dayData.Restaurants[indexOrKey] = newItem;
@@ -93,7 +93,7 @@ const RadiusModify = () => {
       altData.Restaurants[indexOrKey] = altList;
     }
   
-    // 🗺 Swap Attractions
+    // Swap Attractions
     else if (type === 'Attractions') {
       const currentAtt = dayData.Attractions[indexOrKey];
       dayData.Attractions[indexOrKey] = newItem;
@@ -149,10 +149,10 @@ const RadiusModify = () => {
       <Header />
       <div className="editpage-wrapper">
         <div className="editleft-scrollable">
-          <h2>Modify {username.toUpperCase()}'s {name.toUpperCase()} Itinerary</h2>
+          <h2 className='TitleModify'>Modify {username.toUpperCase()}'s {name.toUpperCase()} Itinerary</h2>
           {Object.entries(itinerary.itinerary).map(([dayKey, day]) => (
             <div key={dayKey} className="editday">
-              <h3>{dayKey}</h3>
+              <h3 className='SubTitleModify'>{dayKey}</h3>
 
               {/* Hotel */}
               <div>
@@ -205,7 +205,6 @@ const RadiusModify = () => {
     </div>
   </div>
 ))}
-
               </div>
             </div>
           ))}

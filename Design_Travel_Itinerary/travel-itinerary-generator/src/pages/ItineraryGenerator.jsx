@@ -1,6 +1,7 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import Header from "../components/Header";
+import Layout from '../components/Layout';
 import Footer from "../components/Footer";
 import "../index.css";
 
@@ -21,12 +22,13 @@ const ItineraryGenerator = () => {
                         <Link to="/no-radius-mode" id="create-itinerary-link">
                             Create New Itinerary
                         </Link>
-                        <Link to="/modify-request/:username" id="modify-itinerary-link">
+                        <Link to="/normal-modify-request/:username" id="modify-itinerary-link">
                             Modify Itinerary
                         </Link>
                     </div>
                 </div>
             </div>
+                    <Layout />
             <Footer />
         </>
     );

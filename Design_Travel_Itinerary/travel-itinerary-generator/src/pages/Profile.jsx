@@ -2,6 +2,7 @@ import React, { useContext, useEffect, useState } from "react";
 import { AuthContext } from "../context/auth.context.jsx";
 import { FaPencilAlt } from "react-icons/fa";
 import Header from "../components/Header";
+import Layout from '../components/Layout';
 import Footer from "../components/Footer";
 import "../index.css"; // Import the external CSS file
 
@@ -57,7 +58,7 @@ const Profile = () => {
     e.preventDefault();
     try {
       const response = await fetch(
-          `http://localhost:5001/api/profile/${auth.user.id}`,
+          `http://localhost:5002/api/profile/${auth.user.id}`,
           {
             method: "PATCH",
             headers: {
@@ -279,6 +280,7 @@ const Profile = () => {
             </form>
           </div>
         </div>
+        <Layout />
         <Footer />
       </>
   );

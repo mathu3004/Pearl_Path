@@ -2,6 +2,7 @@ import React from "react";
 import { Link } from "react-router-dom";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
+import Layout from '../components/Layout';
 import "../index.css"; // Make sure index.css is in your src folder or adjust the path accordingly
 
 const fadeInKeyframes = `
@@ -47,6 +48,7 @@ const RadiusItineraryGenerator = () => {
                     </div>
                 </div>
             </div>
+            <Layout />
             <Footer />
         </>
     );

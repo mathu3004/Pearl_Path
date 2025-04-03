@@ -1,6 +1,7 @@
 // src/pages/OnlyItinerary.jsx
 import React from "react";
 import { Link } from "react-router-dom";
+import Layout from '../components/Layout';
 
 const fadeInKeyframes = `
 @keyframes fadeIn {
@@ -102,6 +103,7 @@ const OnlyItinerary = () => {
                     </Link>
                 </div>
             </div>
+            <Layout />
         </>
     );
 };

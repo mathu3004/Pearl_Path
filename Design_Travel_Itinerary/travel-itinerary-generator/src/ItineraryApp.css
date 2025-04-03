@@ -14,7 +14,6 @@ html, body, #root {
     min-height: 100vh;
   }
   
-  
   /* Main Layout */
   .main-layout {
     display: flex;
@@ -195,7 +194,6 @@ html, body, #root {
     display: flex;
     flex-direction: column;
     min-height: 100vh;
-    padding-top: 70px;
     background-image: url('https://i0.wp.com/www.tourbooking.lk/wp-content/uploads/2023/03/merlin_148552275_74c0d250-949c-46e0-b8a1-e6d499e992cf-superJumbo-edited.jpg?fit=2048%2C1151&ssl=1'); /* Change path to your image */
     background-size: cover;
     background-position: center;
@@ -257,7 +255,7 @@ html, body, #root {
   top: 100%;
   right: 0;
   min-width: 150px;
-  background-color: #3e3e3e; /* dark background */
+  background-color: #808080; /* dark background */
   color: #ffffff;
   padding: 0.75rem;
   margin-top: 0.5rem;
@@ -281,6 +279,7 @@ html, body, #root {
   width: 50px;       /* w-8 */
   border-radius: 50%; /* rounded-full */
   cursor: pointer;   /* cursor-pointer */
+  opacity: 50%;
 }
 
 /* Bold name only, if you want the user name bold */
@@ -501,6 +500,14 @@ html, body, #root {
     text-align: center;
   }
   
+  .itinerary_subtitle {
+      font-size: 1.8rem;
+      font-weight: bold;
+      color: #064e3b;
+      margin-top: 20px;
+      text-transform: capitalize;
+  
+  }
   
   .map-container {
     width: 50%;
@@ -574,7 +581,7 @@ html, body, #root {
   user-select: none;
   z-index: 1000;
   margin-left: 70px;
-  margin-top: 660px;
+  margin-top: 600px;
 }
 
 /* Chat Box */
@@ -591,7 +598,7 @@ html, body, #root {
   display: flex;
   flex-direction: column;
   margin-left: 100px;
-  margin-top: 640px;
+  margin-top: 580px;
 }
 
 .header-left {

@@ -55,7 +55,7 @@ const TravelItinerary = () => {
     } catch (error) {
       console.error("Failed to export PDF:", error);
     } finally {
-      hiddenElements.forEach((el) => (el.style.display = "")); //  show buttons again
+      hiddenElements.forEach((el) => (el.style.display = "")); 
     }
   };
 
@@ -173,16 +173,15 @@ if (!itineraries || !itineraries.itinerary) {
 return (
   <div className='main'>
     <div>
-      <Header />  
-      <div
-  className="pagecontainers"
-  ref={itineraryRef} style={{
-    backgroundImage: 'url("https://i0.wp.com/www.tourbooking.lk/wp-content/uploads/2023/03/merlin_148552275_74c0d250-949c-46e0-b8a1-e6d499e992cf-superJumbo-edited.jpg?fit=2048%2C1151&ssl=1")',
-    backgroundPosition: 'center',
-    backgroundAttachment: 'fixed',
-    minHeight: '200vh'
-  }}
->
+       
+      <div className="pagecontainers"
+        ref={itineraryRef} style={{
+          backgroundImage: 'url("https://i0.wp.com/www.tourbooking.lk/wp-content/uploads/2023/03/merlin_148552275_74c0d250-949c-46e0-b8a1-e6d499e992cf-superJumbo-edited.jpg?fit=2048%2C1151&ssl=1")',
+          backgroundPosition: 'center',
+          backgroundAttachment: 'fixed',
+          minHeight: '200vh'
+        }}>
+          <Header /> 
         <div className="mainlayout">
           <div className="itinerarycard">
           <h2 className="itinerarytitle">Itineraries for {username}</h2>
@@ -278,19 +277,12 @@ return (
         </div>
       </div>
       <div className="buttoncontainer hide-on-export">
-      <button className="button" onClick={() => navigate(`/modify-radius/${lowerUsername}/${lowerName}`)}>Edit</button>
-  <button className="button" onClick={handleSaveItinerary}>Save Itinerary</button>
-  <button className="button" onClick={handleExportPDF}>Export</button>
-  <button className="button" onClick={() => navigate(`/modify-request/${lowerUsername}`)}>
-  Request Modify
-</button>
-
-</div>
-
-      <Layout>
-    </Layout>
-    <p className="thankyou-message">Thank You! Enjoy Your Trip! <FaTrain /> </p>
-
+        <button className="button" onClick={() => navigate(`/modify-radius/${lowerUsername}/${lowerName}`)}>Edit</button>
+        <button className="button" onClick={handleSaveItinerary}>Save Itinerary</button>
+        <button className="button" onClick={handleExportPDF}>Export</button>
+      </div>
+      <Layout></Layout>
+    <p className="thankyou-message"><FaTrain /> Thank You! Enjoy Your Trip!</p>
     </div> <Footer />
         </div>  
         </div>

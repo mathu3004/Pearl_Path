@@ -76,44 +76,6 @@ const runPythonScript = (scriptPath, args, callback) => {
     });
     };
 
-    // **User Signup**
-    app.post("/signup", async (req, res) => {
-      try {
-        const { username, email, password } = req.body;
-    
-        const existingUser = await User.findOne({ $or: [{ email }, { username }] });
-        if (existingUser) {
-          return res.status(400).json({ message: "User already exists" });
-        }
-    
-        const newUser = new User({ username, email, password });
-        await newUser.save();
-    
-        res.status(201).json({ message: "User registered successfully" });
-      } catch (error) {
-        console.error("Signup error:", error);
-        res.status(500).json({ message: "Server error" });
-      }
-    });    
-    
-// **User Signin**
-app.post("/signin", async (req, res) => {
-  try {
-    const { username, password } = req.body;
-
-    const user = await User.findOne({ username });
-
-    if (!user || user.password !== password) {
-      return res.status(400).json({ message: "Invalid credentials" });
-    }
-
-    res.json({ message: "Login successful", userId: user._id, username: user.username });
-  } catch (error) {
-    console.error("Signin error:", error);
-    res.status(500).json({ message: "Server error" });
-  }
-});
-
 // API Endpoint to Save Itinerary Data
 app.post('/api/itinerary', async (req, res) => {
     try {
@@ -185,7 +147,7 @@ runPythonScript("RadiusBasedGenerator.py", [username, name], (error) => {
 app.get('/api/itineraries/:username/:name', async (req, res) => {
     try {
         const { username, name } = req.params;
-        console.log("🔍 Searching for itinerary:", { username, name });
+        console.log("Searching for itinerary:", { username, name });
 
         const itinerary = await mongoose.connection.db
             .collection("generated_itineraries")
@@ -208,33 +170,55 @@ app.get('/api/itineraries/:username/:name', async (req, res) => {
 });
 
 app.post('/api/save-itinerary', async (req, res) => {
-    try {
-      const { username, name } = req.body;
-      if (!username || !name) {
-        return res.status(400).json({ error: 'Missing username or itinerary name' });
-      }
-  
-      const db = mongoose.connection.db;
-      const sourceItinerary = await db.collection("generated_itineraries").findOne({
-        username: username.toLowerCase(),
-        name: name.toLowerCase()
-      });
-  
-      if (!sourceItinerary) {
-        return res.status(404).json({ error: 'Itinerary not found' });
-      }
-  
-      await db.collection("saved_itineraries").insertOne({
-        ...sourceItinerary,
-        saved_at: new Date()
-      });
-  
-      return res.status(201).json({ message: "Itinerary saved successfully!" });
-    } catch (error) {
-      console.error("Save itinerary failed:", error);
-      res.status(500).json({ error: "Failed to save itinerary", details: error.message });
+  try {
+    console.log("Incoming save request:", req.body);
+    const { username, name } = req.body;
+    if (!username || !name) {
+      return res.status(400).json({ error: 'Missing username or itinerary name' });
     }
-  });  
+
+    const db = mongoose.connection.db;
+
+    const sourceItinerary = await db.collection("generated_itineraries").findOne({
+      username: username.toLowerCase(),
+      name: name.toLowerCase()
+    });
+
+    if (!sourceItinerary) {
+      console.error("No itinerary found for", username, name);
+      return res.status(404).json({ error: 'Itinerary not found' });
+    }
+
+    console.log("Found source itinerary:", sourceItinerary);
+
+    // Prevent _id duplication
+    delete sourceItinerary._id;
+    console.log("Source itinerary after removing _id:", sourceItinerary);
+
+    try {
+      await db.collection("saved_itineraries").updateOne(
+        { username: username.toLowerCase(), name: name.toLowerCase() },
+        {
+          $set: {
+            ...sourceItinerary,
+            saved_at: new Date()
+          }
+        },
+        { upsert: true }
+      );
+      console.log("Itinerary successfully saved/updated.");
+      return res.status(201).json({ message: "Itinerary saved or updated successfully!" });
+    } catch (updateError) {
+      console.error("Update operation failed:", updateError);
+      return res.status(500).json({ error: "Update operation failed", details: updateError.message });
+    }
+
+  } catch (error) {
+    console.error("Save itinerary failed:", error);
+    res.status(500).json({ error: "Failed to save itinerary", details: error.message });
+  }
+});
+
 
   app.post('/api/save-edited-itinerary', async (req, res) => {
     try {

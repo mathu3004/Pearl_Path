@@ -3,7 +3,6 @@ import React, { useContext, useEffect } from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { AuthProvider, AuthContext } from "./context/auth.context";
 
-// Pages from your friend
 import LandingPage from "./pages/LandingPage";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
@@ -18,7 +17,6 @@ import VendorDashboard from "./pages/VendorDashboard";
 import ProtectedRoute from "./router/ProtectedRoute";
 import AboutUs from "./pages/AboutUs";
 
-// Your custom components
 import RadiusTravelItineraryGenerator from "./RadiusTravelItineraryGenerator";
 import RadiusTravelItinerary from "./RadiusVisual";
 import RadiusModify from "./RadiusModify";
@@ -26,6 +24,7 @@ import TravelItineraryGenerator from './TravelItineraryGenerator';
 import RadiusModifyRequest from "./RadiusModifyRequest";
 import VisualizationItinerary from "./VisualizationItinerary";
 import ModifyItinerary from "./ModifyItinerary";
+import NormalModifyRequest from "./ModifyRequest";
 
 const AppContent = () => {
     const { auth, fetchProfile } = useContext(AuthContext);
@@ -41,8 +40,8 @@ const AppContent = () => {
             <main className="flex-grow">
                 <Routes>
                     {/* Auth + Static Pages */}
-                    <Route path="/" element={<LandingPage />} />
-                    <Route path="/login" element={<Login />} />
+                    <Route path="/LandingPage" element={<LandingPage />} />
+                    <Route path="/" element={<Login />} />
                     <Route path="/register" element={<Register />} />
                     <Route path="/reset-password" element={<ResetPassword />} />
                     <Route path="/about-us" element={<AboutUs />} />
@@ -80,6 +79,7 @@ const AppContent = () => {
                     <Route path="/modify-radius/:username/:name" element={<RadiusModify />} />
                     <Route path="/modify-request/:username" element={<RadiusModifyRequest />} />
                     <Route path="/modify/:username/:itinerary_name" element={<ModifyItinerary />} />
+                    <Route path="/normal-modify-request/:username" element={<NormalModifyRequest />} />
 
                     {/* Fallback */}
                     <Route path="*" element={<LandingPage />} />

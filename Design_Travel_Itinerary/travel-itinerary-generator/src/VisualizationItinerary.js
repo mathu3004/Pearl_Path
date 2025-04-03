@@ -23,8 +23,6 @@ L.Icon.Default.mergeOptions({
   shadowUrl: iconShadow,
 });
 
-
-
 const VisualizationItinerary = () => {
   const { username, itinerary_name } = useParams();
   const [itinerary, setItinerary] = useState(null);
@@ -128,11 +126,15 @@ const VisualizationItinerary = () => {
 
   if (!itinerary) return <p className="text-center mt-20 text-lg">Loading itinerary...</p>;
 
-  const handleOptionalSave = async () => {
-    console.log("🚀 Itinerary object in save handler:", itinerary);
+   // Updated save function to save to the SavedItineraries collection
+   const handleOptionalSave = async () => {
+    console.log("Itinerary object in save handler:", itinerary);
   
-    if (!itinerary?.username || !itinerary?.itinerary_name) {
-      alert("❌ Cannot save: Missing username or itinerary name.");
+    const username = itinerary?.username;
+    const itineraryName = itinerary?.itineraryName || itinerary?.itinerary_name; // supports both cases
+  
+    if (!username || !itineraryName) {
+      alert("Cannot save: Missing username or itinerary name.");
       return;
     }
   
@@ -141,8 +143,8 @@ const VisualizationItinerary = () => {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          username: itinerary.username,
-          itinerary_name: itinerary.itinerary_name,
+          username: username.toLowerCase(),
+          itineraryName: itineraryName.toLowerCase(),
         }),
       });
   
@@ -151,8 +153,7 @@ const VisualizationItinerary = () => {
       if (!res.ok) {
         const errorText = contentType?.includes("application/json")
           ? await res.json()
-          : await res.text(); // fallback for HTML error page
-  
+          : await res.text();
         throw new Error(
           typeof errorText === "string"
             ? errorText
@@ -167,7 +168,6 @@ const VisualizationItinerary = () => {
     }
   };
   
-  
   return (
     <div className='main'>
     <div className="page-containers">
@@ -181,7 +181,7 @@ const VisualizationItinerary = () => {
 
           {Array.isArray(itinerary.days) && itinerary.days.map((day, idx) => (
             <div key={idx} className="bg-green-50 p-4 rounded-xl shadow-md">
-              <h2 className="text-xl font-semibold mb-4">Day {day.day}: {day.destination}</h2>
+              <h2 className="itinerary_subtitle">Day {day.day}: {day.destination}</h2>
 
               {/* Hotel */}
               {day.hotel?.name && (
@@ -330,15 +330,17 @@ const VisualizationItinerary = () => {
   </button>
 
   <button className="viz-button" onClick={handleOptionalSave}>
-    Save Itinerary
-  </button>
+            Save Itinerary
+          </button>
 
 </div>
 <Layout>
 </Layout>
-      <Footer />
+
     </div>
+    <Footer />
     </div>
+   
   );
 };
 

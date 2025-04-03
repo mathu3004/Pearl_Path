@@ -7,7 +7,7 @@ import Footer from './components/Footer';
 import './TravelItineraryRadius.css';
 import { AuthContext } from './context/auth.context'; // Import AuthContext
 
-const ModifyRequest = () => {
+const NormalModifyRequest = () => {
   const { fetchProfile } = useContext(AuthContext); // Get fetchProfile from context
   const [username, setUsername] = useState('');
   const [itineraries, setItineraries] = useState([]);
@@ -37,9 +37,8 @@ const ModifyRequest = () => {
 
     setLoading(true);
     try {
-      const response = await axios.get(
-        `http://localhost:5003/api/user-itineraries/${username.toLowerCase()}`
-      );
+      // Use the new endpoint for the friend's DB/collection
+      const response = await axios.get(`http://localhost:5001/api/user-itineraries/${username.toLowerCase()}`);
       setItineraries(response.data || []);
     } catch (error) {
       console.error('Error fetching itineraries:', error);
@@ -50,14 +49,15 @@ const ModifyRequest = () => {
   };
 
   const handleNavigate = (itineraryName) => {
-    navigate(`/modify-radius/${username.toLowerCase()}/${itineraryName.toLowerCase()}`);
+    // Navigate to the modify route for the friend's itineraries
+    navigate(`/modify/${username}/${itineraryName}`)
   };
 
   return (
     <div className="main">
       <div className="editrequest-page-wrapper">
         <Header />
-  
+
         {/* Form Container */}
         <div className="editrequest-left">
           <h2>Find and Modify Your Itinerary</h2>
@@ -71,27 +71,28 @@ const ModifyRequest = () => {
           <br />
           <button className="button" onClick={handleSearch}>Search Itineraries</button>
         </div>
-  
+
         {/* Itinerary Grid */}
         {loading && <p>Loading...</p>}
         {itineraries.length > 0 && (
           <div className="editrequest-day">
             <h3>Available Itineraries</h3>
             <ul>
-              {itineraries.map((itinerary, idx) => (
-                <li key={idx}>
-                  <button
-                    className="button"
-                    onClick={() => handleNavigate(itinerary.name)}
-                  >
-                    {itinerary.name.toUpperCase()}
-                  </button>
-                </li>
-              ))}
+            {itineraries.map((itinerary, idx) => (
+  <li key={idx}>
+    <button
+      className="button"
+      onClick={() => handleNavigate(itinerary.itineraryName)}
+    >
+      {itinerary.itineraryName?.toUpperCase() || "(Unnamed Itinerary)"}
+    </button>
+  </li>
+))}
+
             </ul>
           </div>
         )}
-  
+
         <Layout />
         <Footer />
       </div>
@@ -99,4 +100,4 @@ const ModifyRequest = () => {
   );
 };
 
-export default ModifyRequest;
+export default NormalModifyRequest;

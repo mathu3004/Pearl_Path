@@ -28,8 +28,8 @@ app.use(express.json());
 // MongoDB connection
 mongoose.connect(process.env.MONGO_URI, {
     dbName: "itinerary_recommendations",
-}).then(() => console.log("✅ MongoDB Connected"))
-  .catch(err => console.error("❌ MongoDB Connection Error:", err));
+}).then(() => console.log("MongoDB Connected"))
+  .catch(err => console.error("MongoDB Connection Error:", err));
 
 // Define UserInputs schema
 const itinerarySchema = new mongoose.Schema({
@@ -53,15 +53,15 @@ const Itinerary = mongoose.model('UserInputs', itinerarySchema);
 const runPythonScript = (scriptPath, args, callback) => {
     const fullPath = path.resolve(__dirname, scriptPath);
     const command = `python3 "${fullPath}" ${args.join(" ")}`;
-    console.log(`📌 EXECUTING: ${command}`);
+    console.log(`EXECUTING: ${command}`);
 
     exec(command, (error, stdout, stderr) => {
         if (error) {
-            console.error(`❌ Python Script Error: ${error.message}`);
+            console.error(`Python Script Error: ${error.message}`);
             return callback(new Error("Preprocessing script execution failed."));
         }
-        if (stderr) console.error(`⚠️ Python Warning: ${stderr}`);
-        console.log(`✅ Python Script Output: ${stdout}`);
+        if (stderr) console.error(`Python Warning: ${stderr}`);
+        console.log(`Python Script Output: ${stdout}`);
         callback(null, stdout);
     });
 };
@@ -92,21 +92,21 @@ app.post('/api/itinerary', async (req, res) => {
             return res.status(400).json({ error: "All fields are required." });
         }
 
-        // ✅ Trim and convert to lowercase for case-insensitive matching
+        // Trim and convert to lowercase for case-insensitive matching
         username = username.trim().toLowerCase();
         itineraryName = itineraryName.trim().toLowerCase();
 
-        console.log("📌 Checking for existing itinerary:", { username, itineraryName });
+        console.log("Checking for existing itinerary:", { username, itineraryName });
 
-        // ✅ Check if the itinerary already exists for this user
+        // Check if the itinerary already exists for this user
         const existingItinerary = await Itinerary.findOne({ username, itineraryName });
 
         if (existingItinerary) {
-            console.log("❌ Error: Itinerary name already exists for this user.");
+            console.log("Error: Itinerary name already exists for this user.");
             return res.status(400).json({ error: "Itinerary name must be unique for each user." });
         }
 
-        // ✅ Create a new itinerary if it doesn't exist
+        // Create a new itinerary if it doesn't exist
         try {
             const newItinerary = new Itinerary({
                 username, itineraryName, startingDestination, destinations, 
@@ -228,68 +228,74 @@ app.put('/api/save-updated-itinerary', async (req, res) => {
     }
 });
 
-  
-app.post('/api/save-itinerary-to-saved', async (req, res) => {
-    console.log("📥 Received Save Request:", req.body);
-    const { username, itineraryName } = req.body;
-
-    if (!username || !itineraryName) {
-        return res.status(400).json({ error: "Missing required fields." });
-    }
-
-    const lowerUsername = username.toLowerCase();
-    const lowerItineraryName = itineraryName.toLowerCase();
-
-    // Models
-    const SavedItinerary = mongoose.model(
-        'SavedItinerary',
-        new mongoose.Schema({}, { strict: false }),
-        'SavedItineraries'
-    );
-
-    const GeneratedItinerary = mongoose.model(
-        'GeneratedItinerary',
-        new mongoose.Schema({}, { strict: false }),
-        'GeneratedItineraries'
-    );
-
+app.get('/api/user-itineraries/:username', async (req, res) => {
     try {
-        // 🔍 Check if already saved
-        const exists = await SavedItinerary.findOne({
-            username: lowerUsername,
-            itineraryName: lowerItineraryName
-        });
-
-        if (exists) {
-            return res.status(409).json({ error: "Itinerary already saved." });
-        }
-
-        // 📤 Fetch from GeneratedItineraries
-        const originalItinerary = await GeneratedItinerary.findOne({
-            username: lowerUsername,
-            itineraryName: lowerItineraryName
-        });
-
-        if (!originalItinerary) {
-            return res.status(404).json({ error: "Generated itinerary not found." });
-        }
-
-        // 💾 Save copy to SavedItineraries
-        const toSave = {
-            ...originalItinerary.toObject(),
-            saved_at: new Date()
-        };
-
-        delete toSave._id; // Remove original _id to avoid conflict
-
-        await SavedItinerary.create(toSave);
-
-        res.status(201).json({ message: "✅ Itinerary saved!" });
-    } catch (err) {
-        console.error("❌ Failed to save itinerary:", err);
-        res.status(500).json({ error: "Server error", details: err.message });
+      const { username } = req.params;
+      const itineraries = await mongoose.connection.db.collection('GeneratedItineraries')
+        .find({ username: username.toLowerCase() })
+        .toArray();
+  
+      res.json(itineraries);
+    } catch (error) {
+      console.error('Error fetching user itineraries:', error);
+      res.status(500).send('Server error');
     }
-});
-
+  });  
+  
+  app.post('/api/save-itinerary-to-saved', async (req, res) => {
+    console.log("📥 Received Save Request:", req.body);
+  
+    const { username, itineraryName } = req.body;
+  
+    if (!username || !itineraryName) {
+      return res.status(400).json({ error: "Missing required fields." });
+    }
+  
+    const lowerUsername = username;
+    const lowerItineraryName = itineraryName;
+    const db = mongoose.connection.db;
+  
+    try {
+      // 🔍 Fetch from GeneratedItineraries (check both field names)
+      const original = await db.collection("GeneratedItineraries").findOne({
+        username: lowerUsername,
+        $or: [
+          { itineraryName: lowerItineraryName },
+          { name: lowerItineraryName }
+        ]
+      });
+  
+      if (!original) {
+        return res.status(404).json({ error: "Generated itinerary not found." });
+      }
+  
+      // 🧹 Remove _id to avoid conflict on insert
+      delete original._id;
+  
+      // 💾 Upsert into SavedItineraries (insert or update)
+      await db.collection("SavedItineraries").updateOne(
+        {
+          username: lowerUsername,
+          $or: [
+            { itineraryName: lowerItineraryName },
+            { name: lowerItineraryName }
+          ]
+        },
+        {
+          $set: {
+            ...original,
+            saved_at: new Date()
+          }
+        },
+        { upsert: true } // ← key part
+      );
+  
+      return res.status(200).json({ message: "✅ Itinerary saved or updated in favorites!" });
+  
+    } catch (err) {
+      console.error("❌ Failed to save/update itinerary:", err);
+      return res.status(500).json({ error: "Server error", details: err.message });
+    }
+  });  
       
 app.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));

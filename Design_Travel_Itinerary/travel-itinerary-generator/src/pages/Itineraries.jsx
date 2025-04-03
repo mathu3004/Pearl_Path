@@ -2,6 +2,7 @@ import React, { useContext, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { AuthContext } from "../context/auth.context";
 import Header from "../components/Header";
+import Layout from '../components/Layout';
 import Footer from "../components/Footer";
 
 const fadeInKeyframes = `
@@ -150,6 +151,7 @@ const Itineraries = () => {
           </div>
         </div>
       </div>
+      <Layout />
       <Footer />
     </>
   );

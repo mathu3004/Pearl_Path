@@ -129,7 +129,6 @@ const TravelItineraryGenerator = () => {
         <div className="pagecontainer" id="travel-itinerary-generator">
             <Header />
             <div className="glass-card">
-            <h2 className="page-title">Heal to Nature</h2>
             <h2 className="page-title">Craft your Dream</h2>
                 <form onSubmit={handleSubmit} className="form-grid">
 
