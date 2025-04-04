@@ -2,7 +2,6 @@
 import React, { useContext, useEffect } from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { AuthProvider, AuthContext } from "./context/auth.context";
-import { useNavigate } from "react-router-dom";
 
 import LandingPage from "./pages/LandingPage";
 import Login from "./pages/Login";
@@ -29,55 +28,63 @@ import NormalModifyRequest from "./ModifyRequest";
 
 const AppContent = () => {
     const { auth, fetchProfile } = useContext(AuthContext);
-    const navigate = useNavigate();
 
     useEffect(() => {
         if (auth.token) {
-        fetchProfile();
-        } else if (!auth.loading) {
-        navigate("/"); // Redirect to Landing Page if not authenticated
+            fetchProfile();
         }
-    }, [auth.token, auth.loading, fetchProfile, navigate]);
+        // ❌ Do NOT redirect in useEffect — leave that to <ProtectedRoute>
+    }, [auth.token, fetchProfile]);
 
     return (
         <div className="flex flex-col min-h-screen">
             <main className="flex-grow">
                 <Routes>
-                    {/* Auth + Static Pages */}
-                    
-
+                    {/* Public Routes */}
                     <Route path="/" element={<LandingPage />} />
                     <Route path="/register" element={<Register />} />
                     <Route path="/reset-password" element={<ResetPassword />} />
                     <Route path="/about-us" element={<AboutUs />} />
-
-                    {/* User Area */}
                     <Route path="/login" element={<Login />} />
-                    <Route path="/triphome" element={<TripHome />} />
-                    <Route path="/profile" element={<Profile />} />
-                    <Route path="/itineraries" element={<Itineraries />} />
-                    <Route path="/itinerary-generator" element={<ItineraryGenerator />} />
-                    <Route path="/radius-itinerary-generator" element={<RadiusItineraryGenerator />} />
-                   
-                    {/* Dashboards with protection */}
-                    <Route
-                        path="/user-dashboard"
-                        element={
-                            <ProtectedRoute allowedRole="user">
-                                <UserDashboard />
-                            </ProtectedRoute>
-                        }
-                    />
-                    <Route
-                        path="/vendor-dashboard"
-                        element={
-                            <ProtectedRoute allowedRole="vendor">
-                                <VendorDashboard />
-                            </ProtectedRoute>
-                        }
-                    />
 
-                    {/* Your Itinerary System Routes */}
+                    {/* Protected Routes */}
+                    <Route path="/triphome" element={
+                        <ProtectedRoute allowedRole="user">
+                            <TripHome />
+                        </ProtectedRoute>
+                    } />
+                    <Route path="/profile" element={
+                        <ProtectedRoute allowedRole="user">
+                            <Profile />
+                        </ProtectedRoute>
+                    } />
+                    <Route path="/itineraries" element={
+                        <ProtectedRoute allowedRole="user">
+                            <Itineraries />
+                        </ProtectedRoute>
+                    } />
+                    <Route path="/itinerary-generator" element={
+                        <ProtectedRoute allowedRole="user">
+                            <ItineraryGenerator />
+                        </ProtectedRoute>
+                    } />
+                    <Route path="/radius-itinerary-generator" element={
+                        <ProtectedRoute allowedRole="user">
+                            <RadiusItineraryGenerator />
+                        </ProtectedRoute>
+                    } />
+                    <Route path="/user-dashboard" element={
+                        <ProtectedRoute allowedRole="user">
+                            <UserDashboard />
+                        </ProtectedRoute>
+                    } />
+                    <Route path="/vendor-dashboard" element={
+                        <ProtectedRoute allowedRole="vendor">
+                            <VendorDashboard />
+                        </ProtectedRoute>
+                    } />
+
+                    {/* Itinerary System Routes */}
                     <Route path="/radius-mode" element={<RadiusTravelItineraryGenerator />} />
                     <Route path="/no-radius-mode" element={<TravelItineraryGenerator />} />
                     <Route path="/visual-radius/:username/:name" element={<RadiusTravelItinerary />} />
