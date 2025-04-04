@@ -1,10 +1,15 @@
 import React, { createContext, useState, useEffect } from "react";
-import {jwtDecode} from "jwt-decode";
+import { jwtDecode } from "jwt-decode";
 
 export const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
   const [auth, setAuth] = useState({ token: null, user: null, loading: true });
+
+  const logout = () => {
+    localStorage.removeItem("token");
+    setAuth({ token: null, user: null, loading: false });
+  };
 
   const login = async ({ username, password }) => {
     try {
@@ -39,10 +44,7 @@ export const AuthProvider = ({ children }) => {
       if (res.ok) {
         return { success: true, message: data.message };
       } else {
-        return {
-          success: false,
-          message: data.message || "Registration failed",
-        };
+        return { success: false, message: data.message || "Registration failed" };
       }
     } catch (error) {
       console.error("Registration error:", error);
@@ -50,16 +52,11 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  const logout = () => {
-    localStorage.removeItem("token");
-    setAuth({ token: null, user: null, loading: false });
-  };
-
   const fetchProfile = async () => {
     if (!auth.token || !auth.user) return null;
     const userId = auth.user.id || auth.user._id || auth.user.userId;
     if (!userId) {
-      console.error("User ID not found in token", auth.user);
+      logout(); // Token is invalid
       return null;
     }
     try {
@@ -70,12 +67,15 @@ export const AuthProvider = ({ children }) => {
           Authorization: `Bearer ${auth.token}`,
         },
       });
+      if (res.status === 401 || res.status === 403) {
+        logout(); // Expired or invalid token
+        return null;
+      }
       const data = await res.json();
-      if (res.ok) return data;
-      console.error("Error fetching profile:", data.message);
-      return null;
+      return res.ok ? data : null;
     } catch (error) {
-      console.error("Fetch profile error:", error);
+      console.error("Server unreachable, logging out:", error);
+      logout(); // Server not reachable
       return null;
     }
   };
@@ -85,10 +85,15 @@ export const AuthProvider = ({ children }) => {
     if (storedToken) {
       try {
         const decoded = jwtDecode(storedToken);
-        setAuth({ token: storedToken, user: decoded, loading: false });
+        const isExpired = decoded.exp * 1000 < Date.now();
+        if (isExpired) {
+          logout(); // Token expired
+        } else {
+          setAuth({ token: storedToken, user: decoded, loading: false });
+        }
       } catch (error) {
         console.error("Token decode error:", error);
-        setAuth({ token: null, user: null, loading: false });
+        logout();
       }
     } else {
       setAuth({ token: null, user: null, loading: false });
@@ -96,9 +101,7 @@ export const AuthProvider = ({ children }) => {
   }, []);
 
   return (
-    <AuthContext.Provider
-      value={{ auth, login, register, logout, fetchProfile }}
-    >
+    <AuthContext.Provider value={{ auth, login, register, logout, fetchProfile }}>
       {children}
     </AuthContext.Provider>
   );

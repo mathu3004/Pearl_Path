@@ -94,7 +94,7 @@ app.post('/api/itinerary', async (req, res) => {
             peopleCount
         } = req.body;
 
-        // 🔹 Ensure proper type conversion
+        // Ensure proper type conversion
         maxDistance = Number(maxDistance);  // Convert to Number
         numberOfDays = Number(numberOfDays);  // Convert to Number
         peopleCount = String(peopleCount);  // Ensure it's a String

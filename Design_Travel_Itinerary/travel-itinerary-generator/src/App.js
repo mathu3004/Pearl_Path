@@ -2,6 +2,7 @@
 import React, { useContext, useEffect } from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { AuthProvider, AuthContext } from "./context/auth.context";
+import { useNavigate } from "react-router-dom";
 
 import LandingPage from "./pages/LandingPage";
 import Login from "./pages/Login";
@@ -28,25 +29,30 @@ import NormalModifyRequest from "./ModifyRequest";
 
 const AppContent = () => {
     const { auth, fetchProfile } = useContext(AuthContext);
+    const navigate = useNavigate();
 
     useEffect(() => {
         if (auth.token) {
-            fetchProfile();
+        fetchProfile();
+        } else if (!auth.loading) {
+        navigate("/"); // Redirect to Landing Page if not authenticated
         }
-    }, [auth.token, fetchProfile]);
+    }, [auth.token, auth.loading, fetchProfile, navigate]);
 
     return (
         <div className="flex flex-col min-h-screen">
             <main className="flex-grow">
                 <Routes>
                     {/* Auth + Static Pages */}
-                    <Route path="/LandingPage" element={<LandingPage />} />
-                    <Route path="/" element={<Login />} />
+                    
+
+                    <Route path="/" element={<LandingPage />} />
                     <Route path="/register" element={<Register />} />
                     <Route path="/reset-password" element={<ResetPassword />} />
                     <Route path="/about-us" element={<AboutUs />} />
 
                     {/* User Area */}
+                    <Route path="/login" element={<Login />} />
                     <Route path="/triphome" element={<TripHome />} />
                     <Route path="/profile" element={<Profile />} />
                     <Route path="/itineraries" element={<Itineraries />} />

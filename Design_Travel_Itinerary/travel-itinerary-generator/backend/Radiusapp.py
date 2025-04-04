@@ -77,7 +77,7 @@ file_paths = {
 
 print("Checking model files in 'models/' directory...")
 for key, path in file_paths.items():
-    print(f"{key}: {path} {'Exists' if os.path.exists(path) else '❌ Missing'}")
+    print(f"{key}: {path} {'Exists' if os.path.exists(path) else 'Missing'}")
 
 # Function to safely load models
 import joblib
@@ -212,7 +212,7 @@ def get_nearby_options(lat, lon, options, max_distance_km):
 def assign_hotel_for_destination(user, destination):
     budget = user.get('hotelBudget', None)
     if budget is None:
-        print(f"⚠ No hotel budget provided for {destination}")
+        print(f"No hotel budget provided for {destination}")
         return None, []
     city_aliases = {
     "nuwara_eliya": "eliya", }
@@ -220,18 +220,18 @@ def assign_hotel_for_destination(user, destination):
 
     city_col = f"city_{fixed_dest.lower().replace(' ', '_')}"
     if city_col not in hotels.columns:
-        print(f"⚠ No hotel city column found: {city_col}")
+        print(f"No hotel city column found: {city_col}")
         return None, []
 
     city_hotels = hotels[hotels[city_col] == 1].copy()
     city_hotels = city_hotels[city_hotels['pricelevel'] <= budget]
     
     if city_hotels.empty:
-        print(f"⚠ No hotels in {destination} within budget. Retrying without budget filter.")
+        print(f"No hotels in {destination} within budget. Retrying without budget filter.")
         city_hotels = hotels[hotels[city_col] == 1]
 
     if city_hotels.empty:
-        print(f"❌ Still no hotels found in {destination}")
+        print(f"Still no hotels found in {destination}")
         return None, []
 
     # ML Integration — Predict hotel rating
@@ -272,7 +272,7 @@ def assign_hotel_for_destination(user, destination):
 def recommend_attractions_for_destination(user, destination, hotel_lat, hotel_lon, used_attractions):
     max_distance_km = user['maximum_distance']
     city_aliases = {
-    "nuwara_eliya": "eliya"
+        "nuwara_eliya": "eliya"
     }
     fixed_dest = city_aliases.get(destination, destination)
     city_col = f"city_{fixed_dest}"
@@ -281,65 +281,84 @@ def recommend_attractions_for_destination(user, destination, hotel_lat, hotel_lo
     if city_col in attractions.columns:
         city_attractions = attractions[attractions[city_col] == 1].copy()
     else:
-        print(f"❌ City column not found: {city_col} — skipping attractions for {destination}")
+        print(f"City column not found: {city_col} — skipping attractions for {destination}")
         return [], {}
 
     # Step 2: Activity preference filtering
-    user_activities = [col for col in user.keys() if col.startswith("activities_preference_") and user[col] == 1]
-    matching_cols = [col for col in user_activities if col in city_attractions.columns]
+    # Normalize attraction columns
+    city_attractions.columns = map(str.lower, city_attractions.columns)
+
+    # Normalize user keys
+    user = {k.lower(): v for k, v in user.items()}
+
+    # Match activity preference columns
+    activity_cols = [col for col in user if col.startswith("activities_preference_") and user[col] == 1]
+    matching_cols = [col for col in activity_cols if col in city_attractions.columns]
+
+    # Apply filtering
     if matching_cols:
         city_attractions = city_attractions[city_attractions[matching_cols].sum(axis=1) > 0]
 
-    # Step 3: Distance filtering
+    # Step 3: Filter by distance from hotel
     city_attractions['distance'] = city_attractions.apply(
         lambda row: geodesic((hotel_lat, hotel_lon), (row['latitude'], row['longitude'])).km, axis=1)
     city_attractions = city_attractions[city_attractions['distance'] <= max_distance_km]
 
-    # Step 4: Remove used
+    # Step 4: Remove already used attractions
     city_attractions = city_attractions[~city_attractions['name'].isin(used_attractions)]
 
-    # Step 5: Apply PCA + DBSCAN Clustering
+    # Step 5: Clustering with PCA + DBSCAN
     try:
         cluster_input = city_attractions[['rating', 'latitude', 'longitude']].fillna(0)
-        cluster_input_scaled = StandardScaler().fit_transform(cluster_input)
-        pca_data = attraction_model_pca.transform(cluster_input_scaled)
-        cluster_labels = attraction_model_dbscan.fit_predict(pca_data)
-        city_attractions['cluster'] = cluster_labels
-
-        # Filter out noise cluster (-1)
-        clustered_attractions = city_attractions[city_attractions['cluster'] != -1]
-        clustered_attractions = clustered_attractions.sort_values(by='rating', ascending=False)
+        scaled = StandardScaler().fit_transform(cluster_input)
+        pca_data = attraction_model_pca.transform(scaled)
+        labels = attraction_model_dbscan.fit_predict(pca_data)
+        city_attractions['cluster'] = labels
+        clustered = city_attractions[city_attractions['cluster'] != -1]
+        clustered = clustered.sort_values(by='rating', ascending=False)
     except Exception as e:
-        clustered_attractions = city_attractions.sort_values(by="rating", ascending=False)
+        print(f"Clustering failed: {e}")
+        clustered = city_attractions.sort_values(by='rating', ascending=False)
 
-    clustered_attractions = clustered_attractions.head(40)
+    clustered = clustered.head(16)  # cap to avoid overloading
+    group_size = 4
+    num_groups = max(1, len(clustered) // group_size)
+
+    def extract_activities(row):
+        flags = [
+            col.replace("activities_preference_", "") for col in attractions.columns
+            if col.startswith("activities_preference_") and row.get(col, 0) == 1
+        ]
+        return flags if flags else row.get("activities", [])
 
     main = []
     alternatives = {}
 
-    for i in range(4):
-        group = clustered_attractions.iloc[i * 4: (i + 1) * 4]
+    for i in range(num_groups):
+        group = clustered.iloc[i * group_size: (i + 1) * group_size]
         if group.empty:
             continue
 
         main_attraction = group.iloc[0]
-        alt_group = group.iloc[1:4]
-        
+        alt_group = group.iloc[1:]
+        alt_group = alt_group[~alt_group['name'].isin(used_attractions)]
+
         main_obj = {
             "name": str(main_attraction["name"]),
             "latitude": float(main_attraction["latitude"]),
             "longitude": float(main_attraction["longitude"]),
             "rating": float(main_attraction["rating"]),
-            "city": destination.title()
+            "city": destination.title(),
+            "activities": extract_activities(main_attraction)
         }
-        alt_group = alt_group[~alt_group['name'].isin(used_attractions)]
 
-        alt_objs = [ {
+        alt_objs = [{
             "name": str(row["name"]),
             "latitude": float(row["latitude"]),
             "longitude": float(row["longitude"]),
             "rating": float(row["rating"]),
-            "city": destination.title()
+            "city": destination.title(),
+            "activities": extract_activities(row)
         } for _, row in alt_group.iterrows()]
 
         main.append(main_obj)
@@ -352,48 +371,58 @@ def recommend_attractions_for_destination(user, destination, hotel_lat, hotel_lo
 # Recommend Restaurants
 def recommend_restaurants_for_destination(user, destination, hotel_lat, hotel_lon, used_restaurants):
     max_distance_km = user['maximum_distance']
-    city_aliases = {
-    "nuwara_eliya": "eliya"}
-    fixed_dest = city_aliases.get(destination, destination)
+    city_aliases = {"nuwara_eliya": "eliya"}
+    fixed_dest = city_aliases.get(destination.lower(), destination.lower())
     city_col = f"city_{fixed_dest}"
 
-    # Filter by city
-    if city_col in restaurants.columns:
-        city_restaurants = restaurants[restaurants[city_col] == 1].copy()
-    else:
-        print(f"❌ City column not found: {city_col} — skipping restaurants for {destination}")
+    if city_col not in restaurants.columns:
+        print(f"City column not found: {city_col} — skipping restaurants for {destination}")
         return {}, {}
 
-    # Dietary filtering
-    dietary = 'dietary_veg' if user.get('food_preference_veg') == 1 else 'dietary_non-veg'
-    if dietary in city_restaurants.columns:
-        city_restaurants = city_restaurants[city_restaurants[dietary] == 1]
+    city_restaurants = restaurants[restaurants[city_col] == 1].copy()
 
-    # Cuisine filtering
-    user_cuisines = [col.replace("cuisine_preference_", "cuisine_") for col in user.keys()
-                     if col.startswith("cuisine_preference_") and user[col] == 1]
+    # Normalize user keys
+    user = {k.lower(): v for k, v in user.items()}
+
+    # Normalize column names
+    city_restaurants.columns = map(str.lower, city_restaurants.columns)
+
+    # Normalize dietary and cuisines
+    dietary_options = []
+    if user.get('food_preference_veg') == 1:
+        dietary_options.append('dietary_veg')
+    if user.get('food_preference_non_veg') == 1:
+        dietary_options.append('dietary_non-veg')
+
+    user_cuisines = [f"cuisine_{k.replace('cuisine_preference_', '')}"
+                    for k in user if k.startswith("cuisine_preference_") and user[k] == 1]
     valid_cuisines = [c for c in user_cuisines if c in city_restaurants.columns]
+
+    # Apply preference filters BEFORE prediction
+    if dietary_options:
+        city_restaurants = city_restaurants[city_restaurants[dietary_options].sum(axis=1) > 0]
     if valid_cuisines:
         city_restaurants = city_restaurants[city_restaurants[valid_cuisines].sum(axis=1) > 0]
 
-    # Add distance column
+    # Filter by distance
     city_restaurants['distance'] = city_restaurants.apply(
         lambda row: geodesic((hotel_lat, hotel_lon), (row['latitude'], row['longitude'])).km, axis=1)
     city_restaurants = city_restaurants[city_restaurants['distance'] <= max_distance_km]
 
-    # Load model features list
+    # Remove already used restaurants
+    city_restaurants = city_restaurants[~city_restaurants['name'].isin(used_restaurants)]
+
+    # Load model features
     try:
         restaurant_model_features = joblib.load(os.path.join(MODEL_FOLDER, "restaurant_model_features.pkl"))
     except Exception as e:
         print("Error loading restaurant model features:", e)
         restaurant_model_features = []
 
-    # Add missing features
     for col in restaurant_model_features:
         if col not in city_restaurants.columns:
             city_restaurants[col] = 0
 
-    # Apply ML model prediction
     try:
         feature_data = city_restaurants[restaurant_model_features].to_numpy()
         city_restaurants['predicted_rating_class'] = restaurant_model.predict(feature_data)
@@ -402,47 +431,73 @@ def recommend_restaurants_for_destination(user, destination, hotel_lat, hotel_lo
         print(f"[ML Restaurant] Prediction failed, fallback to rating: {e}")
         city_restaurants = city_restaurants.sort_values(by="rating", ascending=False)
 
-    # Filter out used
-    top_restaurants = city_restaurants[
-        ~city_restaurants['name'].isin(used_restaurants)
-    ].head(12)
-
-    # Track used restaurant names
-    used_restaurants.update(top_restaurants['name'].tolist())
-
-    # Split into meals
+    # Final selection
     meals = ['breakfast', 'lunch', 'dinner']
     best = {}
     alternatives = {}
 
-    for i, meal in enumerate(meals):
-        start = i * 4
-        end = start + 4
-        group = top_restaurants.iloc[start:end]
+    for meal in meals:
+        meal_key = f"mealtype_{meal}"
+        meal_restaurants = city_restaurants[city_restaurants[meal_key] == 1].copy()
 
-        if not group.empty:
-            best_restaurant = group.iloc[0]
-            best[meal] = {
-                "name": str(best_restaurant['name']),
-                "latitude": float(best_restaurant['latitude']),
-                "longitude": float(best_restaurant['longitude']),
-                "city": destination.replace('_', ' ').title(),
-                "rating": float(best_restaurant['rating']),
-                "weburl": str(best_restaurant['weburl'])
-            }
+        # First: strict filter
+        filtered = meal_restaurants.copy()
+        if dietary_options:
+            filtered = filtered[filtered[dietary_options].sum(axis=1) > 0]
+        if valid_cuisines:
+            filtered = filtered[filtered[valid_cuisines].sum(axis=1) > 0]
 
-            alt_group = group.iloc[1:4]
-            alternatives[meal] = [{
-                "name": str(row["name"]),
-                "latitude": float(row["latitude"]),
-                "longitude": float(row["longitude"]),
-                "rating": float(row["rating"]),
-                "weburl": str(row['weburl']),
-                "city": destination.replace('_', ' ').title()
-            } for _, row in alt_group.iterrows()]
-        else:
+        # Fallback: relax filters if too few
+        if filtered.shape[0] < 4:
+            print(f"[{meal}] Too few after filtering ({filtered.shape[0]}). Relaxing filters.")
+            filtered = meal_restaurants
+            if filtered.shape[0] < 4:
+                filtered = city_restaurants[city_restaurants[meal_key] == 1]
+
+        top_meal_group = filtered.head(4)
+        if top_meal_group.empty:
             best[meal] = {}
             alternatives[meal] = []
+            continue
+
+        best_restaurant = top_meal_group.iloc[0]
+
+        best[meal] = {
+            "name": str(best_restaurant['name']),
+            "latitude": float(best_restaurant['latitude']),
+            "longitude": float(best_restaurant['longitude']),
+            "city": destination.replace('_', ' ').title(),
+            "rating": float(best_restaurant['rating']),
+            "weburl": str(best_restaurant['weburl']),
+            "dietary": [
+                label for label, col in {
+                    "veg": "dietary_veg",
+                    "non-veg": "dietary_non-veg"
+                }.items() if best_restaurant.get(col, 0) == 1
+            ],
+            "cuisines": [col.replace("cuisine_", "") for col in city_restaurants.columns
+                         if col.startswith("cuisine_") and best_restaurant.get(col, 0) == 1]
+        }
+
+        alt_group = top_meal_group.iloc[1:]
+        alternatives[meal] = [{
+            "name": str(row["name"]),
+            "latitude": float(row["latitude"]),
+            "longitude": float(row["longitude"]),
+            "rating": float(row["rating"]),
+            "weburl": str(row['weburl']),
+            "city": destination.replace('_', ' ').title(),
+            "dietary": [
+                label for label, col in {
+                    "veg": "dietary_veg",
+                    "non-veg": "dietary_non-veg"
+                }.items() if row.get(col, 0) == 1
+            ],
+            "cuisines": [col.replace("cuisine_", "") for col in city_restaurants.columns
+                         if col.startswith("cuisine_") and row.get(col, 0) == 1]
+        } for _, row in alt_group.iterrows()]
+
+        used_restaurants.update(top_meal_group['name'].tolist())
 
     return best, alternatives
 
@@ -485,12 +540,36 @@ def generate_itinerary():
         user = db.preitineraries.find_one({"username": username, "name": itinerary_name}, {'_id': 0})
         if not user:
             return jsonify({"error": "User itinerary not found"}), 404
+        
+        # Fix: Normalize cuisines, dietary, activities from list format into flags
+        if 'cuisines' in user:
+            for cuisine in user['cuisines']:
+                key = f"cuisine_preference_{cuisine.lower().replace(' ', '_')}"
+                user[key] = 1
+
+        if 'activities' in user:
+            for activity in user['activities']:
+                key = f"activities_preference_{activity.lower().replace(' ', '_')}"
+                user[key] = 1
+
+        if 'foodPreferences' in user:
+            if 'veg' in user['foodPreferences'].lower():
+                user['food_preference_veg'] = 1
+            if 'non' in user['foodPreferences'].lower():
+                user['food_preference_non_veg'] = 1
+
+        # Normalize maxDistance
+        if 'maxDistance' in user:
+            user['maximum_distance'] = user['maxDistance']
+
+        # Normalize numberOfDays
+        if 'numberOfDays' in user:
+            user['numberofdays'] = user['numberOfDays']
 
         days_per_destination = allocate_days_to_destinations(user, user['numberofdays'])
         itinerary = {}
         used_attractions = set()
         used_restaurants = set()
-
 
         for destination, days in days_per_destination.items():
             destination_key = destination.replace('_', ' ').title()
@@ -519,7 +598,7 @@ def generate_itinerary():
                     "Alternative Restaurants": alt_restaurants
                 }
 
-        transport_modes = get_user_transport_modes(username, itinerary_name)  # Get selected transport modes
+        transport_modes = get_user_transport_modes(username, itinerary_name)  
 
         db.generated_itineraries.update_one(
             {"username": username, "name": itinerary_name},
@@ -527,7 +606,7 @@ def generate_itinerary():
                 "username": username,
                 "name": itinerary_name,
                 "itinerary": itinerary,
-                "transport_modes": transport_modes,  #  save user-selected transport modes
+                "transport_modes": transport_modes,  
                 "last_updated": datetime.now(timezone.utc)
             }},
             upsert=True
@@ -548,7 +627,7 @@ def get_itinerary_by_user_and_name(username, name):
     if not itinerary or "itinerary" not in itinerary:
         return jsonify({"error": "Itinerary not found"}), 404
 
-    # ✅ Inject transport modes
+    # Inject transport modes
     transport_modes = get_user_transport_modes(username, name)
     updated_itinerary = assign_transport_modes_to_itinerary(itinerary["itinerary"], transport_modes)
     itinerary["itinerary"] = updated_itinerary

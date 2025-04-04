@@ -14,9 +14,9 @@ db = client["test"]  # Database name
 collection = db["itineraries"]  # Collection name
 preprocessed_collection = db["preitineraries"] 
 
-# ✅ Fetch username and itinerary name from command-line arguments
+# Fetch username and itinerary name from command-line arguments
 if len(sys.argv) < 3:
-    print("❌ Error: Username and itinerary name required")
+    print("Error: Username and itinerary name required")
     sys.exit(1)
 
 username = sys.argv[1].strip()  # Trim spaces
@@ -27,7 +27,7 @@ try:
     itinerary = collection.find_one({"username": username, "name": itinerary_name})
 
     if not itinerary:
-        print(f"❌ No itinerary found for user '{username}' and name '{itinerary_name}'")
+        print(f"No itinerary found for user '{username}' and name '{itinerary_name}'")
         sys.exit(1)
 
     # Convert MongoDB document to DataFrame
@@ -102,22 +102,22 @@ try:
     # Drop `_id` column to avoid duplicate key errors
     if "_id" in df.columns:
         df = df.drop(columns=["_id"])
-    # ✅ Check if itinerary already exists in preprocessed collection
+    # Check if itinerary already exists in preprocessed collection
     existing_preprocessed = preprocessed_collection.find_one({"username": username, "name": itinerary_name})
 
     if existing_preprocessed:
-        # ✅ Update only this itinerary
+        # Update only this itinerary
         preprocessed_collection.update_one(
             {"username": username, "name": itinerary_name},
             {"$set": df.to_dict(orient='records')[0]}
         )
         print(f"Updated existing preprocessed itinerary for '{username}' - '{itinerary_name}'")
     else:
-        # ✅ Insert a new preprocessed itinerary
+        # Insert a new preprocessed itinerary
         preprocessed_collection.insert_one(df.to_dict(orient='records')[0])
-        print(f"✅ Inserted new preprocessed itinerary for '{username}' - '{itinerary_name}'")
+        print(f"Inserted new preprocessed itinerary for '{username}' - '{itinerary_name}'")
 
 except Exception as e:
-    print("❌ Error during processing:", str(e))
+    print("Error during processing:", str(e))
     traceback.print_exc()
     sys.exit(1)
