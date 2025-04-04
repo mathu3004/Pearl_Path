@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Demo Page with Pearlie Widget</title>
+    <link rel="stylesheet" href="chatbot_styles.css">
+</head>
+<body>
+
+    <div class="demo-content">
+        <h1>Welcome to the Demo Page</h1>
+        <p>Click on the chat widget to talk to Pearlie!</p>
+    </div>
+
+    <!-- Chat Widget -->
+    <div class="widget" id="widget" aria-label="Open Chat">💬</div>
+
+    <!-- Chat Box -->
+    <div class="chatbox" id="chatbox" aria-labelledby="chatHeader">
+        <div class="chat-header" id="chatHeader">
+            Pearl Chat
+            <span class="close-btn" aria-label="Close Chat" onclick="toggleChat()">✖</span>
+        </div>
+        <div class="chat-container" id="chat" aria-live="polite">
+            <div class="message bot-message">Hi! I’m Pearlie from Pearl Path. How can I help you today?</div>
+        </div>
+        <div class="input-container">
+            <input type="text" id="userInput" placeholder="Message..." aria-label="Type your message">
+            <button onclick="sendMessage()" aria-label="Send Message">Send</button>
+        </div>
+    </div>
+
+    <script src="scripts.js"></script>
+</body>
+</html>
