@@ -53,9 +53,19 @@
   background: #fff;
   padding: 20px;
   border-radius: 8px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
   opacity: 0;
   animation: fadeIn 1s ease forwards;
+  text-align: center;
+}
+
+/* New styles for team member images */
+.team-member-image {
+  width: 150px;
+  height: 150px;
+  object-fit: cover;
+  border-radius: 50%;
+  margin: 0 auto 20px auto;
 }
 
 .team-member-name {
@@ -242,8 +252,7 @@
 /* Title */
 #login-title {
   text-align: center;
-  color: black;
-  font-size: 2rem; /* Adjust as needed */
+  font-size: 1.5rem; /* Adjust as needed */
   font-weight: bold;
   margin-bottom: 1.5rem;
 }
@@ -263,7 +272,6 @@
 #login-form label {
   display: block;
   margin-bottom: 0.5rem;
-  font-size: 22px;
   font-weight: 600; /* Semi-bold */
 }
 
@@ -312,6 +320,7 @@
 #login-links a:hover {
   text-decoration: underline;
 }
+
 /* ResetPassword Component Styles */
 
 #reset-password-container {
@@ -352,8 +361,7 @@
 /* Additional element styles can be added as needed */
 #reset-password-title {
   text-align: center;
-  font-size: 2rem;
-  color: black;
+  font-size: 1.5rem;
   font-weight: bold;
   margin-bottom: 1.5rem;
 }
@@ -372,7 +380,6 @@
   display: block;
   margin-bottom: 0.5rem;
   font-weight: bold;
-  font-size: 20px;
 }
 
 #reset-password-form input {
@@ -424,6 +431,8 @@
   }
 }
 
+
+
 /* Profile Component */
 /* Profile Container */
 #profile-container {
@@ -452,7 +461,6 @@
 /* Header Section (Title + Edit Button) */
 #profile-header {
   display: flex;
-
   justify-content: space-between;
   align-items: center;
   margin-bottom: 1.5rem; /* Some spacing below the header */
@@ -460,8 +468,7 @@
 
 /* Title */
 #profile-title {
-  font-size: 3rem;
-  color: black;
+  font-size: 2rem;
   font-weight: bold;
   margin: 0; /* Remove default margins */
 }
@@ -497,7 +504,6 @@
   margin-bottom: 1rem;
   font-weight: 500;
   line-height: 1.4;
-  font-size: 30px;
 }
 
 #profile-message {
@@ -523,7 +529,7 @@
 
 #user-information h3,
 #vendor-information h3 {
-  font-size: 1.5rem;
+  font-size: 1.25rem;
   font-weight: 600;
   margin-bottom: 1rem;
 }
@@ -540,7 +546,6 @@
   display: block;
   font-weight: 600;
   margin-bottom: 0.5rem;
-  font-size: 25px;
 }
 
 #user-information input,
@@ -550,14 +555,8 @@
   padding: 0.65rem;
   border: 1px solid #ccc;
   border-radius: 0.375rem;
-  font-size: 2rem;
+  font-size: 1rem;
   font-family: inherit; /* Use the same font as the container */
-}
-
-#user-information p {
-  font-size: 1.2rem;
-  margin-top: 0.5rem;
-  color: #000000;
 }
 
 /* Update Button */
@@ -578,7 +577,6 @@
 #profile-update-button:hover {
   background-color: #047857; /* Darker green on hover */
 }
-
 
 /* Outer container */
 #trip-home-container {
@@ -632,7 +630,7 @@
 
 #trip-home-header-greeting {
   margin-top: 10px;
-  font-size: 1.5rem;
+  font-size: 1.2rem;
   opacity: 0.9;
 }
 
@@ -1042,8 +1040,6 @@
 #modify-itinerary-link:hover {
   background-color: #555;
 }
-/* ResetPassword Component Styles */
-
 
 /* Radius Itinerary Generator Component Styles */
 #radius-itinerary-container {
@@ -1132,6 +1128,19 @@
 
 
 /* Outer container for Register page */
+/* Fade-in keyframes */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Outer container for Register page */
 
 #register-container {
   position: relative;
@@ -1178,9 +1187,8 @@
 /* Title */
 #register-title {
   text-align: center;
-  font-size: 2.5rem;
+  font-size: 2rem;
   font-weight: bold;
-  color: black;
   margin-bottom: 1.5rem;
 }
 
@@ -1204,7 +1212,6 @@
   display: block;
   margin-bottom: 0.5rem;
   font-weight: bold;
-  font-size: 20px;
 }
 #register-form input,
 #register-form select,
@@ -1342,4 +1349,48 @@
 
 .landing-hero-image:hover {
   transform: scale(1.05);
+}
+
+/* Vendor Dashboard Styles */
+#vendor-dashboard-container {
+  position: relative;
+  width: 100%;
+  min-height: 100vh;
+  /*background-image: url("/public/Lizard.jpg");*/
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+#vendor-dashboard-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.3);
+  z-index: 1;
+}
+
+#vendor-dashboard-content {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 40px;
+}
+
+#vendor-dashboard-title {
+  font-size: 2.5rem;
+  font-weight: bold;
+  margin-bottom: 20px;
+  color: #333;
+}
+
+#vendor-dashboard-text {
+  font-size: 1.2rem;
+  color: #555;
+  margin-bottom: 20px;
 }

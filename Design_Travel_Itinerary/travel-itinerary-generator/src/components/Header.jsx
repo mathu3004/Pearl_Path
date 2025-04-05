@@ -61,12 +61,11 @@ const Header = () => {
           </>
         ) : (
           <>
+            {role === 'vendor' && (
             <li>
-              <Link to={role === 'vendor' ? '/vendor-dashboard' : '/user-dashboard'}>
-                Dashboard
-              </Link>
+              <Link to="/vendor-dashboard">Dashboard</Link>
             </li>
-
+          )}
             {/* Profile Dropdown */}
             <li className="relative">
               <img

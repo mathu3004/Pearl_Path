@@ -153,9 +153,6 @@ const TripHome = () => {
                         <Link id="trip-home-plan-trip" to="/itineraries">
                             Plan New Trip
                         </Link>
-                        <Link id="trip-home-saved-itineraries" to="/saved-itineraries">
-                            View Saved Itineraries
-                        </Link>
                     </div>
                 </div>
             </div>

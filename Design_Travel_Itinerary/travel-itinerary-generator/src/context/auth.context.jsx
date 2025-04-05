@@ -84,11 +84,32 @@ export const AuthProvider = ({ children }) => {
   };
 
   useEffect(() => {
-    // Force clear token on every app load
-    localStorage.removeItem("token");
-    setAuth({ token: null, user: null, loading: false });
-  }, []);  
-
+    // Load token from localStorage on initial load
+    const token = localStorage.getItem("token");
+    if (token) {
+      try {
+        const decoded = jwtDecode(token);
+        setAuth({ token, user: decoded, loading: false });
+      } catch (err) {
+        console.error("Invalid token, logging out...");
+        logout();
+      }
+    } else {
+      setAuth({ token: null, user: null, loading: false });
+    }
+  
+    // Listen for tab/window close to remove token
+    const handleUnload = () => {
+      localStorage.removeItem("token");
+    };
+  
+    window.addEventListener("beforeunload", handleUnload);
+  
+    return () => {
+      window.removeEventListener("beforeunload", handleUnload);
+    };
+  }, []);
+    
   return (
     <AuthContext.Provider value={{ auth, login, register, logout, fetchProfile }}>
       {children}
