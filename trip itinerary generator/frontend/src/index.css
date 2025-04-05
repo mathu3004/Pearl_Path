@@ -1,10 +1,8 @@
 @import "tailwindcss";
 
 /* Tailwind directives */
-/* Tailwind directives for v4 */
 @import "tailwindcss/preflight";
-@import "tailwindcss/utilities";
-
+@tailwind utilities;
 
 /* Keyframes */
 @keyframes fadeIn {
@@ -54,9 +52,19 @@
   background: #fff;
   padding: 20px;
   border-radius: 8px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
   opacity: 0;
   animation: fadeIn 1s ease forwards;
+  text-align: center;
+}
+
+/* New styles for team member images */
+.team-member-image {
+  width: 150px;
+  height: 150px;
+  object-fit: cover;
+  border-radius: 50%;
+  margin: 0 auto 20px auto;
 }
 
 .team-member-name {
@@ -80,7 +88,7 @@
 }
 
 #itineraries-bg {
-  background-image: url("/public/Caravan.jpg");
+  background-image: url("/Caravan.jpg");
   background-size: cover;
   background-position: center;
   position: absolute;
@@ -160,7 +168,7 @@
   width: 100%;
   min-height: 100vh;
   font-family: 'Poppins', sans-serif;
-  background-image: url("/public/Beach.jpg");
+  background-image: url("/Beach.jpg");
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
@@ -208,7 +216,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background-image: url("/public/LoginOption6.jpg"); /* Ensure image is in your public folder */
+  background-image: url("/LoginOption6.jpg"); /* Ensure image is in your public folder */
   background-size: cover;
   background-position: center;
   filter: brightness(0.9) contrast(1.1);
@@ -243,8 +251,7 @@
 /* Title */
 #login-title {
   text-align: center;
-  color: black;
-  font-size: 2rem; /* Adjust as needed */
+  font-size: 1.5rem; /* Adjust as needed */
   font-weight: bold;
   margin-bottom: 1.5rem;
 }
@@ -264,7 +271,6 @@
 #login-form label {
   display: block;
   margin-bottom: 0.5rem;
-  font-size: 22px;
   font-weight: 600; /* Semi-bold */
 }
 
@@ -313,6 +319,7 @@
 #login-links a:hover {
   text-decoration: underline;
 }
+
 /* ResetPassword Component Styles */
 
 #reset-password-container {
@@ -320,7 +327,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background-image: url("/public/LoginOption6.jpg");  /* Ensure this image is in your public folder */
+  background-image: url("/LoginOption6.jpg");  /* Ensure this image is in your public folder */
   background-size: cover;
   background-position: center;
   filter: brightness(0.9) contrast(1.1);
@@ -353,8 +360,7 @@
 /* Additional element styles can be added as needed */
 #reset-password-title {
   text-align: center;
-  font-size: 2rem;
-  color: black;
+  font-size: 1.5rem;
   font-weight: bold;
   margin-bottom: 1.5rem;
 }
@@ -373,7 +379,6 @@
   display: block;
   margin-bottom: 0.5rem;
   font-weight: bold;
-  font-size: 20px;
 }
 
 #reset-password-form input {
@@ -425,6 +430,8 @@
   }
 }
 
+
+
 /* Profile Component */
 /* Profile Container */
 #profile-container {
@@ -453,7 +460,6 @@
 /* Header Section (Title + Edit Button) */
 #profile-header {
   display: flex;
-
   justify-content: space-between;
   align-items: center;
   margin-bottom: 1.5rem; /* Some spacing below the header */
@@ -461,8 +467,7 @@
 
 /* Title */
 #profile-title {
-  font-size: 3rem;
-  color: black;
+  font-size: 2rem;
   font-weight: bold;
   margin: 0; /* Remove default margins */
 }
@@ -498,7 +503,6 @@
   margin-bottom: 1rem;
   font-weight: 500;
   line-height: 1.4;
-  font-size: 30px;
 }
 
 #profile-message {
@@ -541,7 +545,6 @@
   display: block;
   font-weight: 600;
   margin-bottom: 0.5rem;
-  font-size: 30px;
 }
 
 #user-information input,
@@ -551,7 +554,7 @@
   padding: 0.65rem;
   border: 1px solid #ccc;
   border-radius: 0.375rem;
-  font-size: 2rem;
+  font-size: 1rem;
   font-family: inherit; /* Use the same font as the container */
 }
 
@@ -574,7 +577,6 @@
   background-color: #047857; /* Darker green on hover */
 }
 
-
 /* Outer container */
 #trip-home-container {
   position: relative;
@@ -582,7 +584,7 @@
   min-height: 100vh;
   font-family: 'Poppins', sans-serif;
   overflow: hidden;
-  background-image: url("/public/Lighthouse.jpeg");
+  background-image: url("/Lighthouse.jpeg");
   background-size: cover;
   background-position: center;
   animation: fadeIn 1s ease forwards;
@@ -627,7 +629,7 @@
 
 #trip-home-header-greeting {
   margin-top: 10px;
-  font-size: 1.5rem;
+  font-size: 1.2rem;
   opacity: 0.9;
 }
 
@@ -955,7 +957,7 @@
   width: 100%;
   min-height: 100vh;
   font-family: 'Poppins', sans-serif;
-  background-image: url("/public/Beach.jpg");
+  background-image: url("/Beach.jpg");
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
@@ -1037,8 +1039,6 @@
 #modify-itinerary-link:hover {
   background-color: #555;
 }
-/* ResetPassword Component Styles */
-
 
 /* Radius Itinerary Generator Component Styles */
 #radius-itinerary-container {
@@ -1047,7 +1047,7 @@
   min-height: 100vh;
   font-family: 'Poppins', sans-serif;
   animation: fadeIn 1s ease forwards;
-  background-image: url("/public/Mirissa.jpg");
+  background-image: url("/Mirissa.jpg");
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
@@ -1127,6 +1127,19 @@
 
 
 /* Outer container for Register page */
+/* Fade-in keyframes */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Outer container for Register page */
 
 #register-container {
   position: relative;
@@ -1150,7 +1163,7 @@
 
 /* Background image container for the registration form */
 #register-bg-container {
-  background-image: url("/public/CreateAccount1.jpg");
+  background-image: url("/CreateAccount1.jpg");
   background-size: cover;
   background-position: center;
   position: relative;
@@ -1173,9 +1186,8 @@
 /* Title */
 #register-title {
   text-align: center;
-  font-size: 2.5rem;
+  font-size: 2rem;
   font-weight: bold;
-  color: black;
   margin-bottom: 1.5rem;
 }
 
@@ -1199,7 +1211,6 @@
   display: block;
   margin-bottom: 0.5rem;
   font-weight: bold;
-  font-size: 20px;
 }
 #register-form input,
 #register-form select,
