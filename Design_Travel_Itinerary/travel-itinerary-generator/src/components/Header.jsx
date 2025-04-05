@@ -15,10 +15,15 @@ const Header = () => {
   };
 
   // Logout handler: call logout and then redirect to login page
-  const handleLogout = () => {
-    logout();
-    navigate('/');
+  const handleLogout = async () => {
+    try {
+      await logout();       // Clear token and context
+      navigate('/');        // Navigate only after cleanup
+    } catch (err) {
+      console.error("Logout failed", err);
+    }
   };
+  
 
   // Retrieve current user's profile to extract the username
   useEffect(() => {

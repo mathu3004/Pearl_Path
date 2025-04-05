@@ -7,9 +7,12 @@ export const AuthProvider = ({ children }) => {
   const [auth, setAuth] = useState({ token: null, user: null, loading: true });
 
   const logout = () => {
-    localStorage.removeItem("token");
-    setAuth({ token: null, user: null, loading: false });
-  };
+    return new Promise((resolve) => {
+      localStorage.removeItem("token");
+      setAuth({ token: null, user: null, loading: false });
+      resolve();
+    });
+  };  
 
   const login = async ({ username, password }) => {
     try {
@@ -81,24 +84,10 @@ export const AuthProvider = ({ children }) => {
   };
 
   useEffect(() => {
-    const storedToken = localStorage.getItem("token");
-    if (storedToken) {
-      try {
-        const decoded = jwtDecode(storedToken);
-        const isExpired = decoded.exp * 1000 < Date.now();
-        if (isExpired) {
-          logout(); // Token expired
-        } else {
-          setAuth({ token: storedToken, user: decoded, loading: false });
-        }
-      } catch (error) {
-        console.error("Token decode error:", error);
-        logout();
-      }
-    } else {
-      setAuth({ token: null, user: null, loading: false });
-    }
-  }, []);
+    // Force clear token on every app load
+    localStorage.removeItem("token");
+    setAuth({ token: null, user: null, loading: false });
+  }, []);  
 
   return (
     <AuthContext.Provider value={{ auth, login, register, logout, fetchProfile }}>

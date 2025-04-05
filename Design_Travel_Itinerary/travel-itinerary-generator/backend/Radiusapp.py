@@ -272,7 +272,7 @@ def assign_hotel_for_destination(user, destination):
 def recommend_attractions_for_destination(user, destination, hotel_lat, hotel_lon, used_attractions):
     max_distance_km = user['maximum_distance']
     city_aliases = {
-        "nuwara_eliya": "eliya"
+    "nuwara_eliya": "eliya"
     }
     fixed_dest = city_aliases.get(destination, destination)
     city_col = f"city_{fixed_dest}"
@@ -285,64 +285,56 @@ def recommend_attractions_for_destination(user, destination, hotel_lat, hotel_lo
         return [], {}
 
     # Step 2: Activity preference filtering
-    # Normalize attraction columns
-    city_attractions.columns = map(str.lower, city_attractions.columns)
-
-    # Normalize user keys
-    user = {k.lower(): v for k, v in user.items()}
-
-    # Match activity preference columns
-    activity_cols = [col for col in user if col.startswith("activities_preference_") and user[col] == 1]
-    matching_cols = [col for col in activity_cols if col in city_attractions.columns]
-
-    # Apply filtering
+    user_activities = [col for col in user.keys() if col.startswith("activities_preference_") and user[col] == 1]
+    matching_cols = [col for col in user_activities if col in city_attractions.columns]
     if matching_cols:
         city_attractions = city_attractions[city_attractions[matching_cols].sum(axis=1) > 0]
 
-    # Step 3: Filter by distance from hotel
+    # Step 3: Distance filtering
     city_attractions['distance'] = city_attractions.apply(
         lambda row: geodesic((hotel_lat, hotel_lon), (row['latitude'], row['longitude'])).km, axis=1)
     city_attractions = city_attractions[city_attractions['distance'] <= max_distance_km]
 
-    # Step 4: Remove already used attractions
+    # Step 4: Remove used
     city_attractions = city_attractions[~city_attractions['name'].isin(used_attractions)]
 
-    # Step 5: Clustering with PCA + DBSCAN
+    # Step 5: Apply PCA + DBSCAN Clustering
     try:
         cluster_input = city_attractions[['rating', 'latitude', 'longitude']].fillna(0)
-        scaled = StandardScaler().fit_transform(cluster_input)
-        pca_data = attraction_model_pca.transform(scaled)
-        labels = attraction_model_dbscan.fit_predict(pca_data)
-        city_attractions['cluster'] = labels
-        clustered = city_attractions[city_attractions['cluster'] != -1]
-        clustered = clustered.sort_values(by='rating', ascending=False)
+        cluster_input_scaled = StandardScaler().fit_transform(cluster_input)
+        pca_data = attraction_model_pca.transform(cluster_input_scaled)
+        cluster_labels = attraction_model_dbscan.fit_predict(pca_data)
+        city_attractions['cluster'] = cluster_labels
+
+        # Filter out noise cluster (-1)
+        clustered_attractions = city_attractions[city_attractions['cluster'] != -1]
+        clustered_attractions = clustered_attractions.sort_values(by='rating', ascending=False)
     except Exception as e:
-        print(f"Clustering failed: {e}")
-        clustered = city_attractions.sort_values(by='rating', ascending=False)
+        clustered_attractions = city_attractions.sort_values(by="rating", ascending=False)
 
-    clustered = clustered.head(16)  # cap to avoid overloading
-    group_size = 4
-    num_groups = max(1, len(clustered) // group_size)
+    clustered_attractions = clustered_attractions.head(40)
 
+    # Util to extract activity list from a row
     def extract_activities(row):
         flags = [
             col.replace("activities_preference_", "") for col in attractions.columns
             if col.startswith("activities_preference_") and row.get(col, 0) == 1
         ]
-        return flags if flags else row.get("activities", [])
+        if flags:
+            return flags
+        return row.get("activities", [])
 
     main = []
     alternatives = {}
 
-    for i in range(num_groups):
-        group = clustered.iloc[i * group_size: (i + 1) * group_size]
+    for i in range(4):
+        group = clustered_attractions.iloc[i * 4: (i + 1) * 4]
         if group.empty:
             continue
 
         main_attraction = group.iloc[0]
-        alt_group = group.iloc[1:]
-        alt_group = alt_group[~alt_group['name'].isin(used_attractions)]
-
+        alt_group = group.iloc[1:4]
+        
         main_obj = {
             "name": str(main_attraction["name"]),
             "latitude": float(main_attraction["latitude"]),
@@ -351,8 +343,9 @@ def recommend_attractions_for_destination(user, destination, hotel_lat, hotel_lo
             "city": destination.title(),
             "activities": extract_activities(main_attraction)
         }
+        alt_group = alt_group[~alt_group['name'].isin(used_attractions)]
 
-        alt_objs = [{
+        alt_objs = [ {
             "name": str(row["name"]),
             "latitude": float(row["latitude"]),
             "longitude": float(row["longitude"]),
@@ -381,21 +374,15 @@ def recommend_restaurants_for_destination(user, destination, hotel_lat, hotel_lo
 
     city_restaurants = restaurants[restaurants[city_col] == 1].copy()
 
-    # Normalize user keys
-    user = {k.lower(): v for k, v in user.items()}
-
-    # Normalize column names
-    city_restaurants.columns = map(str.lower, city_restaurants.columns)
-
-    # Normalize dietary and cuisines
+    # Prepare dietary and cuisine preferences
     dietary_options = []
     if user.get('food_preference_veg') == 1:
         dietary_options.append('dietary_veg')
     if user.get('food_preference_non_veg') == 1:
         dietary_options.append('dietary_non-veg')
 
-    user_cuisines = [f"cuisine_{k.replace('cuisine_preference_', '')}"
-                    for k in user if k.startswith("cuisine_preference_") and user[k] == 1]
+    user_cuisines = [col.replace("cuisine_preference_", "cuisine_") for col in user.keys()
+                     if col.startswith("cuisine_preference_") and user[col] == 1]
     valid_cuisines = [c for c in user_cuisines if c in city_restaurants.columns]
 
     # Apply preference filters BEFORE prediction
@@ -419,10 +406,12 @@ def recommend_restaurants_for_destination(user, destination, hotel_lat, hotel_lo
         print("Error loading restaurant model features:", e)
         restaurant_model_features = []
 
+    # Add missing features
     for col in restaurant_model_features:
         if col not in city_restaurants.columns:
             city_restaurants[col] = 0
 
+    # Apply ML model prediction
     try:
         feature_data = city_restaurants[restaurant_model_features].to_numpy()
         city_restaurants['predicted_rating_class'] = restaurant_model.predict(feature_data)
@@ -431,73 +420,75 @@ def recommend_restaurants_for_destination(user, destination, hotel_lat, hotel_lo
         print(f"[ML Restaurant] Prediction failed, fallback to rating: {e}")
         city_restaurants = city_restaurants.sort_values(by="rating", ascending=False)
 
-    # Final selection
+    # Filter out used
+    top_restaurants = city_restaurants[
+        ~city_restaurants['name'].isin(used_restaurants)
+    ].head(12)
+
+    # Track used restaurant names
+    used_restaurants.update(top_restaurants['name'].tolist())
+
+    # Split into meals
     meals = ['breakfast', 'lunch', 'dinner']
     best = {}
     alternatives = {}
 
     for meal in meals:
         meal_key = f"mealtype_{meal}"
-        meal_restaurants = city_restaurants[city_restaurants[meal_key] == 1].copy()
+        meal_restaurants = city_restaurants[
+            (city_restaurants[meal_key] == 1) &
+            (~city_restaurants['name'].isin(used_restaurants))
+        ].copy()
 
-        # First: strict filter
-        filtered = meal_restaurants.copy()
+        # Re-apply user dietary and cuisine filtering
         if dietary_options:
-            filtered = filtered[filtered[dietary_options].sum(axis=1) > 0]
+            meal_restaurants = meal_restaurants[meal_restaurants[dietary_options].sum(axis=1) > 0]
         if valid_cuisines:
-            filtered = filtered[filtered[valid_cuisines].sum(axis=1) > 0]
+            meal_restaurants = meal_restaurants[meal_restaurants[valid_cuisines].sum(axis=1) > 0]
 
-        # Fallback: relax filters if too few
-        if filtered.shape[0] < 4:
-            print(f"[{meal}] Too few after filtering ({filtered.shape[0]}). Relaxing filters.")
-            filtered = meal_restaurants
-            if filtered.shape[0] < 4:
-                filtered = city_restaurants[city_restaurants[meal_key] == 1]
+        if not meal_restaurants.empty:
+            top_meal_group = meal_restaurants.head(4)
+            best_restaurant = top_meal_group.iloc[0]
 
-        top_meal_group = filtered.head(4)
-        if top_meal_group.empty:
+            best[meal] = {
+                "name": str(best_restaurant['name']),
+                "latitude": float(best_restaurant['latitude']),
+                "longitude": float(best_restaurant['longitude']),
+                "city": destination.replace('_', ' ').title(),
+                "rating": float(best_restaurant['rating']),
+                "weburl": str(best_restaurant['weburl']),
+                "dietary": [
+                    label for label, col in {
+                        "veg": "dietary_veg",
+                        "non-veg": "dietary_non-veg"
+                    }.items() if best_restaurant.get(col, 0) == 1
+                ],
+                "cuisines": [col.replace("cuisine_", "") for col in city_restaurants.columns
+                             if col.startswith("cuisine_") and best_restaurant.get(col, 0) == 1]
+            }
+
+            alt_group = top_meal_group.iloc[1:4]
+            alternatives[meal] = [ {
+                "name": str(row["name"]),
+                "latitude": float(row["latitude"]),
+                "longitude": float(row["longitude"]),
+                "rating": float(row["rating"]),
+                "weburl": str(row['weburl']),
+                "city": destination.replace('_', ' ').title(),
+                "dietary": [
+                    label for label, col in {
+                        "veg": "dietary_veg",
+                        "non-veg": "dietary_non-veg"
+                    }.items() if row.get(col, 0) == 1
+                ],
+                "cuisines": [col.replace("cuisine_", "") for col in city_restaurants.columns
+                             if col.startswith("cuisine_") and row.get(col, 0) == 1]
+            } for _, row in alt_group.iterrows()]
+
+            used_restaurants.update(top_meal_group['name'].tolist())
+        else:
             best[meal] = {}
             alternatives[meal] = []
-            continue
-
-        best_restaurant = top_meal_group.iloc[0]
-
-        best[meal] = {
-            "name": str(best_restaurant['name']),
-            "latitude": float(best_restaurant['latitude']),
-            "longitude": float(best_restaurant['longitude']),
-            "city": destination.replace('_', ' ').title(),
-            "rating": float(best_restaurant['rating']),
-            "weburl": str(best_restaurant['weburl']),
-            "dietary": [
-                label for label, col in {
-                    "veg": "dietary_veg",
-                    "non-veg": "dietary_non-veg"
-                }.items() if best_restaurant.get(col, 0) == 1
-            ],
-            "cuisines": [col.replace("cuisine_", "") for col in city_restaurants.columns
-                         if col.startswith("cuisine_") and best_restaurant.get(col, 0) == 1]
-        }
-
-        alt_group = top_meal_group.iloc[1:]
-        alternatives[meal] = [{
-            "name": str(row["name"]),
-            "latitude": float(row["latitude"]),
-            "longitude": float(row["longitude"]),
-            "rating": float(row["rating"]),
-            "weburl": str(row['weburl']),
-            "city": destination.replace('_', ' ').title(),
-            "dietary": [
-                label for label, col in {
-                    "veg": "dietary_veg",
-                    "non-veg": "dietary_non-veg"
-                }.items() if row.get(col, 0) == 1
-            ],
-            "cuisines": [col.replace("cuisine_", "") for col in city_restaurants.columns
-                         if col.startswith("cuisine_") and row.get(col, 0) == 1]
-        } for _, row in alt_group.iterrows()]
-
-        used_restaurants.update(top_meal_group['name'].tolist())
 
     return best, alternatives
 
@@ -540,36 +531,12 @@ def generate_itinerary():
         user = db.preitineraries.find_one({"username": username, "name": itinerary_name}, {'_id': 0})
         if not user:
             return jsonify({"error": "User itinerary not found"}), 404
-        
-        # Fix: Normalize cuisines, dietary, activities from list format into flags
-        if 'cuisines' in user:
-            for cuisine in user['cuisines']:
-                key = f"cuisine_preference_{cuisine.lower().replace(' ', '_')}"
-                user[key] = 1
-
-        if 'activities' in user:
-            for activity in user['activities']:
-                key = f"activities_preference_{activity.lower().replace(' ', '_')}"
-                user[key] = 1
-
-        if 'foodPreferences' in user:
-            if 'veg' in user['foodPreferences'].lower():
-                user['food_preference_veg'] = 1
-            if 'non' in user['foodPreferences'].lower():
-                user['food_preference_non_veg'] = 1
-
-        # Normalize maxDistance
-        if 'maxDistance' in user:
-            user['maximum_distance'] = user['maxDistance']
-
-        # Normalize numberOfDays
-        if 'numberOfDays' in user:
-            user['numberofdays'] = user['numberOfDays']
 
         days_per_destination = allocate_days_to_destinations(user, user['numberofdays'])
         itinerary = {}
         used_attractions = set()
         used_restaurants = set()
+
 
         for destination, days in days_per_destination.items():
             destination_key = destination.replace('_', ' ').title()
@@ -598,7 +565,7 @@ def generate_itinerary():
                     "Alternative Restaurants": alt_restaurants
                 }
 
-        transport_modes = get_user_transport_modes(username, itinerary_name)  
+        transport_modes = get_user_transport_modes(username, itinerary_name)  # Get selected transport modes
 
         db.generated_itineraries.update_one(
             {"username": username, "name": itinerary_name},
@@ -606,7 +573,7 @@ def generate_itinerary():
                 "username": username,
                 "name": itinerary_name,
                 "itinerary": itinerary,
-                "transport_modes": transport_modes,  
+                "transport_modes": transport_modes,  #  save user-selected transport modes
                 "last_updated": datetime.now(timezone.utc)
             }},
             upsert=True

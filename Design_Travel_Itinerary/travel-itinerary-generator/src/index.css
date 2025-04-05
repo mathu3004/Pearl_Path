@@ -5,7 +5,6 @@
 @import "tailwindcss/preflight";
 @import "tailwindcss/utilities";
 
-
 /* Keyframes */
 @keyframes fadeIn {
   0% {

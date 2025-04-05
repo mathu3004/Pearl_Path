@@ -33,7 +33,7 @@ const AppContent = () => {
         if (auth.token) {
             fetchProfile();
         }
-        // ❌ Do NOT redirect in useEffect — leave that to <ProtectedRoute>
+        // Do NOT redirect in useEffect — leave that to <ProtectedRoute>
     }, [auth.token, fetchProfile]);
 
     return (
@@ -41,7 +41,7 @@ const AppContent = () => {
             <main className="flex-grow">
                 <Routes>
                     {/* Public Routes */}
-                    <Route path="/" element={<LandingPage />} />
+                    <Route path="/home" element={<LandingPage />} />
                     <Route path="/register" element={<Register />} />
                     <Route path="/reset-password" element={<ResetPassword />} />
                     <Route path="/about-us" element={<AboutUs />} />

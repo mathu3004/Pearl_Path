@@ -104,19 +104,22 @@ const MapComponent = ({ locations, activeLocation, transportModesPerDay }) => {
       path.push([dayData.Hotel.latitude, dayData.Hotel.longitude]);
     }
 
-    if (dayData?.Restaurants?.breakfast)
-      path.push([dayData.Restaurants.breakfast.latitude, dayData.Restaurants.breakfast.longitude]);
-
     dayData?.Attractions?.forEach(att => {
       if (att?.latitude && att?.longitude)
         path.push([att.latitude, att.longitude]);
     });
 
-    if (dayData?.Restaurants?.lunch)
-      path.push([dayData.Restaurants.lunch.latitude, dayData.Restaurants.lunch.longitude]);
+    const breakfast = dayData?.Restaurants?.breakfast;
+    if (breakfast && breakfast.latitude && breakfast.longitude)
+      path.push([breakfast.latitude, breakfast.longitude]);
 
-    if (dayData?.Restaurants?.dinner)
-      path.push([dayData.Restaurants.dinner.latitude, dayData.Restaurants.dinner.longitude]);
+    const lunch = dayData?.Restaurants?.lunch;
+    if (lunch && lunch.latitude && lunch.longitude)
+      path.push([lunch.latitude, lunch.longitude]);
+
+    const dinner = dayData?.Restaurants?.dinner;
+    if (dinner && dinner.latitude && dinner.longitude)
+      path.push([dinner.latitude, dinner.longitude]);
 
     if (dayData?.Hotel) {
       // End at the same hotel (loop route)
