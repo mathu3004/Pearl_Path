@@ -116,85 +116,92 @@ const ModifyItinerary = () => {
       <Header />
 
       <div className="main-layout single">
-        <div className="itinerary-card">
-          <h1 className="itinerary-title">
-            MODIFY {(username || itinerary.username || "Your").toUpperCase()}'S ITINERARY
-          </h1>
+  <div className="itinerary-card">
+    <h1 className="itinerary-title">
+      MODIFY {(username || itinerary.username || "Your").toUpperCase()}'S ITINERARY
+    </h1>
 
-          {itinerary.days.map((day, idx) => (
-            <div key={idx} className="bg-green-50 p-4 rounded-xl shadow-md">
-              <h2 className="text-xl font-semibold mb-4">Day {day.day}: {day.destination}</h2>
+    <div className="modify-itinerary-day-card">
+      {itinerary.days.map((day, idx) => (
+        <div key={idx} className="modify-itinerary-day-inner">
+          <h2 className="modify-itinerary-day-title">Day {day.day}: {day.destination}</h2>
 
-              {/* Hotel */}
-              {day.hotel?.name && (
-                <div className="itinerary-item">
-                  <div className="activity-header">
-                    <FaHotel className="activity-icon" />Hotel: {day.hotel.name}
-                  </div>
-                  <div className="activity-second-row">
-                    <div className="activity-location"><FaMapMarkerAlt /> {day.hotel.address || day.hotel.city}</div>
-                    <div className="activity-rating">⭐ {day.hotel.rating} {day.hotel.price && `| Rs. ${day.hotel.price}`}</div>
-                  </div>
-                  <button className="change-button" onClick={() => handleChange('hotel', idx)}>Change Hotel</button>
+          {/* Hotel */}
+          {day.hotel?.name && (
+            <div className="modify-itinerary-item hotel">
+              <div className="modify-activity-header">
+                <FaHotel className="activity-icon" />
+                Hotel: {day.hotel.name}
+              </div>
+              <div className="modify-activity-details">
+                <div><FaMapMarkerAlt /> {day.hotel.address || day.hotel.city}</div>
+                <div>⭐ {day.hotel.rating} {day.hotel.price && `| Rs. ${day.hotel.price}`}</div>
+              </div>
+              <button className="change-button" onClick={() => handleChange('hotel', idx)}>Change Hotel</button>
+            </div>
+          )}
+
+          {/* Meals */}
+          {['breakfast', 'lunch', 'dinner'].map(mealType => {
+            const meal = day.meals?.[mealType];
+            return meal?.name && (
+              <div key={mealType} className="modify-itinerary-item restaurant">
+                <div className="modify-activity-header">
+                  <FaUtensils className="activity-icon" />
+                  {mealType.charAt(0).toUpperCase() + mealType.slice(1)}: {meal.name}
                 </div>
-              )}
-
-              {/* Meals */}
-              {['breakfast', 'lunch', 'dinner'].map(mealType => {
-                const meal = day.meals?.[mealType];
-                return meal?.name && (
-                  <div key={mealType} className="itinerary-item">
-                    <div className="activity-header">
-                      <FaUtensils className="activity-icon" />{mealType.charAt(0).toUpperCase() + mealType.slice(1)}: {meal.name}
-                    </div>
-                    <div className="activity-second-row">
-                      <div className="activity-location"><FaMapMarkerAlt /> {meal.address || meal.city}</div>
-                      <div className="activity-rating">
-                        ⭐ {meal.rating} {meal.cuisines && `| ${meal.cuisines}`} {meal.pricelevel_lkr && `| Rs. ${meal.pricelevel_lkr}`}
-                      </div>
-                    </div>
-                    <button className="change-button" onClick={() => handleChange('restaurant', idx, mealType)}>
-  Change {mealType.charAt(0).toUpperCase() + mealType.slice(1)} Restaurant
-</button>
-<button className="remove-button ml-2" onClick={() => handleRemove('restaurant', idx, mealType)}>
-  Remove {mealType.charAt(0).toUpperCase() + mealType.slice(1)}
-</button>
+                <div className="modify-activity-details">
+                  <div><FaMapMarkerAlt /> {meal.address || meal.city}</div>
+                  <div>
+                    ⭐ {meal.rating}
+                    {meal.cuisines && ` | ${meal.cuisines}`}
+                    {meal.pricelevel_lkr && ` | Rs. ${meal.pricelevel_lkr}`}
                   </div>
-                );
-              })}
-
-              {/* Attractions */}
-              {day.attractions?.map((attr, i) => attr?.name && (
-                <div key={i} className="itinerary-item">
-                  <div className="activity-header">
-                    <FaMapMarkerAlt className="activity-icon" />Attraction: {attr.name}
-                  </div>
-                  <div className="activity-second-row">
-                    <div className="activity-location"><FaMapMarkerAlt /> {attr.address || attr.city}</div>
-                    <div className="activity-rating">⭐ {attr.rating} {attr.price && `| Rs. ${attr.price}`}</div>
-                  </div>
-                  <button className="change-button" onClick={() => handleChange('attraction', idx, null, i)}>
-  Change Attraction
-</button>
-<button className="remove-button ml-2" onClick={() => handleRemove('attraction', idx, null, i)}>
-  Remove Attraction
-</button>
                 </div>
-              ))}
+                <button className="change-button" onClick={() => handleChange('restaurant', idx, mealType)}>
+                  Change {mealType.charAt(0).toUpperCase() + mealType.slice(1)} Restaurant
+                </button>
+                <button className="remove-button" onClick={() => handleRemove('restaurant', idx, mealType)}>
+                  Remove {mealType.charAt(0).toUpperCase() + mealType.slice(1)}
+                </button>
+              </div>
+            );
+          })}
+
+          {/* Attractions */}
+          {day.attractions?.map((attr, i) => attr?.name && (
+            <div key={i} className="modify-itinerary-item attraction">
+              <div className="modify-activity-header">
+                <FaMapMarkerAlt className="activity-icon" />
+                Attraction: {attr.name}
+              </div>
+              <div className="modify-activity-details">
+                <div><FaMapMarkerAlt /> {attr.address || attr.city}</div>
+                <div>⭐ {attr.rating} {attr.price && `| Rs. ${attr.price}`}</div>
+              </div>
+              <button className="change-button" onClick={() => handleChange('attraction', idx, null, i)}>
+                Change Attraction
+              </button>
+              <button className="remove-button" onClick={() => handleRemove('attraction', idx, null, i)}>
+                Remove Attraction
+              </button>
             </div>
           ))}
         </div>
+      ))}
+    </div>
+    <div className="modify-itinerary-save-wrapper">
+    <button className="modify-itinerary-save-button" onClick={handleSave}>Save Changes</button>
+  </div>
+  </div>
+  <br></br>
 
-      
-      </div>
-      <div className="save-button-wrapper">
-        <button className="viz-button" onClick={handleSave}>Save Changes</button>
-      </div>
-      <Layout>
-      </Layout>
-      </div>
-      <Footer />
+  
+</div>
+  <Layout />
+</div>
 
+<Footer />
     </div>
   );
 };

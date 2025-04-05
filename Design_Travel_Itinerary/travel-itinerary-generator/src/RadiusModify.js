@@ -193,18 +193,18 @@ const RadiusModify = () => {
               <div>
                 <h4>Attractions</h4>
                 {day.Attractions?.map((att, idx) => (
-  <div key={idx} className="edititem">
-    <span>{att.name}</span>
-    <button className="removebtn" onClick={() => handleRemove(dayKey, 'Attractions', idx)}>Remove</button>
-    <div className="altrow">
-      {(alternatives[dayKey]?.Attractions?.[att.name] || []).map((alt, aIdx) => (
-        <button key={aIdx} className="replacebtn" onClick={() => handleReplace(dayKey, 'Attractions', idx, alt)}>
-          Replace with: {alt.name}
-        </button>
-      ))}
-    </div>
-  </div>
-))}
+                <div key={idx} className="edititem">
+                  <span>{att.name}</span>
+                  <button className="removebtn" onClick={() => handleRemove(dayKey, 'Attractions', idx)}>Remove</button>
+                  <div className="altrow">
+                    {(alternatives[dayKey]?.Attractions?.[att.name] || []).map((alt, aIdx) => (
+                      <button key={aIdx} className="replacebtn" onClick={() => handleReplace(dayKey, 'Attractions', idx, alt)}>
+                        Replace with: {alt.name}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              ))}
               </div>
             </div>
           ))}
@@ -215,21 +215,27 @@ const RadiusModify = () => {
     locations={
       Object.values(itinerary.itinerary).flatMap((day) => {
         const locs = [];
-
-        if (day.Hotel)
+    
+        if (day.Hotel && day.Hotel.latitude && day.Hotel.longitude) {
           locs.push({ ...day.Hotel, lat: day.Hotel.latitude, lng: day.Hotel.longitude });
-
+        }
+    
         Object.values(day.Restaurants || {}).forEach((rest) => {
-          if (rest) locs.push({ ...rest, lat: rest.latitude, lng: rest.longitude });
+          if (rest && rest.latitude && rest.longitude) {
+            locs.push({ ...rest, lat: rest.latitude, lng: rest.longitude });
+          }
         });
-
+    
         (day.Attractions || []).forEach((att) => {
-          if (att) locs.push({ ...att, lat: att.latitude, lng: att.longitude });
+          if (att && att.latitude && att.longitude) {
+            locs.push({ ...att, lat: att.latitude, lng: att.longitude });
+          }
         });
-
+    
         return locs;
       })
     }
+    
     activeLocation={null}
     transportModesPerDay={itinerary.itinerary}
   />

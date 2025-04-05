@@ -603,7 +603,6 @@ for index, user in user_inputs_df.iterrows():
             "hotel": {
                 "name": current_hotel['name'],
                 "rating": current_hotel['rating'],
-                "price": current_hotel.get('pricerange', ''),
                 "note": hotel_note,
                 "latitude": current_hotel.get('latitude'),
                 "longitude": current_hotel.get('longitude'),
@@ -615,7 +614,6 @@ for index, user in user_inputs_df.iterrows():
                     "name": breakfast_restaurant['name'],
                     "cuisines": breakfast_restaurant.get('cuisines', ''),
                     "dietaryrestrictions": breakfast_restaurant.get('dietaryrestrictions', ''),
-                    "pricelevel_lkr": breakfast_restaurant.get('pricelevel_lkr', ''),
                      "latitude": breakfast_restaurant.get('latitude'),
                     "longitude": breakfast_restaurant.get('longitude'),
                     "mealtypes": breakfast_restaurant.get('mealtypes', ''),
@@ -626,7 +624,6 @@ for index, user in user_inputs_df.iterrows():
                     "name": lunch_restaurant['name'],
                     "cuisines": lunch_restaurant.get('cuisines', ''),
                     "dietaryrestrictions": lunch_restaurant.get('dietaryrestrictions', ''),
-                    "pricelevel_lkr": lunch_restaurant.get('pricelevel_lkr', ''),
                     "latitude": lunch_restaurant.get('latitude'),
                     "longitude": lunch_restaurant.get('longitude'),
                     "mealtypes": lunch_restaurant.get('mealtypes', ''),
@@ -637,7 +634,6 @@ for index, user in user_inputs_df.iterrows():
                     "name": dinner_restaurant['name'],
                     "cuisines": dinner_restaurant.get('cuisines', ''),
                     "dietaryrestrictions": dinner_restaurant.get('dietaryrestrictions', ''),
-                    "pricelevel_lkr": dinner_restaurant.get('pricelevel_lkr', ''),
                     "latitude": dinner_restaurant.get('latitude'),
                     "longitude": dinner_restaurant.get('longitude'),
                     "mealtypes": dinner_restaurant.get('mealtypes', ''),
@@ -649,7 +645,6 @@ for index, user in user_inputs_df.iterrows():
             "attractions": [
                 {
                     "name": attraction_1['Name'],
-                    "price": attraction_1.get('Lowest_Price', ''),
                     "rating": attraction_1.get('Rating', ''),
                     "latitude": attraction_1.get('latitude'),
                     "longitude": attraction_1.get('longitude'),
@@ -658,7 +653,6 @@ for index, user in user_inputs_df.iterrows():
                 },
                 {
                     "name": attraction_2['Name'],
-                    "price": attraction_2.get('Lowest_Price', ''),
                     "rating": attraction_2.get('Rating', ''),
                     "latitude": attraction_2.get('latitude'),
                     "longitude": attraction_2.get('longitude'),

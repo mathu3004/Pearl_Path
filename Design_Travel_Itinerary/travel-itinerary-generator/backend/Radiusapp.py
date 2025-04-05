@@ -165,7 +165,6 @@ visited_attractions = set()
 
 # Allocate Days
 def allocate_days_to_destinations(user, num_days):
-    # Extract destinations and starting destination
     destinations = [
         col.replace("destination_", "").lower().replace(" ", "_") 
         for col in user.keys() if col.startswith("destination_") and user[col] == 1
@@ -175,32 +174,69 @@ def allocate_days_to_destinations(user, num_days):
         col.replace("startingDestination_", "").lower().replace(" ", "_") 
         for col in user.keys() if col.startswith("startingDestination_") and user[col] == 1
     ]
-
-    # Ensure starting_destination is a string, not a list
     starting_destination = starting_destination_list[0] if starting_destination_list else None
 
-    # Ensure starting destination is at the beginning
-    if starting_destination:
-        if starting_destination in destinations:
-            destinations.remove(starting_destination)  # Remove if exists
-        destinations.insert(0, starting_destination)  # Insert at start
+    if starting_destination and starting_destination in destinations:
+        destinations.remove(starting_destination)
+        destinations.insert(0, starting_destination)
 
-    # *Edge Case: If destinations are empty*
     if not destinations:
-        return {}  # Return an empty dictionary instead of causing ZeroDivisionError
+        return {}
 
-    # Allocate days evenly across destinations
-    num_destinations = len(destinations)
-    base_days = num_days // num_destinations
-    extra_days = num_days % num_destinations
+    # --- Score each destination ---
+    destination_scores = {}
+    for dest in destinations:
+        alias = {
+            "nuwara_eliya": "eliya"
+        }.get(dest, dest)
 
-    days_per_destination = {dest: base_days for dest in destinations}
+        hotel_col = f"city_{alias}"
+        rest_col = f"city_{alias}"
+        attr_col = f"city_{alias}"
 
-    # Distribute extra days to the first extra_days destinations
-    for i in range(extra_days):
-        days_per_destination[destinations[i]] += 1
+        hotel_count = hotels[hotels[hotel_col] == 1].shape[0] if hotel_col in hotels.columns else 0
+        rest_count = restaurants[restaurants[rest_col] == 1].shape[0] if rest_col in restaurants.columns else 0
+        attr_count = attractions[attractions[attr_col] == 1].shape[0] if attr_col in attractions.columns else 0
+
+        score = hotel_count + rest_count + attr_count
+        destination_scores[dest] = score
+
+    total_score = sum(destination_scores.values())
+    if total_score == 0:
+        print("No data found for any destination. Falling back to equal distribution.")
+        return {d: num_days // len(destinations) for d in destinations}
+
+    # Step 1: Calculate initial allocation from score
+    raw_allocation = {
+        dest: (score / total_score) * num_days for dest, score in destination_scores.items()
+    }
+    days_per_destination = {dest: int(days) for dest, days in raw_allocation.items()}
+    remaining_days = num_days - sum(days_per_destination.values())
+
+    # Step 2: Apply cap to poor destinations
+    MIN_SCORE_FOR_FLEX = 15  # You can tweak this threshold
+    max_per_poor_dest = 2
+
+    for dest, score in destination_scores.items():
+        if score < MIN_SCORE_FOR_FLEX and days_per_destination[dest] > max_per_poor_dest:
+            diff = days_per_destination[dest] - max_per_poor_dest
+            days_per_destination[dest] = max_per_poor_dest
+            remaining_days += diff  # Reclaim those days
+
+    # Step 3: Redistribute reclaimed days to high-score destinations
+    good_dests = [d for d in destinations if destination_scores[d] >= MIN_SCORE_FOR_FLEX]
+    remainders = {
+        d: raw_allocation[d] - days_per_destination[d] for d in good_dests
+    }
+
+    for dest in sorted(remainders, key=remainders.get, reverse=True):
+        if remaining_days <= 0:
+            break
+        days_per_destination[dest] += 1
+        remaining_days -= 1
 
     return days_per_destination
+
 
 def get_nearby_options(lat, lon, options, max_distance_km):
     return sorted([
@@ -398,6 +434,22 @@ def recommend_restaurants_for_destination(user, destination, hotel_lat, hotel_lo
 
     # Remove already used restaurants
     city_restaurants = city_restaurants[~city_restaurants['name'].isin(used_restaurants)]
+
+    # Fallback: If restaurant count is too low after filtering, relax dietary & cuisine filters
+    if len(city_restaurants) < 12:
+        relaxed = restaurants[restaurants[city_col] == 1].copy()
+
+        # Apply only distance filtering, ignore dietary/cuisine
+        relaxed['distance'] = relaxed.apply(
+            lambda row: geodesic((hotel_lat, hotel_lon), (row['latitude'], row['longitude'])).km, axis=1)
+        relaxed = relaxed[relaxed['distance'] <= max_distance_km]
+
+        # Remove used restaurants
+        relaxed = relaxed[~relaxed['name'].isin(used_restaurants)]
+
+        if not relaxed.empty:
+            print(f"[Fallback] Using relaxed restaurant filtering for {destination}")
+            city_restaurants = relaxed
 
     # Load model features
     try:
