@@ -25,7 +25,7 @@ Pearl Path Chatbot is a web application that provides a chatbot interface for us
 - **Chatbot Information**: The chatbot provides information about itself and the trip itinerary application.
 
 # Travel Itinerary Generator with Radius
-This project is an intelligent travel itinerary planner that generates personalized trip plans for users based on a geographic radius. It leverages clustering and filtering techniques to recommend attractions, hotels, and restaurants within a specified distance from the user’s chosen destination. The model ensures that the recommended places not only match user preferences like cuisine, dietary requirements, and activity interests but are also geographically feasible by applying distance-based constraints. The final itinerary is visualized on an interactive map using OpenStreetMap for intuitive location tracking.
+This component of Pearl Path is an intelligent travel itinerary planner that generates personalized trip plans for users based on a geographic radius. It leverages clustering and filtering techniques to recommend attractions, hotels, and restaurants within a specified distance from the user’s chosen destination. The model ensures that the recommended places not only match user preferences like cuisine, dietary requirements, and activity interests but are also geographically feasible by applying distance-based constraints. The final itinerary is visualized on an interactive map using OpenStreetMap for intuitive location tracking.
 
 ## Features
 - Personalized recommendations for hotels, attractions, and restaurants.
@@ -90,5 +90,70 @@ This application intelligently assigns:
 - **Map Visualization**
     - All recommended places (hotels, restaurants, attractions) are displayed as markers on an interactive map using OpenStreetMap.
     - Helps users easily understand the geographical layout of their itinerary and distances between locations.
+
+# Travel Itinerary Generator Without Radius
+This component of Pearl Path is a machine learning-powered travel planning system that generates personalized itineraries based on user preferences such as destination, budget, cuisines, dietary needs, activities, and number of days—without applying any distance or radius constraints. Instead of location proximity, it uses content-based filtering, collaborative filtering, and feature relevance to deliver intelligent and diverse daily travel recommendations.
+
+## Features
+- Generates daily travel itineraries based on user input
+- Recommends:
+    - One hotel per city (max 3-day stay)
+    - Three restaurants per day (breakfast, lunch, dinner)
+    - Two unique attractions per day based on activities
+- Interactive modification of restaurant and attraction recommendations after generation
+- Map visualization of all itinerary points using OpenStreetMap
+- Ensures no duplicate entries across meals or attractions
+- Clean, personalized suggestions using ML-driven filtering techniques
+
+## Key Highlights
+- Personalized plans based on city, budget, food preferences and activity interests
+- Hotel recommendations using content-based filtering and collaborative filtering (SVD)
+- Restaurant recommendations filtered by meal types, cuisines, dietary needs, and budget
+- Attraction recommendations using TF-IDF + cosine similarity based on activity categories
+- Dynamic frontend built with React for a seamless user experience
+- Real-time itinerary editing with updated suggestions
+- Integrated map view of hotel, restaurant and attraction locations
+
+## Tech Stack
+- **Frontend:** React
+- **Backend:** Python (Flask-based API)
+- **Database:** MongoDB
+- **Machine Learning & Recommendation:**
+    - Content-Based Filtering (TF-IDF, Cosine Similarity)
+    - Collaborative Filtering (SVD)
+    - Data preprocessing and encoding using pandas and scikit-learn
+- **Mapping & Visualization:** OpenStreetMap + Leaflet.js
+
+## How It Works
+- **User Input Form:**
+    - Users fill in trip details including destination(s), number of travel days, budget, cuisines, food preferences, and activity interests.
+- **Preprocessing:**
+    - Encodes destinations, cuisines, dietary preferences, and meal types
+    - Cleans and standardizes price and rating fields
+- **Hotel Matching:**
+    - Combines content-based and collaborative filtering
+    - Filters hotels by budget and destination
+    - Ranks hotels based on rating, ranking position, and feature similarity
+- **Restaurant Matching:**
+    - Matches restaurants based on cuisine, dietary restrictions, and meal types
+    - Filters by city and budget
+    - Calculates a custom match score and returns the best-fitting options
+- **Attraction Matching:**
+    - Uses TF-IDF to compute similarity between user activities and attraction descriptions
+    - Filters attractions by city and price
+    - Sorts by similarity and popularity
+- **Itinerary Assembly:**
+    - Assigns one hotel per city (maximum 3 consecutive days)
+    - Recommends three different restaurants per day
+    - Recommends two unique attractions per day
+    - Ensures diversity and no duplicate selections
+- **Modification & Map Display:**
+    - Users can modify specific recommendations (restaurant, attraction) after itinerary generation
+    - Users can delete individual restaurant, attraction or hotel recommendations
+    - All destinations are plotted interactively on a map using OpenStreetMap and Leaflet
+
+
+
+
 
 
