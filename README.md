@@ -252,7 +252,7 @@ You need to run **three backend servers** and a **chatbot server**.
 - In the **Codespace file explorer**, open `package.json`.
 - Locate the script:
   ```json
-  "start:all": "node Startserver.js"
+  "start:all": "concurrently \"npm run start:radius\" \"npm run start:itinerary\" \"npm run start:start\""
   ```
 - Click the **Run** button next to the script OR run manually:
   ```bash
