@@ -166,54 +166,8 @@ Pearl Path Chatbot is a web application that provides a chatbot interface for us
 
 # Project File Structure
 
-Design_Travel_Itinerary/
-├── backend/
-│   ├── models/                        
-│   ├── change_recommendation.py      
-│   ├── input_preprocessing.py       
-│   ├── Itineraryapp.py               
-│   ├── Itineraryserver.js            
-│   ├── Radiusapp.py                  
-│   ├── RadiusBasedGenerator.py       
-│   ├── Radiusserver.js               
-│   ├── Transport.py                 
-│   ├── .env                         
-│   ├── package.json                  
-│   └── package-lock.json
-│
-├── public/
-│   ├── assets/                       
-│   ├── favicon.ico
-│   ├── index.html                   
-│   ├── logo192.png
-│   ├── logo512.png
-│   ├── manifest.json
-│   └── robots.txt
-│
-├── src/
-│   ├── components/                   
-│   ├── App.js                       
-│   ├── App.test.js
-│   ├── index.js                      
-│   ├── ItineraryApp.css          
-│   ├── ItinerarySelection.js       
-│   ├── ItinerarySelectionPage.css
-│   ├── ModifyItinerary.js          
-│   ├── RadiusMapComponent.js       
-│   ├── RadiusModify.js             
-│   ├── RadiusModifyRequest.js       
-│   ├── RadiusTravelItineraryGenerator.js
-│   ├── RadiusVisual.js              
-│   ├── reportWebVitals.js
-│   ├── setupTests.js
-│   ├── TravelItineraryGenerator.js  
-│   ├── TravelItineraryRadius.css
-│   └── VisualizationItinerary.js    
-│
-├── .gitignore
-├── package.json                     
-├── package-lock.json
-└── README.md
+```
+Design_Travel_Itinerary/ ├── backend/ │ ├── models/ │ ├── change_recommendation.py │ ├── input_preprocessing.py │ ├── Itineraryapp.py │ ├── Itineraryserver.js │ ├── Radiusapp.py │ ├── RadiusBasedGenerator.py │ ├── Radiusserver.js │ ├── Transport.py │ ├── .env │ ├── package.json │ └── package-lock.json │ ├── public/ │ ├── assets/ │ ├── favicon.ico │ ├── index.html │ ├── logo192.png │ ├── logo512.png │ ├── manifest.json │ └── robots.txt │ ├── src/ │ ├── components/ │ ├── App.js │ ├── App.test.js │ ├── index.js │ ├── ItineraryApp.css │ ├── ItinerarySelection.js │ ├── ItinerarySelectionPage.css │ ├── ModifyItinerary.js │ ├── RadiusMapComponent.js │ ├── RadiusModify.js │ ├── RadiusModifyRequest.js │ ├── RadiusTravelItineraryGenerator.js │ ├── RadiusVisual.js │ ├── reportWebVitals.js │ ├── setupTests.js │ ├── TravelItineraryGenerator.js │ ├── TravelItineraryRadius.css │ └── VisualizationItinerary.js │ ├── .gitignore ├── package.json ├── package-lock.json └── README.md ```
 
 # How to Run the Application (in GitHub Codespaces)
 
@@ -272,13 +226,3 @@ This database powers the chatbot system, including hotel and restaurant queries:
   - attractions
   - hotels
   - restaurants
-
-
-
-
-
-
-
-
-
-
