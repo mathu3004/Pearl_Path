@@ -1,28 +1,14 @@
-# Pearl Path Chatbot
+# Pearl Path – Travel Itinerary Generator
+Pearl Path is an AI-powered travel planning platform designed to generate highly personalized and flexible travel itineraries based on user preferences. Whether users are planning a multi-day trip or looking for nearby recommendations, Pearl Path offers intelligent suggestions for hotels, restaurants, and attractions using machine learning models, clustering techniques, and real-time filtering.
 
-## Overview
-Pearl Path Chatbot is a web application that provides a chatbot interface for users to get information about travel destinations, recommendations for hotels and restaurants, and emergency assistance. The chatbot is named Pearlie and is designed to assist users with planning their trips.
+The platform consists of two main itinerary generation modes:
 
-## Features
-- **Emergency Assistance**: Provides information about nearby hospitals, police stations, embassies, and immediate medical support.
-- **Information Hub**: Offers detailed information about attractions in Kandy, Nuwara Eliya, Ella, and Colombo.
-- **User-Provider Connection**: Fetches specific details like contact information, email, price, location, amenities, etc., for hotels and restaurants.
-- **Recommendations**: Suggests hotels, restaurants, and attractions based on user preferences.
-- **Chatbot Information**: Provides information about the chatbot and the trip itinerary application.
+  - With Radius Filtering: Ensures all recommended places are geographically feasible and activity-balanced.
+  - Without Radius Filtering: Uses content-based and collaborative filtering to provide personalized plans based on interests and preferences, without proximity constraints.
 
-## Tech Stack
-- **Frontend**: React
-- **Backend**: Flask
-- **Database**: MongoDB
-- **Model**: Google's Gemini LLM (LangChain)
-- **Web Search**: Serper API
+Additionally, Pearl Path features an integrated chatbot assistant (Pearlie) that helps users find emergency information, destination details, and place recommendations—all through natural conversation.
 
-## How It Works
-- **Emergency Assistance**: The chatbot identifies emergency-related queries and provides relevant information using web search results.
-- **Information Hub**: The chatbot fetches detailed information about attractions using web search results.
-- **User-Provider Connection**: The chatbot retrieves specific details about hotels and restaurants from MongoDB and provides structured responses.
-- **Recommendations**: The chatbot suggests hotels, restaurants, and attractions based on user preferences using web search results.
-- **Chatbot Information**: The chatbot provides information about itself and the trip itinerary application.
+Built with a modular architecture and a modern tech stack (React, Flask, MongoDB, scikit-learn, OpenStreetMap), Pearl Path ensures a seamless and intelligent trip planning experience from start to finish.
 
 # Travel Itinerary Generator with Radius
 This component of Pearl Path is an intelligent travel itinerary planner that generates personalized trip plans for users based on a geographic radius. It leverages clustering and filtering techniques to recommend attractions, hotels, and restaurants within a specified distance from the user’s chosen destination. The model ensures that the recommended places not only match user preferences like cuisine, dietary requirements, and activity interests but are also geographically feasible by applying distance-based constraints. The final itinerary is visualized on an interactive map using OpenStreetMap for intuitive location tracking.
@@ -152,8 +138,148 @@ This component of Pearl Path is a machine learning-powered travel planning syste
     - Users can delete individual restaurant, attraction or hotel recommendations
     - All destinations are plotted interactively on a map using OpenStreetMap and Leaflet
 
+# Pearl Path Chatbot
 
+## Overview
+Pearl Path Chatbot is a web application that provides a chatbot interface for users to get information about travel destinations, recommendations for hotels and restaurants, and emergency assistance. The chatbot is named Pearlie and is designed to assist users with planning their trips.
 
+## Features
+- **Emergency Assistance**: Provides information about nearby hospitals, police stations, embassies, and immediate medical support.
+- **Information Hub**: Offers detailed information about attractions in Kandy, Nuwara Eliya, Ella, and Colombo.
+- **User-Provider Connection**: Fetches specific details like contact information, email, price, location, amenities, etc., for hotels and restaurants.
+- **Recommendations**: Suggests hotels, restaurants, and attractions based on user preferences.
+- **Chatbot Information**: Provides information about the chatbot and the trip itinerary application.
 
+## Tech Stack
+- **Frontend**: React
+- **Backend**: Flask
+- **Database**: MongoDB
+- **Model**: Google's Gemini LLM (LangChain)
+- **Web Search**: Serper API
+
+## How It Works
+- **Emergency Assistance**: The chatbot identifies emergency-related queries and provides relevant information using web search results.
+- **Information Hub**: The chatbot fetches detailed information about attractions using web search results.
+- **User-Provider Connection**: The chatbot retrieves specific details about hotels and restaurants from MongoDB and provides structured responses.
+- **Recommendations**: The chatbot suggests hotels, restaurants, and attractions based on user preferences using web search results.
+- **Chatbot Information**: The chatbot provides information about itself and the trip itinerary application.
+
+# Project File Structure
+
+```Design_Travel_Itinerary/
+├── backend/
+│   ├── models/
+│   ├── change_recommendation.py
+│   ├── input_preprocessing.py
+│   ├── Itineraryapp.py
+│   ├── Itineraryserver.js
+│   ├── Radiusapp.py
+│   ├── RadiusBasedGenerator.py
+│   ├── Radiusserver.js
+│   ├── Transport.py
+│   ├── .env
+│   ├── package.json
+│   └── package-lock.json
+│
+├── public/
+│   ├── assets/
+│   ├── favicon.ico
+│   ├── index.html
+│   ├── logo192.png
+│   ├── logo512.png
+│   ├── manifest.json
+│   └── robots.txt
+│
+├── src/
+│   ├── components/
+│   ├── App.js
+│   ├── App.test.js
+│   ├── index.js
+│   ├── ItineraryApp.css
+│   ├── ItinerarySelection.js
+│   ├── ItinerarySelectionPage.css
+│   ├── ModifyItinerary.js
+│   ├── RadiusMapComponent.js
+│   ├── RadiusModify.js
+│   ├── RadiusModifyRequest.js
+│   ├── RadiusTravelItineraryGenerator.js
+│   ├── RadiusVisual.js
+│   ├── reportWebVitals.js
+│   ├── setupTests.js
+│   ├── TravelItineraryGenerator.js
+│   ├── TravelItineraryRadius.css
+│   └── VisualizationItinerary.js
+│
+├── .gitignore
+├── package.json
+├── package-lock.json
+└── README.md
+```
+
+# How to Run the Application (in GitHub Codespaces)
+
+**Prerequisites**
+- You are working inside a GitHub Codespace.
+- MongoDB is already running (locally or remotely).
+- All required packages are installed via npm install.
+
+## Steps to Start the Application
+
+**Step 1: Start Backend Using package.json**
+- In the Codespace file explorer, open the folder:
+/workspaces/Pearl_Path/Design_Travel_Itinerary/travel-itinerary-generator/backend
+- Open the package.json file.
+- Locate the script: "start:all": "node Startserver.js"
+- Click the Run button next to it to start the backend server. This will run the backend at: http://localhost:5002
+
+**Step 2: Start Frontend from Terminal**
+- Open a new terminal in the Codespace.
+- Navigate to the root folder:
+/workspaces/Pearl_Path/Design_Travel_Itinerary/travel-itinerary-generator
+- Run the following command: npm start
+- This will start the frontend server at: http://localhost:3000
+
+**Application Access**
+- Frontend: http://localhost:3000
+- Backend API: http://localhost:5002
+
+# MongoDB Collections
+
+- **Database Name: itinerary_recommendations (used in non-radius itinerary generation)**
+This database stores collections related to standard travel itinerary generation (without radius filtering):
+  - Attractions
+  - GeneratedItineraries
+  - Hotels
+  - PreUserInputs
+  - Restaurants
+  - SavedItineraries
+  - UserInputs
+ 
+-  **Database Name: test (used in radius-based itinerary generation)**
+This database is used for the version of the itinerary generator that includes radius-based filtering and location-aware clustering:
+    - Attractions
+   - Hotels
+   - Restaurants
+   - User
+   - generated_itineraries
+   - itineraries
+   - preitineraries
+   - saved_itineraries
+   - users
+   - vendors
+
+- **Database Name: chatbot (used for the travel chatbot component)**
+This database powers the chatbot system, including hotel and restaurant queries:
+  - attractions
+  - hotels
+  - restaurants
+
+# Acknowledgement
+
+We would like to express our sincere gratitude to our module coordinator, Mr. Prasan Yapa, for his consistent guidance, encouragement, and timely reminders throughout the course of this project. His continuous push for excellence and constructive feedback helped us stay focused and meet every milestone with clarity and purpose.
+
+A special thank you goes to our supervisor, Mr. Imesh Pathirana, whose unwavering support and mentorship were instrumental from the beginning to the very end of this journey. His insightful suggestions, patient guidance, and practical solutions helped us overcome challenges, resolve conflicts, and stay united as a team. His dedication truly inspired us to push beyond our limits and achieve the best version of this project.
+
+Finally, we would like to extend our heartfelt thanks to our families, friends, and everyone who supported us throughout this process. Your encouragement and belief in us made all the difference.
 
 
