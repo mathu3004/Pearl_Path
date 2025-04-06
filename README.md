@@ -151,6 +151,38 @@ This component of Pearl Path is a machine learning-powered travel planning syste
     - Users can modify specific recommendations (restaurant, attraction) after itinerary generation
     - Users can delete individual restaurant, attraction or hotel recommendations
     - All destinations are plotted interactively on a map using OpenStreetMap and Leaflet
+ 
+# How to Run the Application (in GitHub Codespaces)
+
+**Prerequisites**
+- You are working inside a GitHub Codespace.
+- MongoDB is already running (locally or remotely).
+- All required packages are installed via npm install.
+
+## Steps to Start the Application
+
+**Step 1: Start Backend Using package.json**
+- In the Codespace file explorer, open the folder:
+/workspaces/Pearl_Path/Design_Travel_Itinerary/travel-itinerary-generator/backend
+- Open the package.json file.
+- Locate the script: "start:all": "node Startserver.js"
+- Click the Run button next to it to start the backend server. This will run the backend at: http://localhost:5002
+
+**Step 2: Start Frontend from Terminal**
+- Open a new terminal in the Codespace.
+- Navigate to the root folder:
+/workspaces/Pearl_Path/Design_Travel_Itinerary/travel-itinerary-generator
+- Run the following command: npm start
+- This will start the frontend server at: http://localhost:3000
+
+**Application Access**
+- Frontend: http://localhost:3000
+- Backend API: http://localhost:5002
+
+
+
+
+
 
 
 
