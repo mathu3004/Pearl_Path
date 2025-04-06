@@ -8,7 +8,17 @@ The platform consists of two main itinerary generation modes:
 
 Additionally, Pearl Path features an integrated chatbot assistant (Pearlie) that helps users find emergency information, destination details, and place recommendations—all through natural conversation.
 
+Datasets for restaurant, attraction, and hotel data were collected through web scraping, while user preferences were gathered via a structured Google Form for personalized itinerary planning.
+
 Built with a modular architecture and a modern tech stack (React, Flask, MongoDB, scikit-learn, OpenStreetMap), Pearl Path ensures a seamless and intelligent trip planning experience from start to finish.
+
+## Target Users
+### Pearl Path is designed for:
+- Tourists and travelers seeking custom trip plans.
+- Backpackers looking for flexible day-wise recommendations.
+- Families and groups wanting itinerary suggestions that suit all members.
+- Solo explorers looking for budget-conscious and preference-aware planning.
+- Anyone interested in simplifying and enhancing their travel experience through smart automation.
 
 # Travel Itinerary Generator with Radius
 This component of Pearl Path is an intelligent travel itinerary planner that generates personalized trip plans for users based on a geographic radius. It leverages clustering and filtering techniques to recommend attractions, hotels, and restaurants within a specified distance from the user’s chosen destination. The model ensures that the recommended places not only match user preferences like cuisine, dietary requirements, and activity interests but are also geographically feasible by applying distance-based constraints. The final itinerary is visualized on an interactive map using OpenStreetMap for intuitive location tracking.
