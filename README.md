@@ -163,7 +163,58 @@ Pearl Path Chatbot is a web application that provides a chatbot interface for us
 - **User-Provider Connection**: The chatbot retrieves specific details about hotels and restaurants from MongoDB and provides structured responses.
 - **Recommendations**: The chatbot suggests hotels, restaurants, and attractions based on user preferences using web search results.
 - **Chatbot Information**: The chatbot provides information about itself and the trip itinerary application.
- 
+
+# Project File Structure
+
+Design_Travel_Itinerary/
+├── backend/
+│   ├── models/                        
+│   ├── change_recommendation.py      
+│   ├── input_preprocessing.py       
+│   ├── Itineraryapp.py               
+│   ├── Itineraryserver.js            
+│   ├── Radiusapp.py                  
+│   ├── RadiusBasedGenerator.py       
+│   ├── Radiusserver.js               
+│   ├── Transport.py                 
+│   ├── .env                         
+│   ├── package.json                  
+│   └── package-lock.json
+│
+├── public/
+│   ├── assets/                       
+│   ├── favicon.ico
+│   ├── index.html                   
+│   ├── logo192.png
+│   ├── logo512.png
+│   ├── manifest.json
+│   └── robots.txt
+│
+├── src/
+│   ├── components/                   
+│   ├── App.js                       
+│   ├── App.test.js
+│   ├── index.js                      
+│   ├── ItineraryApp.css          
+│   ├── ItinerarySelection.js       
+│   ├── ItinerarySelectionPage.css
+│   ├── ModifyItinerary.js          
+│   ├── RadiusMapComponent.js       
+│   ├── RadiusModify.js             
+│   ├── RadiusModifyRequest.js       
+│   ├── RadiusTravelItineraryGenerator.js
+│   ├── RadiusVisual.js              
+│   ├── reportWebVitals.js
+│   ├── setupTests.js
+│   ├── TravelItineraryGenerator.js  
+│   ├── TravelItineraryRadius.css
+│   └── VisualizationItinerary.js    
+│
+├── .gitignore
+├── package.json                     
+├── package-lock.json
+└── README.md
+
 # How to Run the Application (in GitHub Codespaces)
 
 **Prerequisites**
