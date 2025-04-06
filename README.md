@@ -164,7 +164,7 @@ Pearl Path Chatbot is a web application that provides a chatbot interface for us
 - **Recommendations**: The chatbot suggests hotels, restaurants, and attractions based on user preferences using web search results.
 - **Chatbot Information**: The chatbot provides information about itself and the trip itinerary application.
 
-## 📁 Project File Structure
+## Project File Structure
 
 ```bash
 Design_Travel_Itinerary/travel-itinerary-generator
@@ -299,7 +299,7 @@ You need to run **three backend servers** and a **chatbot server**.
 
 ## Server Overview
 
-| Server                     | Port   | Description                            |
+| Server                    | Port   | Description                            |
 |---------------------------|--------|----------------------------------------|
 | Frontend (React App)      | 3000   | User Interface                         |
 | Chatbot Server            | 5000   | Python Flask app for chatbot logic     |
@@ -370,8 +370,10 @@ Finally, we would like to extend our heartfelt thanks to our families, friends, 
 
 # Contributors
 
+**For any questions or issues, feel free to contact the following members:** 
+
 ### Mathusha Kannathasan – [mathusha.20233136@iit.ac.lk](mailto:mathusha.20233136@iit.ac.lk)
-**Main Role:** Machine Learning Engineer  
+**Main Role:** Machine Learning Engineer (Team Leader)
 - Trained machine learning models for the itinerary generator with maximum radius and dynamic itinerary modification.  
 - Developed the backend to support radius-based itinerary generation and recommendation logic.  
 - Built the frontend interface for the radius-based itinerary generator, ensuring smooth user interaction.  
@@ -402,4 +404,3 @@ Finally, we would like to extend our heartfelt thanks to our families, friends, 
 - Developed the frontend for sign in, sign up, home and about us and component selection to ensure intuitive user interface.  
 - Integrated user profile functionality with MongoDB for efficient data management and seamless interaction.  
 - **Also contributed to:** Data collection and preprocessing.
-"""
