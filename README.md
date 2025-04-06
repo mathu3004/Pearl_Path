@@ -12,7 +12,7 @@ Datasets for restaurant, attraction, and hotel data were collected through web s
 
 Built with a modular architecture and a modern tech stack (React, Flask, MongoDB, scikit-learn, OpenStreetMap), Pearl Path ensures a seamless and intelligent trip planning experience from start to finish.
 
-## Target Users
+### Target Users
 ### Pearl Path is designed for:
 - Tourists and travelers seeking custom trip plans.
 - Backpackers looking for flexible day-wise recommendations.
