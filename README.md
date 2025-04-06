@@ -193,16 +193,16 @@ This database stores collections related to standard travel itinerary generation
  
 -  **test (used in radius-based itinerary generation)**
 This database is used for the version of the itinerary generator that includes radius-based filtering and location-aware clustering:
-  - Attractions
-  - Hotels
-  - Restaurants
-  - User
-  - generated_itineraries
-  - itineraries
-  - preitineraries
-  - saved_itineraries
-  - users
-  - vendors
+    - Attractions
+   - Hotels
+   - Restaurants
+   - User
+   - generated_itineraries
+   - itineraries
+   - preitineraries
+   - saved_itineraries
+   - users
+   - vendors
 
 - **chatbot (used for the travel chatbot component)**
 This database powers the chatbot system, including hotel and restaurant queries:
