@@ -273,3 +273,13 @@ This database powers the chatbot system, including hotel and restaurant queries:
   - attractions
   - hotels
   - restaurants
+
+# Acknowledgement
+
+We would like to express our sincere gratitude to our module coordinator, Mr. Prasan Yapa, for his consistent guidance, encouragement, and timely reminders throughout the course of this project. His continuous push for excellence and constructive feedback helped us stay focused and meet every milestone with clarity and purpose.
+
+A special thank you goes to our supervisor, Mr. Imesh Pathirana, whose unwavering support and mentorship were instrumental from the beginning to the very end of this journey. His insightful suggestions, patient guidance, and practical solutions helped us overcome challenges, resolve conflicts, and stay united as a team. His dedication truly inspired us to push beyond our limits and achieve the best version of this project.
+
+Finally, we would like to extend our heartfelt thanks to our families, friends, and everyone who supported us throughout this process. Your encouragement and belief in us made all the difference.
+
+
