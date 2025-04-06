@@ -213,7 +213,8 @@ Pearl Path Chatbot is a web application that provides a chatbot interface for us
 ├── .gitignore
 ├── package.json
 ├── package-lock.json
-└── README.md ```
+└── README.md
+```
 
 # How to Run the Application (in GitHub Codespaces)
 
