@@ -23,3 +23,72 @@ Pearl Path Chatbot is a web application that provides a chatbot interface for us
 - **User-Provider Connection**: The chatbot retrieves specific details about hotels and restaurants from MongoDB and provides structured responses.
 - **Recommendations**: The chatbot suggests hotels, restaurants, and attractions based on user preferences using web search results.
 - **Chatbot Information**: The chatbot provides information about itself and the trip itinerary application.
+
+# Travel Itinerary Generator with Radius
+This project is an intelligent travel itinerary planner that generates personalized trip plans for users based on a geographic radius. It leverages clustering and filtering techniques to recommend attractions, hotels, and restaurants within a specified distance from the user’s chosen destination. The model ensures that the recommended places not only match user preferences like cuisine, dietary requirements, and activity interests but are also geographically feasible by applying distance-based constraints. The final itinerary is visualized on an interactive map using OpenStreetMap for intuitive location tracking.
+
+## Features
+- Personalized recommendations for hotels, attractions, and restaurants.
+- Radius-based filtering to ensure proximity relevance.
+- Clustering of attractions using PCA and DBSCAN for activity-based grouping.
+- Cuisine and dietary filtering for restaurant recommendations.
+- Dynamic model training using Random Forest and Scikit-learn.
+- Support for alternative recommendations for flexibility.
+- Allows users to modify itinerary selections dynamically.
+- Interactive itinerary map rendered using OpenStreetMap with markers for each location.
+  
+## Overview
+This application intelligently assigns:
+- **Hotels** using a RandomForestRegressor that matches user preferences and budget.
+- **Restaurants** for breakfast, lunch, and dinner via a RandomForestClassifier using dietary and cuisine filters.
+- **Attractions** using PCA + DBSCAN clustering to ensure activity diversity while adhering to distance constraints.
+- **Alternatives** for each main recommendation to ensure flexibility and user choice.
+- **Radius** filtering to ensure that all recommended places are within the specified maximum distance from the destination.
+- Visual display of the complete itinerary with markers on OpenStreetMap.
+
+## Key Highlights
+- Trained models with a structured feature selection pipeline.
+- Attraction clustering ensures activity diversity and user-preference mapping.
+- Uses geopy for precise distance calculations.
+- Cleanly separates model training, preprocessing, and recommendation logic for modularity.
+- Ensures uniqueness in daily plans across attractions and restaurants.
+- Dynamic itinerary modification is supported through an interactive interface.
+- Integrated OpenStreetMap with Leaflet.js to visualize all recommended places on an interactive map.
+
+## Tech Stack
+- **Language:** Python
+- **Libraries:** pandas, scikit-learn, geopy, numpy, matplotlib
+- **Clustering:** PCA, DBSCAN
+- **Modeling:** RandomForestRegressor, RandomForestClassifier
+- **Distance Calculation:** geopy.distance
+- **Frontend Mapping:** OpenStreetMap via Leaflet.js
+- **Database:** MongoDB 
+
+## How It Works
+- **Data Preprocessing:**
+    Raw datasets for hotels, attractions, and restaurants are cleaned and encoded.
+    Cuisine, dietary, activity types, and price ratings are extracted and processed.
+- **Hotel Recommendation:**
+    Uses RandomForestRegressor to predict the most suitable hotel per destination within budget.
+- **Attraction Recommendation:**
+    Applies PCA for dimensionality reduction on attraction features.
+    Uses DBSCAN clustering to group attractions by activity type.
+    Filters attractions by radius and selects 2 per day, ensuring activity diversity.
+- **Restaurant Recommendation:**
+    Trains RandomForestClassifier using top 10 numeric features.
+    Filters options based on meal type (breakfast/lunch/dinner), cuisine, dietary preferences, and location radius.
+- **Alternative Generation:**
+    For each place (hotel, restaurant, attraction), generates 3 additional options excluding the primary recommendation.
+    If preferences result in insufficient options, filters are relaxed while still prioritizing relevance.
+- **Distance Constraint Application:**
+    Every recommendation (main + alternatives) is verified to be within the defined maximum radius from the destination using geopy.
+- **Itinerary Modification**
+    Users can dynamically modify their itinerary:
+    Change individual restaurant and attraction recommendations.
+    Delete individual hotel, restaurant or attraction recommendations.
+    Save updated itineraries, preserving personalization and proximity filters.
+- **Map Visualization**
+    All recommended places (hotels, restaurants, attractions) are displayed as markers on an interactive map using OpenStreetMap.
+    Helps users easily understand the geographical layout of their itinerary and distances between locations.
+
+
