@@ -66,29 +66,29 @@ This application intelligently assigns:
 
 ## How It Works
 - **Data Preprocessing:**
-    Raw datasets for hotels, attractions, and restaurants are cleaned and encoded.
-    Cuisine, dietary, activity types, and price ratings are extracted and processed.
+    - Raw datasets for hotels, attractions, and restaurants are cleaned and encoded.
+    - Cuisine, dietary, activity types, and price ratings are extracted and processed.
 - **Hotel Recommendation:**
-    Uses RandomForestRegressor to predict the most suitable hotel per destination within budget.
+    - Uses RandomForestRegressor to predict the most suitable hotel per destination within budget.
 - **Attraction Recommendation:**
-    Applies PCA for dimensionality reduction on attraction features.
-    Uses DBSCAN clustering to group attractions by activity type.
-    Filters attractions by radius and selects 2 per day, ensuring activity diversity.
+    - Applies PCA for dimensionality reduction on attraction features.
+    - Uses DBSCAN clustering to group attractions by activity type.
+    - Filters attractions by radius and selects 2 per day, ensuring activity diversity.
 - **Restaurant Recommendation:**
-    Trains RandomForestClassifier using top 10 numeric features.
-    Filters options based on meal type (breakfast/lunch/dinner), cuisine, dietary preferences, and location radius.
+    - Trains RandomForestClassifier using top 10 numeric features.
+    - Filters options based on meal type (breakfast/lunch/dinner), cuisine, dietary preferences, and location radius.
 - **Alternative Generation:**
-    For each place (hotel, restaurant, attraction), generates 3 additional options excluding the primary recommendation.
-    If preferences result in insufficient options, filters are relaxed while still prioritizing relevance.
+    - For each place (hotel, restaurant, attraction), generates 3 additional options excluding the primary recommendation.
+    - If preferences result in insufficient options, filters are relaxed while still prioritizing relevance.
 - **Distance Constraint Application:**
-    Every recommendation (main + alternatives) is verified to be within the defined maximum radius from the destination using geopy.
+    - Every recommendation (main + alternatives) is verified to be within the defined maximum radius from the destination using geopy.
 - **Itinerary Modification**
-    Users can dynamically modify their itinerary:
-    Change individual restaurant and attraction recommendations.
-    Delete individual hotel, restaurant or attraction recommendations.
-    Save updated itineraries, preserving personalization and proximity filters.
+    - Users can dynamically modify their itinerary:
+    - Change individual restaurant and attraction recommendations.
+    - Delete individual hotel, restaurant or attraction recommendations.
+    - Save updated itineraries, preserving personalization and proximity filters.
 - **Map Visualization**
-    All recommended places (hotels, restaurants, attractions) are displayed as markers on an interactive map using OpenStreetMap.
-    Helps users easily understand the geographical layout of their itinerary and distances between locations.
+    - All recommended places (hotels, restaurants, attractions) are displayed as markers on an interactive map using OpenStreetMap.
+    - Helps users easily understand the geographical layout of their itinerary and distances between locations.
 
 
