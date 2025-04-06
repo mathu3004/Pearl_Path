@@ -181,7 +181,7 @@ This component of Pearl Path is a machine learning-powered travel planning syste
 
 # MongoDB Collections
 
-- **itinerary_recommendations (used in non-radius itinerary generation)**
+- **Database Name: itinerary_recommendations (used in non-radius itinerary generation)**
 This database stores collections related to standard travel itinerary generation (without radius filtering):
   - Attractions
   - GeneratedItineraries
@@ -191,7 +191,7 @@ This database stores collections related to standard travel itinerary generation
   - SavedItineraries
   - UserInputs
  
--  **test (used in radius-based itinerary generation)**
+-  **Database Name: test (used in radius-based itinerary generation)**
 This database is used for the version of the itinerary generator that includes radius-based filtering and location-aware clustering:
     - Attractions
    - Hotels
@@ -204,7 +204,7 @@ This database is used for the version of the itinerary generator that includes r
    - users
    - vendors
 
-- **chatbot (used for the travel chatbot component)**
+- **Database Name: chatbot (used for the travel chatbot component)**
 This database powers the chatbot system, including hotel and restaurant queries:
   - attractions
   - hotels
