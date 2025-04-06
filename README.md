@@ -164,19 +164,22 @@ Pearl Path Chatbot is a web application that provides a chatbot interface for us
 - **Recommendations**: The chatbot suggests hotels, restaurants, and attractions based on user preferences using web search results.
 - **Chatbot Information**: The chatbot provides information about itself and the trip itinerary application.
 
-# Project File Structure
+## 📁 Project File Structure
 
-```Design_Travel_Itinerary/
+```bash
+Design_Travel_Itinerary/travel-itinerary-generator
 ├── backend/
 │   ├── models/
+│   ├── app.py
 │   ├── change_recommendation.py
+│   ├── config.py
 │   ├── input_preprocessing.py
 │   ├── Itineraryapp.py
 │   ├── Itineraryserver.js
 │   ├── Radiusapp.py
 │   ├── RadiusBasedGenerator.py
 │   ├── Radiusserver.js
-│   ├── Transport.py
+│   ├── Startserver.js
 │   ├── .env
 │   ├── package.json
 │   └── package-lock.json
@@ -184,6 +187,7 @@ Pearl Path Chatbot is a web application that provides a chatbot interface for us
 ├── public/
 │   ├── assets/
 │   ├── favicon.ico
+│   ├── _.jpg (Images)
 │   ├── index.html
 │   ├── logo192.png
 │   ├── logo512.png
@@ -192,20 +196,29 @@ Pearl Path Chatbot is a web application that provides a chatbot interface for us
 │
 ├── src/
 │   ├── components/
+│   │   ├── ChatBox.js
+│   │   ├── ChatWidget.js
+│   │   ├── Layout.js
+│   │   ├── Message.js
+│   │   ├── Footer.jsx
+│   │   ├── Header.jsx
+│   ├── context/
+│   │   ├── auth.context.jsx
+│   ├── pages/
+│   ├── router/
+│   │   ├── ProtectedRoute.jsx
 │   ├── App.js
 │   ├── App.test.js
 │   ├── index.js
+│   ├── index.css
 │   ├── ItineraryApp.css
-│   ├── ItinerarySelection.js
-│   ├── ItinerarySelectionPage.css
 │   ├── ModifyItinerary.js
+│   ├── ModifyRequest.js
 │   ├── RadiusMapComponent.js
 │   ├── RadiusModify.js
 │   ├── RadiusModifyRequest.js
 │   ├── RadiusTravelItineraryGenerator.js
 │   ├── RadiusVisual.js
-│   ├── reportWebVitals.js
-│   ├── setupTests.js
 │   ├── TravelItineraryGenerator.js
 │   ├── TravelItineraryRadius.css
 │   └── VisualizationItinerary.js
@@ -215,64 +228,137 @@ Pearl Path Chatbot is a web application that provides a chatbot interface for us
 ├── package-lock.json
 └── README.md
 ```
+## How to Run the Application (in GitHub Codespaces)
 
-# How to Run the Application (in GitHub Codespaces)
+### Prerequisites
+- You are working **inside a GitHub Codespace**.
+- **MongoDB** is already running (locally or remotely).
+- All dependencies are installed by running:
+  ```bash
+  npm install
+  ```
 
-**Prerequisites**
-- You are working inside a GitHub Codespace.
-- MongoDB is already running (locally or remotely).
-- All required packages are installed via npm install.
+---
 
-## Steps to Start the Application
+## Step-by-Step Instructions
 
-**Step 1: Start Backend Using package.json**
-- In the Codespace file explorer, open the folder:
-/workspaces/Pearl_Path/Design_Travel_Itinerary/travel-itinerary-generator/backend
-- Open the package.json file.
-- Locate the script: "start:all": "node Startserver.js"
-- Click the Run button next to it to start the backend server. This will run the backend at: http://localhost:5002
+### Step 1: Start Backend Servers
 
-**Step 2: Start Frontend from Terminal**
-- Open a new terminal in the Codespace.
-- Navigate to the root folder:
-/workspaces/Pearl_Path/Design_Travel_Itinerary/travel-itinerary-generator
-- Run the following command: npm start
-- This will start the frontend server at: http://localhost:3000
+You need to run **three backend servers** and a **chatbot server**.
 
-**Application Access**
-- Frontend: http://localhost:3000
-- Backend API: http://localhost:5002
+#### 1️ Signin/Signup Server (Port: 5002)
+- Path:  
+  `/workspaces/Pearl_Path/Design_Travel_Itinerary/travel-itinerary-generator/backend`
+- In the **Codespace file explorer**, open `package.json`.
+- Locate the script:
+  ```json
+  "start:all": "node Startserver.js"
+  ```
+- Click the **Run** button next to the script OR run manually:
+  ```bash
+  npm run start:all
+  ```
+- This starts the backend at:  
+  `http://localhost:5002`
 
-# MongoDB Collections
+#### 2️ Itinerary Generator Server (Port: 5001)  
+- Launched through the same `Itineraryserver.js`.  
+  Ensure the routes and server logic are correctly configured to run on port `5001`.
 
-- **Database Name: itinerary_recommendations (used in non-radius itinerary generation)**
-This database stores collections related to standard travel itinerary generation (without radius filtering):
-  - Attractions
-  - GeneratedItineraries
-  - Hotels
-  - PreUserInputs
-  - Restaurants
-  - SavedItineraries
-  - UserInputs
- 
--  **Database Name: test (used in radius-based itinerary generation)**
-This database is used for the version of the itinerary generator that includes radius-based filtering and location-aware clustering:
-    - Attractions
-   - Hotels
-   - Restaurants
-   - User
-   - generated_itineraries
-   - itineraries
-   - preitineraries
-   - saved_itineraries
-   - users
-   - vendors
+#### 3️ Radius-Based Itinerary Generator Server (Port: 5003)  
+- Also initiated within the same `Radiusserver.js` or as a separate process if required.
 
-- **Database Name: chatbot (used for the travel chatbot component)**
-This database powers the chatbot system, including hotel and restaurant queries:
-  - attractions
-  - hotels
-  - restaurants
+---
+
+### Step 2: Start Chatbot Server (Port: 5000)
+- Navigate to the backend folder:
+  ```bash
+  cd /workspaces/Pearl_Path/Design_Travel_Itinerary/travel-itinerary-generator/backend
+  ```
+- Start the chatbot server:
+  ```bash
+  python app.py
+  ```
+
+---
+
+### Step 3: Start Frontend Application
+- Open a **new terminal** in your Codespace.
+- Navigate to the frontend root folder:
+  ```bash
+  cd /workspaces/Pearl_Path/Design_Travel_Itinerary/travel-itinerary-generator
+  ```
+- Start the frontend React app:
+  ```bash
+  npm start
+  ```
+- Access the frontend in your browser at:  
+  `http://localhost:3000`
+
+---
+
+## Server Overview
+
+| Server                     | Port   | Description                            |
+|---------------------------|--------|----------------------------------------|
+| Frontend (React App)      | 3000   | User Interface                         |
+| Chatbot Server            | 5000   | Python Flask app for chatbot logic     |
+| Itinerary Generator       | 5001   | Backend logic for itinerary generation |
+| Signin/Signup Server      | 5002   | Handles authentication                 |
+| Radius-Based Generator    | 5003   | Alternative itinerary logic by radius  |
+
+---
+
+## Notes
+- Ensure all required environment variables and MongoDB URIs are configured.
+- The app uses `localStorage` for maintaining login sessions.
+- You can modify port configurations in the corresponding server files.
+
+---
+
+## MongoDB Collections
+
+### Database: `itinerary_recommendations`  
+Used in **standard (non-radius)** itinerary generation.
+
+| Collection Name        | Purpose                                                                 |
+|------------------------|-------------------------------------------------------------------------|
+| `Attractions`          | Stores detailed data on attractions used for recommendation.            |
+| `GeneratedItineraries`| Holds final itineraries generated for users.                             |
+| `Hotels`               | Contains hotel information for prediction and selection.                |
+| `PreUserInputs`        | Temporarily stores processed user inputs for recommendation use.        |
+| `Restaurants`          | Contains restaurant details for classification and filtering.           |
+| `SavedItineraries`     | Stores itineraries users have explicitly saved.                         |
+| `UserInputs`           | Stores raw form input from users before processing.                     |
+
+---
+
+### Database: `test`  
+Used in **radius-based itinerary generation** with location clustering.
+
+| Collection Name         | Purpose                                                                 |
+|--------------------------|--------------------------------------------------------------------------|
+| `Attractions`            | Stores location-based attraction data.                                  |
+| `Hotels`                 | Stores hotels with coordinates for distance-based filtering.            |
+| `Restaurants`            | Stores restaurants for location-aware selection.                        |
+| `generated_itineraries` | Stores generated itineraries with radius filtering.                     |
+| `itineraries`            | Stores raw input data for radius-based generation.                      |
+| `preitineraries`         | Stores preprocessed data before generating radius itineraries.          |
+| `saved_itineraries`      | Stores user-saved radius-based itineraries.                             |
+| `users`                  | Stores registered user profiles for authentication.                     |
+| `vendors`                | Stores vendor (business) account details.                               |
+
+---
+
+### Database: `chatbot`  
+Used in the **chatbot system** for answering travel-related queries.
+
+| Collection Name | Purpose                                                              |
+|------------------|----------------------------------------------------------------------|
+| `attractions`     | Contains attractions data for chatbot queries.                     |
+| `hotels`          | Stores hotel data accessible by chatbot interactions.              |
+| `restaurants`     | Stores restaurant info the chatbot can respond with or suggest.    |
+
 
 # Acknowledgement
 
@@ -282,4 +368,38 @@ A special thank you goes to our supervisor, Mr. Imesh Pathirana, whose unwaverin
 
 Finally, we would like to extend our heartfelt thanks to our families, friends, and everyone who supported us throughout this process. Your encouragement and belief in us made all the difference.
 
+# Contributors
 
+### Mathusha Kannathasan – [mathusha.20233136@iit.ac.lk](mailto:mathusha.20233136@iit.ac.lk)
+**Main Role:** Machine Learning Engineer  
+- Trained machine learning models for the itinerary generator with maximum radius and dynamic itinerary modification.  
+- Developed the backend to support radius-based itinerary generation and recommendation logic.  
+- Built the frontend interface for the radius-based itinerary generator, ensuring smooth user interaction.  
+- **Also contributed to:** Data collection and preprocessing.
+
+---
+
+### Ehansa Amavindi Gajanayaka – [ehansa.20232972@iit.ac.lk](mailto:ehansa.20232972@iit.ac.lk)
+**Main Role:** Machine Learning Engineer  
+- Trained machine learning models for the itinerary generator without radius and supported itinerary modification.  
+- Developed the backend logic for non-radius-based itinerary generation and management.  
+- Designed and implemented the frontend for the non-radius itinerary generator.  
+- **Also contributed to:** Data collection and preprocessing.
+
+---
+
+### Denuri Chamathvie Manage – [denuri.20230036@iit.ac.lk](mailto:denuri.20230036@iit.ac.lk)
+**Main Role:** Chatbot Developer  
+- **LLM Integration:** Integrated Google’s Gemini to power the chatbot with travel planning and emergency support.  
+- **Backend:** Built the chatbot’s backend using Flask and MongoDB for API handling and LLM communication.  
+- **Frontend:** Developed a React-based chatbot interface with a draggable chat widget for smooth user interaction.  
+- **Also contributed to:** Data collection and preprocessing.
+
+---
+
+### Neelia Makuloluwa – [neelia.20232613@iit.ac.lk](mailto:neelia.20232613@iit.ac.lk)
+**Main Role:** Web Developer  
+- Developed the frontend for sign in, sign up, home and about us and component selection to ensure intuitive user interface.  
+- Integrated user profile functionality with MongoDB for efficient data management and seamless interaction.  
+- **Also contributed to:** Data collection and preprocessing.
+"""
