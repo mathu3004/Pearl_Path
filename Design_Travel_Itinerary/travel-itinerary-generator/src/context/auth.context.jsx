@@ -97,17 +97,6 @@ export const AuthProvider = ({ children }) => {
     } else {
       setAuth({ token: null, user: null, loading: false });
     }
-  
-    // Listen for tab/window close to remove token
-    const handleUnload = () => {
-      localStorage.removeItem("token");
-    };
-  
-    window.addEventListener("beforeunload", handleUnload);
-  
-    return () => {
-      window.removeEventListener("beforeunload", handleUnload);
-    };
   }, []);
     
   return (

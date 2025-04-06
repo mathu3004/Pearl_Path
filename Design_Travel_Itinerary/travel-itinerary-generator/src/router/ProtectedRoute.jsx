@@ -1,24 +1,22 @@
-import React, { useContext } from "react";
-import { Navigate } from "react-router-dom";
-import { AuthContext } from "../context/auth.context";
+// ProtectedRoute.js
+import React, { useContext } from 'react';
+import { Navigate } from 'react-router-dom';
+import { AuthContext } from '../context/auth.context';
 
-const ProtectedRoute = ({ allowedRole, children }) => {
+const ProtectedRoute = ({ children, allowedRole }) => {
   const { auth } = useContext(AuthContext);
 
-  if (auth.loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <p className="text-xl">Loading...</p>
-      </div>
-    );
-  }
-
   if (!auth.token) {
-    return <Navigate to="/login" replace />;
+    return <Navigate to="/" />;
   }
 
-  if (allowedRole && auth.user?.role !== allowedRole) {
-    return <Navigate to="/" replace />;
+  const userRole = auth?.user?.role;
+  const isAllowed = Array.isArray(allowedRole)
+    ? allowedRole.includes(userRole)
+    : userRole === allowedRole;
+
+  if (!isAllowed) {
+    return <Navigate to="/" />; // Or a 403 page
   }
 
   return children;

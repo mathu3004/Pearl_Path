@@ -93,6 +93,12 @@ const NormalModifyRequest = () => {
           </div>
         )}
 
+        {!loading && itineraries.length === 0 && (
+          <div className="editrequest-day">
+            <p>No itineraries created yet.</p>
+          </div>
+        )}
+
         <Layout />
         <Footer />
       </div>

@@ -17,13 +17,12 @@ const Header = () => {
   // Logout handler: call logout and then redirect to login page
   const handleLogout = async () => {
     try {
-      await logout();       // Clear token and context
-      navigate('/');        // Navigate only after cleanup
+      await logout(); // Clear token and context
+      navigate('/');  // Navigate only after cleanup
     } catch (err) {
       console.error("Logout failed", err);
     }
   };
-  
 
   // Retrieve current user's profile to extract the username
   useEffect(() => {
@@ -41,54 +40,59 @@ const Header = () => {
   }, [fetchProfile]);
 
   return (
-    <header className="header">
-      {/* Left side */}
-      <div className="header-left">
-        <img src="/assests/IconPearl.png" alt="Logo" id="logo" />
-        <span className="greeting">Welcome to Pearl Path, {userName}</span>
-      </div>
+      <header className="header">
+        {/* Left side */}
+        <div className="header-left">
+          <img src="/assests/IconPearl.png" alt="Logo" id="logo" />
+          <span className="greeting">Welcome to Pearl Path, {userName}</span>
+        </div>
 
-      {/* Navigation Links */}
-      <ul className="nav-links">
-        <li><Link to="/home">Home</Link></li>
-        <li><Link to="/itineraries">Itinerary</Link></li>
-        <li><Link to="/about-us">AboutUs</Link></li>
-
-        {!auth.token ? (
-          <>
-            <li><Link to="/login">Login</Link></li>
-            <li><Link to="/register">Sign Up</Link></li>
-          </>
-        ) : (
-          <>
-            {role === 'vendor' && (
-            <li>
-              <Link to="/vendor-dashboard">Dashboard</Link>
-            </li>
+        {/* Navigation Links */}
+        <ul className="nav-links">
+          {/* Only show "Home" and "Itinerary" if the user is not a vendor */}
+          {(!auth.token || (auth.token && role !== 'vendor')) && (
+              <>
+                <li><Link to="/home">Home</Link></li>
+                <li><Link to="/itineraries">Itinerary</Link></li>
+              </>
           )}
-            {/* Profile Dropdown */}
-            <li className="relative">
-              <img
-                src="/profile-icon.jpg"
-                alt="Profile Icon"
-                className="profile-icon"
-                onClick={toggleProfileMenu}
-              />
-              {showProfileMenu && (
-                <div className="profile-container">
-                  <p>{userName} ({role})</p>
-                  <Link to="/profile">View Profile</Link>
-                  <hr />
-                  <button className="logout" onClick={handleLogout}>
-                    Logout
-                  </button>
-                </div>
-              )}
-            </li>
-          </>
-        )}
-      </ul>
-    </header>
+          <li><Link to="/about-us">AboutUs</Link></li>
+
+          {!auth.token ? (
+              <>
+                <li><Link to="/login">Login</Link></li>
+                <li><Link to="/register">Sign Up</Link></li>
+              </>
+          ) : (
+              <>
+                {role === 'vendor' && (
+                    <li>
+                      <Link to="/vendor-dashboard">Dashboard</Link>
+                    </li>
+                )}
+                {/* Profile Dropdown */}
+                <li className="relative">
+                  <img
+                      src="/profile-icon.jpg"
+                      alt="Profile Icon"
+                      className="profile-icon"
+                      onClick={toggleProfileMenu}
+                  />
+                  {showProfileMenu && (
+                      <div className="profile-container">
+                        <p>{userName} ({role})</p>
+                        <Link to="/profile">View Profile</Link>
+                        <hr />
+                        <button className="logout" onClick={handleLogout}>
+                          Logout
+                        </button>
+                      </div>
+                  )}
+                </li>
+              </>
+          )}
+        </ul>
+      </header>
   );
 };
 

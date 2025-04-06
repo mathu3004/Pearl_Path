@@ -36,6 +36,14 @@ const AppContent = () => {
         // Do NOT redirect in useEffect — leave that to <ProtectedRoute>
     }, [auth.token, fetchProfile]);
 
+    if (auth.loading) {
+        return (
+          <div className="min-h-screen flex items-center justify-center">
+            <p className="text-xl">Authenticating...</p>
+          </div>
+        );
+      }
+
     return (
         <div className="flex flex-col min-h-screen">
             <main className="flex-grow">
@@ -54,10 +62,11 @@ const AppContent = () => {
                         </ProtectedRoute>
                     } />
                     <Route path="/profile" element={
-                        <ProtectedRoute allowedRole="user">
+                        <ProtectedRoute allowedRole={["user", "vendor"]}>
                             <Profile />
                         </ProtectedRoute>
-                    } />
+                        } />
+
                     <Route path="/itineraries" element={
                         <ProtectedRoute allowedRole="user">
                             <Itineraries />
