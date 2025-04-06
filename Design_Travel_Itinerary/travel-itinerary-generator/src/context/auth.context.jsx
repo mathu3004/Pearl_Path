@@ -14,6 +14,19 @@ export const AuthProvider = ({ children }) => {
     });
   };  
 
+  useEffect(() => {
+    const handleUnload = () => {
+      logout(); // Clears token + auth state
+    };
+  
+    window.addEventListener("beforeunload", handleUnload);
+  
+    return () => {
+      window.removeEventListener("beforeunload", handleUnload);
+    };
+  }, []);
+  
+
   const login = async ({ username, password }) => {
     try {
       const res = await fetch("http://localhost:5002/api/auth/login", {

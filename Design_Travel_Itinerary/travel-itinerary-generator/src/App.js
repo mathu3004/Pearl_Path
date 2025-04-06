@@ -36,6 +36,13 @@ const AppContent = () => {
         // Do NOT redirect in useEffect — leave that to <ProtectedRoute>
     }, [auth.token, fetchProfile]);
 
+    useEffect(() => {
+    // Force start from root URL
+    if (window.location.pathname !== "/") {
+      window.history.replaceState(null, "", "/");
+    }
+  }, []);
+
     if (auth.loading) {
         return (
           <div className="min-h-screen flex items-center justify-center">

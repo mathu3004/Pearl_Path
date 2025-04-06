@@ -412,18 +412,39 @@ def recommend_restaurants_for_destination(user, destination, hotel_lat, hotel_lo
 
     # Prepare dietary and cuisine preferences
     dietary_options = []
-    if user.get('food_preference_veg') == 1:
+    # After (more robust)
+    if user.get('food_preference_veg') == 1 or user.get("foodPreferences", "").lower() == "veg":
         dietary_options.append('dietary_veg')
-    if user.get('food_preference_non_veg') == 1:
+
+    if user.get('food_preference_non_veg') == 1 or user.get("foodPreferences", "").lower() == "non-veg":
         dietary_options.append('dietary_non-veg')
 
     user_cuisines = [col.replace("cuisine_preference_", "cuisine_") for col in user.keys()
                      if col.startswith("cuisine_preference_") and user[col] == 1]
     valid_cuisines = [c for c in user_cuisines if c in city_restaurants.columns]
 
+        # Add missing dietary columns if needed
+    for col in dietary_options:
+        if col not in city_restaurants.columns:
+            city_restaurants[col] = 0
+
+    # Add missing cuisine columns if needed
+    for col in valid_cuisines:
+        if col not in city_restaurants.columns:
+            city_restaurants[col] = 0
+
     # Apply preference filters BEFORE prediction
-    if dietary_options:
-        city_restaurants = city_restaurants[city_restaurants[dietary_options].sum(axis=1) > 0]
+    if 'dietary_veg' in city_restaurants.columns:
+        if user.get('food_preference_veg') == 1 and not user.get('food_preference_non_veg', 0):
+            # Strict veg: only allow restaurants with veg and not only non-veg
+            city_restaurants = city_restaurants[
+                (city_restaurants['dietary_veg'] == 1) &
+                ((city_restaurants['dietary_non-veg'] != 1) | ('dietary_non-veg' not in city_restaurants.columns))
+            ]
+        elif dietary_options:
+            # Allow both if both preferences are set
+            city_restaurants = city_restaurants[city_restaurants[dietary_options].sum(axis=1) > 0]
+
     if valid_cuisines:
         city_restaurants = city_restaurants[city_restaurants[valid_cuisines].sum(axis=1) > 0]
 
@@ -434,22 +455,6 @@ def recommend_restaurants_for_destination(user, destination, hotel_lat, hotel_lo
 
     # Remove already used restaurants
     city_restaurants = city_restaurants[~city_restaurants['name'].isin(used_restaurants)]
-
-    # Fallback: If restaurant count is too low after filtering, relax dietary & cuisine filters
-    if len(city_restaurants) < 12:
-        relaxed = restaurants[restaurants[city_col] == 1].copy()
-
-        # Apply only distance filtering, ignore dietary/cuisine
-        relaxed['distance'] = relaxed.apply(
-            lambda row: geodesic((hotel_lat, hotel_lon), (row['latitude'], row['longitude'])).km, axis=1)
-        relaxed = relaxed[relaxed['distance'] <= max_distance_km]
-
-        # Remove used restaurants
-        relaxed = relaxed[~relaxed['name'].isin(used_restaurants)]
-
-        if not relaxed.empty:
-            print(f"[Fallback] Using relaxed restaurant filtering for {destination}")
-            city_restaurants = relaxed
 
     # Load model features
     try:
@@ -492,9 +497,23 @@ def recommend_restaurants_for_destination(user, destination, hotel_lat, hotel_lo
             (~city_restaurants['name'].isin(used_restaurants))
         ].copy()
 
+        for col in dietary_options:
+            if col not in meal_restaurants.columns:
+                meal_restaurants[col] = 0
+        for col in valid_cuisines:
+            if col not in meal_restaurants.columns:
+                meal_restaurants[col] = 0
+
         # Re-apply user dietary and cuisine filtering
-        if dietary_options:
-            meal_restaurants = meal_restaurants[meal_restaurants[dietary_options].sum(axis=1) > 0]
+        if 'dietary_veg' in meal_restaurants.columns:
+            if user.get('food_preference_veg') == 1 and not user.get('food_preference_non_veg', 0):
+                meal_restaurants = meal_restaurants[
+                    (meal_restaurants['dietary_veg'] == 1) &
+                    ((meal_restaurants['dietary_non-veg'] != 1) | ('dietary_non-veg' not in meal_restaurants.columns))
+                ]
+            elif dietary_options:
+                meal_restaurants = meal_restaurants[meal_restaurants[dietary_options].sum(axis=1) > 0]
+
         if valid_cuisines:
             meal_restaurants = meal_restaurants[meal_restaurants[valid_cuisines].sum(axis=1) > 0]
 
