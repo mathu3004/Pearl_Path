@@ -1,28 +1,14 @@
-# Pearl Path Chatbot
+# Pearl Path – Travel Itinerary Generator
+Pearl Path is an AI-powered travel planning platform designed to generate highly personalized and flexible travel itineraries based on user preferences. Whether users are planning a multi-day trip or looking for nearby recommendations, Pearl Path offers intelligent suggestions for hotels, restaurants, and attractions using machine learning models, clustering techniques, and real-time filtering.
 
-## Overview
-Pearl Path Chatbot is a web application that provides a chatbot interface for users to get information about travel destinations, recommendations for hotels and restaurants, and emergency assistance. The chatbot is named Pearlie and is designed to assist users with planning their trips.
+The platform consists of two main itinerary generation modes:
 
-## Features
-- **Emergency Assistance**: Provides information about nearby hospitals, police stations, embassies, and immediate medical support.
-- **Information Hub**: Offers detailed information about attractions in Kandy, Nuwara Eliya, Ella, and Colombo.
-- **User-Provider Connection**: Fetches specific details like contact information, email, price, location, amenities, etc., for hotels and restaurants.
-- **Recommendations**: Suggests hotels, restaurants, and attractions based on user preferences.
-- **Chatbot Information**: Provides information about the chatbot and the trip itinerary application.
+  - With Radius Filtering: Ensures all recommended places are geographically feasible and activity-balanced.
+  - Without Radius Filtering: Uses content-based and collaborative filtering to provide personalized plans based on interests and preferences, without proximity constraints.
 
-## Tech Stack
-- **Frontend**: React
-- **Backend**: Flask
-- **Database**: MongoDB
-- **Model**: Google's Gemini LLM (LangChain)
-- **Web Search**: Serper API
+Additionally, Pearl Path features an integrated chatbot assistant (Pearlie) that helps users find emergency information, destination details, and place recommendations—all through natural conversation.
 
-## How It Works
-- **Emergency Assistance**: The chatbot identifies emergency-related queries and provides relevant information using web search results.
-- **Information Hub**: The chatbot fetches detailed information about attractions using web search results.
-- **User-Provider Connection**: The chatbot retrieves specific details about hotels and restaurants from MongoDB and provides structured responses.
-- **Recommendations**: The chatbot suggests hotels, restaurants, and attractions based on user preferences using web search results.
-- **Chatbot Information**: The chatbot provides information about itself and the trip itinerary application.
+Built with a modular architecture and a modern tech stack (React, Flask, MongoDB, scikit-learn, OpenStreetMap), Pearl Path ensures a seamless and intelligent trip planning experience from start to finish.
 
 # Travel Itinerary Generator with Radius
 This component of Pearl Path is an intelligent travel itinerary planner that generates personalized trip plans for users based on a geographic radius. It leverages clustering and filtering techniques to recommend attractions, hotels, and restaurants within a specified distance from the user’s chosen destination. The model ensures that the recommended places not only match user preferences like cuisine, dietary requirements, and activity interests but are also geographically feasible by applying distance-based constraints. The final itinerary is visualized on an interactive map using OpenStreetMap for intuitive location tracking.
@@ -151,6 +137,32 @@ This component of Pearl Path is a machine learning-powered travel planning syste
     - Users can modify specific recommendations (restaurant, attraction) after itinerary generation
     - Users can delete individual restaurant, attraction or hotel recommendations
     - All destinations are plotted interactively on a map using OpenStreetMap and Leaflet
+
+# Pearl Path Chatbot
+
+## Overview
+Pearl Path Chatbot is a web application that provides a chatbot interface for users to get information about travel destinations, recommendations for hotels and restaurants, and emergency assistance. The chatbot is named Pearlie and is designed to assist users with planning their trips.
+
+## Features
+- **Emergency Assistance**: Provides information about nearby hospitals, police stations, embassies, and immediate medical support.
+- **Information Hub**: Offers detailed information about attractions in Kandy, Nuwara Eliya, Ella, and Colombo.
+- **User-Provider Connection**: Fetches specific details like contact information, email, price, location, amenities, etc., for hotels and restaurants.
+- **Recommendations**: Suggests hotels, restaurants, and attractions based on user preferences.
+- **Chatbot Information**: Provides information about the chatbot and the trip itinerary application.
+
+## Tech Stack
+- **Frontend**: React
+- **Backend**: Flask
+- **Database**: MongoDB
+- **Model**: Google's Gemini LLM (LangChain)
+- **Web Search**: Serper API
+
+## How It Works
+- **Emergency Assistance**: The chatbot identifies emergency-related queries and provides relevant information using web search results.
+- **Information Hub**: The chatbot fetches detailed information about attractions using web search results.
+- **User-Provider Connection**: The chatbot retrieves specific details about hotels and restaurants from MongoDB and provides structured responses.
+- **Recommendations**: The chatbot suggests hotels, restaurants, and attractions based on user preferences using web search results.
+- **Chatbot Information**: The chatbot provides information about itself and the trip itinerary application.
  
 # How to Run the Application (in GitHub Codespaces)
 
