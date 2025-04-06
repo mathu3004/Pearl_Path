@@ -57,7 +57,7 @@ itinerarySchema.index({ username: 1, name: 1 }, { unique: true });
 
 const Itinerary = mongoose.model('Itinerary', itinerarySchema);
 
-// Function to run Python scripts
+// Function to run Python scripts (used for preprocessing and itinerary generation)
 const runPythonScript = (scriptPath, args, callback) => {
     const fullPath = path.resolve(__dirname, scriptPath);
     const command = `python "${fullPath}" ${args.join(" ")}`;
@@ -76,7 +76,7 @@ const runPythonScript = (scriptPath, args, callback) => {
     });
     };
 
-// API Endpoint to Save Itinerary Data
+// 9. Endpoint: Save user itinerary form input and trigger backend scripts
 app.post('/api/itinerary', async (req, res) => {
     try {
         let {
@@ -144,6 +144,7 @@ runPythonScript("RadiusBasedGenerator.py", [username, name], (error) => {
     }
 });
 
+// 10. Endpoint: Fetch a generated itinerary by username and name
 app.get('/api/itineraries/:username/:name', async (req, res) => {
     try {
         const { username, name } = req.params;
@@ -169,6 +170,7 @@ app.get('/api/itineraries/:username/:name', async (req, res) => {
     }
 });
 
+// 11. Endpoint: Save itinerary to 'saved_itineraries' collection
 app.post('/api/save-itinerary', async (req, res) => {
   try {
     console.log("Incoming save request:", req.body);
@@ -220,6 +222,7 @@ app.post('/api/save-itinerary', async (req, res) => {
 });
 
 
+// 12. Endpoint: Save an edited itinerary back to MongoDB
   app.post('/api/save-edited-itinerary', async (req, res) => {
     try {
       const { username, name, itinerary } = req.body;
@@ -236,7 +239,7 @@ app.post('/api/save-itinerary', async (req, res) => {
     }
   });
   
-  //For ModifyRequest.js
+  //For ModifyRequest.js point: Get all itineraries for a specific user (used in ModifyRequest.js)
   app.get('/api/user-itineraries/:username', async (req, res) => {
     try {
       const { username } = req.params;
@@ -252,7 +255,8 @@ app.post('/api/save-itinerary', async (req, res) => {
   });
   
 
-// New API Endpoint to Fetch a Specific Itinerary by Name or ID
+
+// 14. Endpoint: Fetch raw user-submitted itinerary input by itinerary name (for debugging)
 app.get('/api/itinerary/:name', async (req, res) => {
     try {
         const name = req.params.name.toLowerCase(); // Normalize casing
@@ -269,4 +273,5 @@ app.get('/api/itinerary/:name', async (req, res) => {
     }
 });
 
+// 15. Start the Express server
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));

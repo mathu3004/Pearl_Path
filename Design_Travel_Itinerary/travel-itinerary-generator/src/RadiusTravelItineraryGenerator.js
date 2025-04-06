@@ -1,4 +1,5 @@
 // TravelItineraryGenerator.js
+// Import necessary dependencies and components
 import React, { useState, useContext, useEffect } from 'react';
 import Layout from './components/Layout';
 import { useNavigate } from 'react-router-dom';
@@ -13,14 +14,15 @@ import {
   FaTrain,
   FaShuttleVan,
 } from 'react-icons/fa';
-import { AuthContext } from './context/auth.context'; // Import AuthContext
+import { AuthContext } from './context/auth.context'; // AuthContext provides the fetchProfile method
 import './TravelItineraryRadius.css';
 
+// Main component for travel itinerary generation
 const TravelItineraryGenerator = () => {
-  const { fetchProfile } = useContext(AuthContext);
-  const navigate = useNavigate();
+  const { fetchProfile } = useContext(AuthContext); // Auth context for user profile
+  const navigate = useNavigate(); // Hook for navigation
 
-  // Initialize username as empty; we'll set it after fetching the profile
+  // Initialize form data state
   const [formData, setFormData] = useState({
     username: '',
     name: '',
@@ -36,9 +38,10 @@ const TravelItineraryGenerator = () => {
     peopleCount: '',
   });
 
+  // Form validation errors
   const [errors, setErrors] = useState({});
 
-  // 1. Fetch the current user's username on mount
+  // Fetch current logged-in user's username and update state
   useEffect(() => {
     async function loadProfile() {
       try {
@@ -56,7 +59,7 @@ const TravelItineraryGenerator = () => {
     loadProfile();
   }, [fetchProfile]);
 
-  // 2. Field-level validation
+  // Individual field-level validation
   const validateField = (name, value) => {
     let error = '';
 
@@ -96,7 +99,7 @@ const TravelItineraryGenerator = () => {
     }));
   };
 
-  // 3. Handle form input changes
+  // Handle form input changes and update state accordingly
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
 
@@ -123,7 +126,7 @@ const TravelItineraryGenerator = () => {
     });
   };
 
-  // 4. Validate entire form
+  // Validate the entire form before submission
   const validateForm = () => {
     let isValid = true;
     let newErrors = {};
@@ -210,7 +213,7 @@ const TravelItineraryGenerator = () => {
     return isValid;
   };
 
-  // 5. Submit form
+   // Submit form to backend and handle response
   const handleSubmit = async (e) => {
     e.preventDefault();
     console.log('Form Data Before Sending:', formData);
@@ -223,7 +226,7 @@ const TravelItineraryGenerator = () => {
     }
 
     try {
-      // Send form data to the backend
+      // POST itinerary data to server
       const response = await fetch('http://localhost:5003/api/itinerary', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -274,6 +277,7 @@ const TravelItineraryGenerator = () => {
     }
   };
 
+  // JSX structure and form rendering
   return (
     <div className="main">
       <div className="page-container" id="travel-itinerary-generator">

@@ -8,23 +8,23 @@ const path = require('path');
 const app = express();
 const PORT = process.env.PORT || 5001;
 
-// ✅ Define corsOptions first
+//  Define corsOptions first
 const corsOptions = {
     origin: '*',
     methods: 'GET, POST, PUT, DELETE, OPTIONS',
     allowedHeaders: 'Content-Type, Authorization',
 };
 
-// ✅ Apply middleware
+//  Apply middleware
 app.use(cors(corsOptions));
 app.use(express.json());
 
-// ✅ Connect to MongoDB
+//  Connect to MongoDB
 mongoose.connect(process.env.MONGO_URI, {
     dbName: "itinerary_recommendations",
 })
-.then(() => console.log("✅ MongoDB Connected"))
-.catch(err => console.error("❌ MongoDB Connection Error:", err));
+.then(() => console.log(" MongoDB Connected"))
+.catch(err => console.error(" MongoDB Connection Error:", err));
 
 // Define Itinerary Schema
 const itinerarySchema = new mongoose.Schema({
@@ -39,26 +39,26 @@ const itinerarySchema = new mongoose.Schema({
     transportationMode: { type: [String], required: true },
     numberOfDays: { type: Number, required: true },
     peopleCount: { type: String, required: true }
-}, { timestamps: true, collection: "UserInputs" }); // ✅ Changed collection name
+}, { timestamps: true, collection: "UserInputs" }); //  Changed collection name
 
-// ✅ Ensure (username, name) is unique
+//  Ensure (username, name) is unique
 itinerarySchema.index({ username: 1, itineraryName: 1 }, { unique: true });
 
-const Itinerary = mongoose.model('UserInputs', itinerarySchema); // ✅ Updated model reference
+const Itinerary = mongoose.model('UserInputs', itinerarySchema); //  Updated model reference
 
 // Function to run Python scripts
 const runPythonScript = (scriptPath, args, callback) => {
     const fullPath = path.resolve(__dirname, scriptPath);
-    const command = `python3 "${fullPath}" ${args.join(" ")}`;  // 🔁 Use python3 instead of python
+    const command = `python3 "${fullPath}" ${args.join(" ")}`;  //  Use python3 instead of python
     console.log(`📌 EXECUTING: ${command}`);
 
     exec(command, (error, stdout, stderr) => {
         if (error) {
-            console.error(`❌ Python Script Error: ${error.message}`);
+            console.error(` Python Script Error: ${error.message}`);
             return callback(new Error("Preprocessing script execution failed."));
         }
         if (stderr) console.error(`⚠️ Python Warning: ${stderr}`);
-        console.log(`✅ Python Script Output: ${stdout}`);
+        console.log(` Python Script Output: ${stdout}`);
         callback(null, stdout);
     });
 };
@@ -90,21 +90,21 @@ app.post('/api/itinerary', async (req, res) => {
             return res.status(400).json({ error: "All fields are required." });
         }
 
-        // ✅ Trim and convert to lowercase for case-insensitive matching
+        //  Trim and convert to lowercase for case-insensitive matching
         username = username.trim().toLowerCase();
         itineraryName = itineraryName.trim().toLowerCase();
 
         console.log("📌 Checking for existing itinerary:", { username, itineraryName });
 
-        // ✅ Check if the itinerary already exists for this user
+        //  Check if the itinerary already exists for this user
         const existingItinerary = await Itinerary.findOne({ username, itineraryName });
 
         if (existingItinerary) {
-            console.log("❌ Error: Itinerary name already exists for this user.");
+            console.log(" Error: Itinerary name already exists for this user.");
             return res.status(400).json({ error: "Itinerary name must be unique for each user." });
         }
 
-        // ✅ Create a new itinerary if it doesn't exist
+        //  Create a new itinerary if it doesn't exist
         try {
             const newItinerary = new Itinerary({
                 username, itineraryName, startingDestination, destinations, 
@@ -113,11 +113,11 @@ app.post('/api/itinerary', async (req, res) => {
             });
         
             const savedItinerary = await newItinerary.save();
-            console.log("✅ Itinerary saved successfully!", savedItinerary);
-            res.status(201).json({ message: "✅ Itinerary saved successfully!" });
+            console.log(" Itinerary saved successfully!", savedItinerary);
+            res.status(201).json({ message: " Itinerary saved successfully!" });
         
         } catch (error) {
-            console.error("❌ MongoDB Save Error:", error);
+            console.error(" MongoDB Save Error:", error);
             res.status(500).json({ 
                 error: "Failed to save itinerary.", 
                 details: error.message 
@@ -127,23 +127,23 @@ app.post('/api/itinerary', async (req, res) => {
         // Run Preprocessing and Itinerary Generation in Sequence
         runPythonScript("input_preprocessing.py", [username, itineraryName], (error) => {
             if (error) {
-                console.error("❌ ERROR: Preprocessing failed.");
+                console.error(" ERROR: Preprocessing failed.");
                 return;
             }
-            console.log("✅ SUCCESS (backend/input_preprocessing.py): Preprocessing done!");
+            console.log(" SUCCESS (backend/input_preprocessing.py): Preprocessing done!");
         
-            // ✅ Corrected Execution of app.py
+            //  Corrected Execution of app.py
             runPythonScript("app.py", [username, itineraryName], (appError) => {
                 if (appError) {
-                    console.error("❌ ERROR: Itinerary generation failed.");
+                    console.error(" ERROR: Itinerary generation failed.");
                     return;
                 }
-                console.log("✅ SUCCESS (backend/app.py): Itinerary Generated!");
+                console.log(" SUCCESS (backend/app.py): Itinerary Generated!");
             });
         });
         
     } catch (err) {
-        console.error("❌ Error during processing:", err);
+        console.error(" Error during processing:", err);
         res.status(500).json({ error: "Processing failed.", details: err.message });
     }
 });
@@ -154,7 +154,7 @@ app.post('/api/itinerary', async (req, res) => {
 const GeneratedItinerary = mongoose.model(
     'GeneratedItinerary',
     new mongoose.Schema({}, { strict: false }),
-    'GeneratedItineraries'  // 👈 use exact MongoDB collection name
+    'GeneratedItineraries'  //  use exact MongoDB collection name
   );
   
 
@@ -166,15 +166,15 @@ app.get('/api/itinerary/:username/:itinerary_name', async (req, res) => {
         const itinerary = await GeneratedItinerary.findOne({ username, itineraryName });
 
         if (!itinerary) {
-            return res.status(404).json({ message: "❌ Itinerary not found." });
+            return res.status(404).json({ message: " Itinerary not found." });
         }
 
         res.json(itinerary);
     } catch (err) {
-        console.error("❌ Error fetching generated itinerary:", err);
-        res.status(500).json({ message: "❌ Server error", error: err.message });
+        console.error(" Error fetching generated itinerary:", err);
+        res.status(500).json({ message: " Server error", error: err.message });
     }
 });
 
 
-app.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));
+app.listen(PORT, () => console.log(` Server running on port ${PORT}`));

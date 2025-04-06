@@ -115,11 +115,11 @@ app.post('/api/itinerary', async (req, res) => {
             });
         
             const savedItinerary = await newItinerary.save();
-            console.log("✅ Itinerary saved successfully!", savedItinerary);
-            res.status(201).json({ message: "✅ Itinerary saved successfully!" });
+            console.log(" Itinerary saved successfully!", savedItinerary);
+            res.status(201).json({ message: " Itinerary saved successfully!" });
         
         } catch (error) {
-            console.error("❌ MongoDB Save Error:", error);
+            console.error(" MongoDB Save Error:", error);
             res.status(500).json({ 
                 error: "Failed to save itinerary.", 
                 details: error.message 
@@ -129,23 +129,23 @@ app.post('/api/itinerary', async (req, res) => {
         // Run Preprocessing and Itinerary Generation in Sequence
         runPythonScript("input_preprocessing.py", [username, itineraryName], (error) => {
             if (error) {
-                console.error("❌ ERROR: Preprocessing failed.");
+                console.error(" ERROR: Preprocessing failed.");
                 return;
             }
-            console.log("✅ SUCCESS (backend/input_preprocessing.py): Preprocessing done!");
+            console.log(" SUCCESS (backend/input_preprocessing.py): Preprocessing done!");
         
-            // ✅ Corrected Execution of Itineraryapp.py
+            //  Corrected Execution of Itineraryapp.py
             runPythonScript("Itineraryapp.py", [username, itineraryName], (appError) => {
                 if (appError) {
-                    console.error("❌ ERROR: Itinerary generation failed.");
+                    console.error(" ERROR: Itinerary generation failed.");
                     return;
                 }
-                console.log("✅ SUCCESS (backend/Itineraryapp.py): Itinerary Generated!");
+                console.log(" SUCCESS (backend/Itineraryapp.py): Itinerary Generated!");
             });
         });
         
     } catch (err) {
-        console.error("❌ Error during processing:", err);
+        console.error(" Error during processing:", err);
         res.status(500).json({ error: "Processing failed.", details: err.message });
     }
 });
@@ -156,7 +156,7 @@ app.post('/api/itinerary', async (req, res) => {
 const GeneratedItinerary = mongoose.model(
     'GeneratedItinerary',
     new mongoose.Schema({}, { strict: false }),
-    'GeneratedItineraries'  // 👈 use exact MongoDB collection name
+    'GeneratedItineraries'  //  use exact MongoDB collection name
   );
   
 
@@ -168,13 +168,13 @@ app.get('/api/itinerary/:username/:itinerary_name', async (req, res) => {
         const itinerary = await GeneratedItinerary.findOne({ username, itineraryName });
 
         if (!itinerary) {
-            return res.status(404).json({ message: "❌ Itinerary not found." });
+            return res.status(404).json({ message: " Itinerary not found." });
         }
 
         res.json(itinerary);
     } catch (err) {
-        console.error("❌ Error fetching generated itinerary:", err);
-        res.status(500).json({ message: "❌ Server error", error: err.message });
+        console.error(" Error fetching generated itinerary:", err);
+        res.status(500).json({ message: " Server error", error: err.message });
     }
 });
 
@@ -188,7 +188,7 @@ app.post('/api/change-recommendation', async (req, res) => {
 
     runPythonScript("change_recommendation.py", args, (err, stdout) => {
         if (err) {
-            console.error("❌ Python script error in /change-recommendation:", err);
+            console.error(" Python script error in /change-recommendation:", err);
             return res.status(500).json({ error: "Change recommendation failed." });
         }
 
@@ -196,14 +196,14 @@ app.post('/api/change-recommendation', async (req, res) => {
             const result = JSON.parse(stdout);
             res.json(result);
         } catch (parseError) {
-            console.error("❌ Failed to parse Python response:", parseError);
+            console.error(" Failed to parse Python response:", parseError);
             res.status(500).json({ error: "Invalid response from Python script." });
         }
     });
 });
 
   
-// ✅ Route: PUT /api/save-updated-itinerary
+//  Route: PUT /api/save-updated-itinerary
 app.put('/api/save-updated-itinerary', async (req, res) => {
     const { username, itineraryName, days } = req.body;
     if (!username || !itineraryName || !Array.isArray(days)) {
@@ -221,9 +221,9 @@ app.put('/api/save-updated-itinerary', async (req, res) => {
             return res.status(404).json({ error: "Itinerary not found" });
         }
 
-        res.json({ message: "✅ Itinerary updated!", updated: result });
+        res.json({ message: " Itinerary updated!", updated: result });
     } catch (err) {
-        console.error("❌ Failed to update itinerary:", err);
+        console.error(" Failed to update itinerary:", err);
         res.status(500).json({ error: "Server error", message: err.message });
     }
 });
@@ -243,7 +243,7 @@ app.get('/api/user-itineraries/:username', async (req, res) => {
   });  
   
   app.post('/api/save-itinerary-to-saved', async (req, res) => {
-    console.log("📥 Received Save Request:", req.body);
+    console.log(" Received Save Request:", req.body);
   
     const { username, itineraryName } = req.body;
   
@@ -269,10 +269,10 @@ app.get('/api/user-itineraries/:username', async (req, res) => {
         return res.status(404).json({ error: "Generated itinerary not found." });
       }
   
-      // 🧹 Remove _id to avoid conflict on insert
+      //  Remove _id to avoid conflict on insert
       delete original._id;
   
-      // 💾 Upsert into SavedItineraries (insert or update)
+      //  Upsert into SavedItineraries (insert or update)
       await db.collection("SavedItineraries").updateOne(
         {
           username: lowerUsername,
@@ -290,12 +290,12 @@ app.get('/api/user-itineraries/:username', async (req, res) => {
         { upsert: true } // ← key part
       );
   
-      return res.status(200).json({ message: "✅ Itinerary saved or updated in favorites!" });
+      return res.status(200).json({ message: " Itinerary saved or updated in favorites!" });
   
     } catch (err) {
-      console.error("❌ Failed to save/update itinerary:", err);
+      console.error(" Failed to save/update itinerary:", err);
       return res.status(500).json({ error: "Server error", details: err.message });
     }
   });  
       
-app.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));
+app.listen(PORT, () => console.log(` Server running on port ${PORT}`));

@@ -161,10 +161,10 @@ const VisualizationItinerary = () => {
         );
       }
   
-      alert("✅ Itinerary saved to your saved list!");
+      alert(" Itinerary saved to your saved list!");
     } catch (err) {
-      console.error("❌ Error saving itinerary:", err);
-      alert("❌ Failed to save itinerary: " + err.message);
+      console.error(" Error saving itinerary:", err);
+      alert(" Failed to save itinerary: " + err.message);
     }
   };
   

@@ -48,6 +48,7 @@ def check_mongo_connection():
 
 check_mongo_connection()
 
+# Basic route to check if the server is running
 @app.route('/')
 def home():
     return "Flask server is running!", 200
@@ -163,7 +164,9 @@ attractions_scaled = scaler.fit_transform(attractions[['rating', 'latitude', 'lo
 visited_restaurants = set()
 visited_attractions = set()
 
-# Allocate Days
+# Allocate number of days per destination based on score
+# Scoring uses counts of hotels + restaurants + attractions
+# Redistribution applies for poorly scored destinations
 def allocate_days_to_destinations(user, num_days):
     destinations = [
         col.replace("destination_", "").lower().replace(" ", "_") 
@@ -214,7 +217,7 @@ def allocate_days_to_destinations(user, num_days):
     remaining_days = num_days - sum(days_per_destination.values())
 
     # Step 2: Apply cap to poor destinations
-    MIN_SCORE_FOR_FLEX = 15  # You can tweak this threshold
+    MIN_SCORE_FOR_FLEX = 15
     max_per_poor_dest = 2
 
     for dest, score in destination_scores.items():
@@ -237,7 +240,7 @@ def allocate_days_to_destinations(user, num_days):
 
     return days_per_destination
 
-
+# Nearby geospatial filter
 def get_nearby_options(lat, lon, options, max_distance_km):
     return sorted([
         (row, geodesic((lat, lon), (row['latitude'], row['longitude'])).km)
@@ -245,6 +248,7 @@ def get_nearby_options(lat, lon, options, max_distance_km):
         if geodesic((lat, lon), (row['latitude'], row['longitude'])).km <= max_distance_km
     ], key=lambda x: x[1])
 
+# Hotel Recommendation
 def assign_hotel_for_destination(user, destination):
     budget = user.get('hotelBudget', None)
     if budget is None:
@@ -581,6 +585,7 @@ def get_user_transport_modes(username, name):
 
     return transport_modes if transport_modes else ["walk"]
 
+# Adds transport mode for each day in the final itinerary
 def assign_transport_modes_to_itinerary(itinerary, transport_modes):
     updated_itinerary = {}
 
@@ -657,6 +662,7 @@ def generate_itinerary():
         print("Error in itinerary generation:", e)
         return jsonify({"error": str(e)}), 500
 
+# GET /api/itineraries/<username>/<name>: Retrieve itinerary by user and name
 @app.route('/api/itineraries/<username>/<name>', methods=['GET'])
 def get_itinerary_by_user_and_name(username, name):
     itinerary = db.generated_itineraries.find_one(
@@ -673,6 +679,7 @@ def get_itinerary_by_user_and_name(username, name):
     return jsonify(itinerary), 200
 
 # At the bottom of app.py
+# Allow running itinerary generation directly from command line
 if __name__ == '__main__':
     import sys
 

@@ -27,17 +27,17 @@ if len(sys.argv) < 3:
 username = sys.argv[1].strip().lower()
 itinerary_name = sys.argv[2].strip().lower()
 
-# ✅ Step 2: Load and Normalize Preprocessed User Data
+#  Step 2: Load and Normalize Preprocessed User Data
 user_input_record = db["PreUserInputs"].find_one({
     "username": username,
     "itineraryName": itinerary_name
 })
 
 if not user_input_record:
-    print("❌ Preprocessed user input not found.")
+    print(" Preprocessed user input not found.")
     sys.exit(1)
 
-# ✅ Step 3: Normalize and Rename Columns
+#  Step 3: Normalize and Rename Columns
 user_inputs_df = pd.DataFrame([user_input_record])
 rename_dict = {
     "destinations": "destination",
@@ -68,7 +68,7 @@ if 'Name' not in Attractions.columns:
     if name_like_cols:
         Attractions.rename(columns={name_like_cols[0]: 'Name'}, inplace=True)
     else:
-        print("❌ 'Name' column not found in Attractions data.")
+        print(" 'Name' column not found in Attractions data.")
         sys.exit(1)
 
 Attractions.columns = [col if col == 'Name' else col.replace(' ', '_') for col in Attractions.columns]
@@ -483,11 +483,11 @@ else:
     print("SVD failed, skipping attraction recommendation.")
 
 
-# ✅ Step 12: Generate and store itinerary to MongoDB
+#  Step 12: Generate and store itinerary to MongoDB
 
 GeneratedItineraries = db["GeneratedItineraries"]
 
-# ✅ Utility: Clean unserializable types for MongoDB
+#  Utility: Clean unserializable types for MongoDB
 def clean_for_mongo(obj):
     if isinstance(obj, dict):
         return {k: clean_for_mongo(v) for k, v in obj.items()}
@@ -665,24 +665,24 @@ for index, user in user_inputs_df.iterrows():
 
     cleaned_itinerary = clean_for_mongo(final_itinerary)
 
-    # ✅ Print output to logs for verification
+    #  Print output to logs for verification
     try:
-        print("🧾 FINAL GENERATED ITINERARY:")
+        print(" FINAL GENERATED ITINERARY:")
         print(json.dumps(cleaned_itinerary, indent=2))  # Log formatted output
     except Exception as e:
-        print(f"❌ Error printing itinerary JSON: {e}")
+        print(f" Error printing itinerary JSON: {e}")
         traceback.print_exc()
 
-    # ✅ Save to MongoDB
+    #  Save to MongoDB
     try:
         GeneratedItineraries.replace_one(
             {"username": user['username'], "itineraryName": user['itineraryName']},
             cleaned_itinerary,
             upsert=True
         )
-        print(f"✅ Itinerary saved to MongoDB for {user['username']} - {user['itineraryName']}")
+        print(f" Itinerary saved to MongoDB for {user['username']} - {user['itineraryName']}")
     except Exception as e:
-        print(f"❌ Error saving itinerary: {e}")
+        print(f" Error saving itinerary: {e}")
         traceback.print_exc()
 
-    print(f"✅ Itinerary saved to MongoDB for {user['username']} - {user['itineraryName']}")
+    print(f" Itinerary saved to MongoDB for {user['username']} - {user['itineraryName']}")

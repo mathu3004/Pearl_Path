@@ -1,4 +1,5 @@
 //Visual.js
+// === 1. Imports and Dependencies ===
 import React, { useState, useEffect, useRef } from "react";
 import { useParams } from "react-router-dom";
 import Layout from './components/Layout';
@@ -15,6 +16,7 @@ import Footer from './components/Footer';
 
 const TravelItinerary = () => {
   const navigate = useNavigate();
+  // State variables
   const [itineraries, setItineraries] = useState(null);
   const [loading, setLoading] = useState(true);
   const [locations, setLocations] = useState([]);
@@ -23,12 +25,14 @@ const TravelItinerary = () => {
   const scrollRefs = useRef([]);
   const itineraryRef = useRef();
 
+    // Detect radius or normal mode
   const { username, name } = useParams();
   const location = useLocation();
   const mode = location.pathname.includes("/visual-radius") ? "radius" : "normal";
   const lowerUsername = username ? username.toLowerCase() : null;
   const lowerName = name ? name.toLowerCase() : null;
 
+  // === 3. Export Itinerary as PDF ===
   const handleExportPDF = async () => {
     const element = itineraryRef.current;
     if (!element) return;
@@ -59,6 +63,7 @@ const TravelItinerary = () => {
     }
   };
 
+  // === 4. Save Itinerary to Favorites ===
   const handleSaveItinerary = async () => {
     try {
       const response = await axios.post("http://localhost:5003/api/save-itinerary", {
@@ -76,7 +81,8 @@ const TravelItinerary = () => {
       alert(" Failed to save itinerary. Check console.");
     }
   };  
- 
+
+ // === 5. Fetch Itinerary from Backend ===
   useEffect(() => {
     if (!lowerUsername || !lowerName) {
       console.warn("Username or name missing from URL params");
@@ -118,6 +124,8 @@ const TravelItinerary = () => {
   };  
         fetchItinerary();
       }, [lowerUsername, lowerName, mode]);
+
+      // === 6. Extract Marker Coordinates for Map ===
 
       useEffect(() => {
         const loadCoordinates = async () => {
@@ -161,11 +169,11 @@ const TravelItinerary = () => {
         loadCoordinates();
       }, [itineraries]);      
       
-
+ // === 7. Render Conditions ===
 if (loading) {
   return <p>Loading itineraries...</p>;
 }
-
+  // === 8. Render Component ===
 if (!itineraries || !itineraries.itinerary) {
   return <p>No itinerary found.</p>;
 }
@@ -266,6 +274,7 @@ return (
             })}
           </div>
         {/* Ensure map loads dynamically after data */}
+        {/* === Map Component with Markers === */}
         <div className="mapcontainer">
         <MapComponent
   locations={locations}
@@ -276,6 +285,7 @@ return (
 
         </div>
       </div>
+      {/* === Action Buttons === */}
       <div className="buttoncontainer hide-on-export">
         <button className="button" onClick={() => navigate(`/modify-radius/${lowerUsername}/${lowerName}`)}>Edit</button>
         <button className="button" onClick={handleSaveItinerary}>Save Itinerary</button>

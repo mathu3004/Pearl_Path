@@ -1,4 +1,4 @@
-# ✅ change_recommendation.py (final fully working version with replacements)
+#  change_recommendation.py (final fully working version with replacements)
 import pandas as pd
 import numpy as np
 import sys
@@ -132,7 +132,7 @@ def match_restaurants():
     df = df[df['addressobj_city'].str.lower() == city.lower()]
     df = df[~df['name'].isin(previous_names)]
     df = df[~df['name'].isin(same_day_meal_names)]
-    df = df[~df['name'].isin(all_restaurant_names)]  # 🆕 Exclude globally used restaurants
+    df = df[~df['name'].isin(all_restaurant_names)]  #  Exclude globally used restaurants
 
     if budget is not None:
         df['pricelevel_lkr'] = pd.to_numeric(df['pricelevel_lkr'], errors='coerce')
@@ -187,7 +187,7 @@ elif type_ == 'attraction' and extra:
         df = Attractions.copy()
         df = df[df['City'].str.lower() == city.lower()]
         df = df[~df['Name'].isin(previous_names)]
-        df = df[~df['Name'].isin(all_attraction_names)]  # ✅ also exclude all attractions
+        df = df[~df['Name'].isin(all_attraction_names)]  #  also exclude all attractions
         if budget is not None:
             df['Lowest_Price'] = pd.to_numeric(df['Lowest_Price'], errors='coerce')
             df = df[df['Lowest_Price'] <= budget]
@@ -232,7 +232,7 @@ def clean_for_json(obj):
     else:
         return obj
 
-# 🔁 Normalize keys for frontend compatibility (especially for Attractions)
+#  Normalize keys for frontend compatibility (especially for Attractions)
 if type_ == 'attraction' and new:
     key_mapping = {
         'Name': 'name',

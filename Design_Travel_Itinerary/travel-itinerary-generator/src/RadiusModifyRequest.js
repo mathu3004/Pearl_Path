@@ -7,6 +7,7 @@ import Footer from './components/Footer';
 import './TravelItineraryRadius.css';
 import { AuthContext } from './context/auth.context'; // Import AuthContext
 
+// === 2. Main Component: ModifyRequest ===
 const ModifyRequest = () => {
   const { fetchProfile } = useContext(AuthContext); // Get fetchProfile from context
   const [username, setUsername] = useState('');
@@ -14,7 +15,7 @@ const ModifyRequest = () => {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
-  // Fetch profile on mount
+  // === 3. On Component Mount: Fetch Logged-In User's Username ===
   useEffect(() => {
     async function loadProfile() {
       try {
@@ -29,6 +30,7 @@ const ModifyRequest = () => {
     loadProfile();
   }, [fetchProfile]);
 
+  // === 4. Handle Itinerary Fetch for Logged-In User ===
   const handleSearch = async () => {
     if (!username) {
       alert('Username is missing!');
@@ -49,10 +51,12 @@ const ModifyRequest = () => {
     }
   };
 
+  // === 5. Navigate to Modify Page on Click ===
   const handleNavigate = (itineraryName) => {
     navigate(`/modify-radius/${username.toLowerCase()}/${itineraryName.toLowerCase()}`);
   };
 
+  // === 6. Render Component ===
   return (
     <div className="main">
       <div className="editrequest-page-wrapper">
@@ -73,6 +77,7 @@ const ModifyRequest = () => {
         </div>
   
         {/* Itinerary Grid */}
+        {/* === Results Panel: Show Itinerary Buttons === */}
         {loading && <p>Loading...</p>}
         {itineraries.length > 0 && (
           <div className="editrequest-day">
@@ -92,6 +97,7 @@ const ModifyRequest = () => {
           </div>
         )}
 
+{/* === Message if No Itineraries Found === */}
         {!loading && itineraries.length === 0 && (
           <div className="editrequest-day">
             <p>No itineraries created yet.</p>

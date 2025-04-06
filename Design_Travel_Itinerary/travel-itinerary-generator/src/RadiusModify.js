@@ -7,12 +7,15 @@ import './TravelItineraryRadius.css';
 import Header from './components/Header';
 import Footer from './components/Footer';
 
+
+// === 2. Main Component: RadiusModify ===
 const RadiusModify = () => {
   const { username, name } = useParams();
   const navigate = useNavigate();
-  const [itinerary, setItinerary] = useState(null);
-  const [alternatives, setAlternatives] = useState({});
+  const [itinerary, setItinerary] = useState(null);       // Main itinerary
+  const [alternatives, setAlternatives] = useState({});   // Alternatives per day
 
+  // === 3. Fetch Itinerary and Alternatives on Mount ===
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -24,7 +27,7 @@ const RadiusModify = () => {
         const data = response.data;
         setItinerary(data);
 
-        // Load alternatives for all entries in parallel (mock example)
+         // Build alternative hotels, restaurants, and attractions for each day
         const fetchedAlternatives = {};
         for (const [dayKey, day] of Object.entries(data.itinerary)) {
           const parsedHotels = (day["Alternative Hotels"] || []).map((item) => {
@@ -53,6 +56,7 @@ const RadiusModify = () => {
     fetchData();
   }, [username, name]);
 
+  // === 4. Replace Handler (Hotel, Restaurant, Attraction) ===
   const handleReplace = (dayKey, type, indexOrKey, newItem) => {
     const updated = { ...itinerary };
     const updatedAlts = { ...alternatives };
@@ -118,6 +122,7 @@ const RadiusModify = () => {
     setAlternatives(updatedAlts);
   };  
   
+  // === 5. Remove an Item from the Itinerary ===
   const handleRemove = (dayKey, type, indexOrKey) => {
     const updated = { ...itinerary };
     if (type === 'Hotel') updated.itinerary[dayKey].Hotel = null;
@@ -126,6 +131,7 @@ const RadiusModify = () => {
     setItinerary(updated);
   };  
 
+  // === 6. Save the Updated Itinerary ===
   const handleSave = async () => {
     try {
       await axios.post(`http://localhost:5003/api/save-edited-itinerary`, {
@@ -141,20 +147,23 @@ const RadiusModify = () => {
     }
   };
 
+  // === 7. Show loading if itinerary not yet loaded ===
   if (!itinerary) return <div>Loading...</div>;
 
+  // === 8. Render the Modify Page ===
   return (
     <div className='main'>
     <div className="full-pagecontainer" id="radius-modify">
       <Header />
       <div className="editpage-wrapper">
+        {/* === Left Scrollable Panel === */}
         <div className="editleft-scrollable">
           <h2 className='TitleModify'>Modify {username.toUpperCase()}'s {name.toUpperCase()} Itinerary</h2>
           {Object.entries(itinerary.itinerary).map(([dayKey, day]) => (
             <div key={dayKey} className="editday">
               <h3 className='SubTitleModify'>{dayKey}</h3>
 
-              {/* Hotel */}
+              {/* === Hotel Section === */}
               <div>
                 <h4>Hotel</h4>
                 {day.Hotel ? (
@@ -171,7 +180,7 @@ const RadiusModify = () => {
               </div>
               </div>
 
-              {/* Restaurants */}
+              {/* === Restaurants Section === */}
               <div>
                 <h4>Restaurants</h4>
                 {Object.entries(day.Restaurants || {}).map(([meal, rest], idx) => (
@@ -189,7 +198,7 @@ const RadiusModify = () => {
                 ))}
               </div>
 
-              {/* Attractions */}
+              {/* === Attractions Section === */}
               <div>
                 <h4>Attractions</h4>
                 {day.Attractions?.map((att, idx) => (
@@ -210,6 +219,7 @@ const RadiusModify = () => {
           ))}
         </div>
   
+  {/* === Right Map Panel === */}
         <div className="editmap">
   <MapComponent
     locations={
@@ -243,6 +253,7 @@ const RadiusModify = () => {
 
 
       </div>
+       {/* === Save Button === */}
       <button className="savebutton" onClick={handleSave}>Save Changes</button>
 
       <Layout>

@@ -29,6 +29,8 @@ const blackIcon = new L.Icon({
   shadowSize: [41, 41]
 });
 
+// === 3. Utility: Sort Coordinates by Nearest Distance (Greedy Algorithm) ===
+// Ensures the path connects points in an optimized visual order
 const sortPathByProximity = (points) => {
   if (points.length <= 2) return points;
 
@@ -55,7 +57,7 @@ const sortPathByProximity = (points) => {
 };
 
 
-// Center and pan to selected location
+// === 4. Subcomponent: Fly and Pan to Selected Location ===
 const FlyToLocation = ({ activeLocation }) => {
   const map = useMap();
 
@@ -92,6 +94,7 @@ const getColorByMode = (mode) => {
   }
 };
 
+// Main MapComponent
 const MapComponent = ({ locations, activeLocation, transportModesPerDay }) => {
   const dayPolylines = [];
 
@@ -100,15 +103,18 @@ const MapComponent = ({ locations, activeLocation, transportModesPerDay }) => {
     const path = [];
     const mode = dayData.transportationMode || "walk"; // default mode
 
+    // Add hotel to path
     if (dayData?.Hotel) {
       path.push([dayData.Hotel.latitude, dayData.Hotel.longitude]);
     }
-
+    
+    // Add attractions
     dayData?.Attractions?.forEach(att => {
       if (att?.latitude && att?.longitude)
         path.push([att.latitude, att.longitude]);
     });
 
+    // Add restaurant locations
     const breakfast = dayData?.Restaurants?.breakfast;
     if (breakfast && breakfast.latitude && breakfast.longitude)
       path.push([breakfast.latitude, breakfast.longitude]);
